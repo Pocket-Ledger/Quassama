@@ -58,117 +58,139 @@ const LoginScreen = () => {
     // Add social login logic here
   };
 
+  const handleSignUp = () => {
+    console.log('Navigate to Sign Up');
+    // Add navigation to sign up screen here
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white ">
       <ScrollView
         className="login-container"
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header with Back Button */}
-        <View className="mb-8 flex-row items-center">
-          <TouchableOpacity className="h-10 w-10 items-center justify-center">
-            <Ionicons name="chevron-back" size={24} color="rgba(0, 0, 0, 0.7)" />
-          </TouchableOpacity>
-        </View>
 
-        <View className="login-content">
+        <View className="login-content relative">
           {/* Logo */}
-          <Logo />
+
+          <View className="absolute left-0 top-0 flex-row items-center ">
+            <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-[10px] border border-border-light">
+              <Ionicons name="chevron-back" size={24} color="rgba(0, 0, 0, 0.7)" />
+            </TouchableOpacity>
+          </View>
+          <View className="logo-container">
+            <Logo />
+          </View>
 
           {/* Title and Subtitle */}
-          <Text className="login-title">Login</Text>
-          <Text className="login-subtitle">
-            Please enter your email and password to enjoy the experience
-          </Text>
+          <View>
+            <Text className="login-title">Login</Text>
+            <Text className="login-subtitle">
+              Please enter your email and password to enjoy the experience
+            </Text>
+          </View>
 
           {/* Form */}
           <View className="form-container">
-            {/* Email Input */}
-            <View className="input-group">
-              <Text className="input-label">Email</Text>
-              <View className="input-container">
-                <Ionicons
-                  name="mail-outline"
-                  className={`input-icon ${errors.email ? 'input-icon-error' : ''}`}
-                />
-                <TextInput
-                  className={`input-field ${errors.email ? 'input-field-error' : ''}`}
-                  placeholder="John.doe@gmail.com"
-                  placeholderTextColor="rgba(0, 0, 0, 0.2)"
-                  value={email}
-                  onChangeText={(text) => {
-                    setEmail(text);
-                    if (errors.email) {
-                      setErrors((prev) => ({ ...prev, email: null }));
-                    }
-                  }}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-              </View>
-              {errors.email && <Text className="error-text">{errors.email}</Text>}
-            </View>
-
-            {/* Password Input */}
-            <View className="input-group">
-              <Text className="input-label">Password</Text>
-              <View className="input-container">
-                <Ionicons
-                  name="lock-closed-outline"
-                  className={`input-icon ${errors.password ? 'input-icon-error' : ''}`}
-                />
-                <TextInput
-                  className={`input-field ${errors.password ? 'input-field-error' : ''}`}
-                  placeholder="••••••••••••••••"
-                  placeholderTextColor="rgba(0, 0, 0, 0.2)"
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    if (errors.password) {
-                      setErrors((prev) => ({ ...prev, password: null }));
-                    }
-                  }}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                <TouchableOpacity
-                  className="password-toggle"
-                  onPress={() => setShowPassword(!showPassword)}>
+            <View className="gap-2">
+              <View className="input-group">
+                <Text className="input-label">Email</Text>
+                <View className="input-container">
                   <Ionicons
-                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                    name="mail-outline"
                     size={20}
-                    color="rgba(0, 0, 0, 0.2)"
+                    style={{
+                      position: 'absolute',
+                      left: 16,
+                      top: '50%',
+                      transform: [{ translateY: -10 }],
+                      color: errors.email ? 'red' : 'rgba(0, 0, 0, 0.2)',
+                      zIndex: 1,
+                    }}
                   />
-                </TouchableOpacity>
+                  <TextInput
+                    className={`input-field ${errors.email ? 'input-field-error' : ''}`}
+                    placeholder="John.doe@gmail.com"
+                    placeholderTextColor="rgba(0, 0, 0, 0.2)"
+                    value={email}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (errors.email) {
+                        setErrors((prev) => ({ ...prev, email: null }));
+                      }
+                    }}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                {errors.email && <Text className="error-text">{errors.email}</Text>}
               </View>
-              {errors.password && <Text className="error-text">{errors.password}</Text>}
+
+              <View className="input-group">
+                <Text className="input-label">Password</Text>
+                <View className="input-container">
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    style={{
+                      position: 'absolute',
+                      left: 16,
+                      top: '50%',
+                      transform: [{ translateY: -10 }],
+                      color: errors.password ? 'red' : 'rgba(0, 0, 0, 0.2)',
+                      zIndex: 1,
+                    }}
+                  />
+                  <TextInput
+                    className={`input-field ${errors.password ? 'input-field-error' : ''}`}
+                    placeholder="••••••••••••••••"
+                    placeholderTextColor="rgba(0, 0, 0, 0.2)"
+                    value={password}
+                    onChangeText={(text) => {
+                      setPassword(text);
+                      if (errors.password) {
+                        setErrors((prev) => ({ ...prev, password: null }));
+                      }
+                    }}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity
+                    className="password-toggle"
+                    onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons
+                      name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                      size={20}
+                      color="rgba(0, 0, 0, 0.2)"
+                    />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && <Text className="error-text">{errors.password}</Text>}
+              </View>
             </View>
 
-            {/* Forgot Password */}
             <TouchableOpacity>
               <Text className="forgot-password-link">Forget Password?</Text>
             </TouchableOpacity>
 
-            {/* Login Button */}
             <TouchableOpacity className="login-button" onPress={handleLogin} disabled={isLoading}>
               <Text className="login-button-text">{isLoading ? 'Logging in...' : 'Login'}</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Divider */}
           <View className="divider-container">
             <View className="divider-line" />
             <Text className="divider-text">OR</Text>
             <View className="divider-line" />
           </View>
 
-          {/* Social Login Buttons */}
           <View className="w-full">
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Google')}>
               <Image
-                source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
+                source={require('../../assets/google.png')}
                 className="h-5 w-5"
                 resizeMode="contain"
               />
@@ -181,10 +203,10 @@ const LoginScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Sign Up Link */}
+          {/* Sign Up Link - UNCOMMENTED */}
           <View className="signup-container">
-            <Text className="signup-text">Didn't have an account?</Text>
-            <TouchableOpacity>
+            <Text className="signup-text">Didn't have an account? </Text>
+            <TouchableOpacity onPress={handleSignUp}>
               <Text className="signup-link">Sign Up</Text>
             </TouchableOpacity>
           </View>

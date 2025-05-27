@@ -1,3 +1,157 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Base Styles */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family:
+      'DM Sans',
+      system-ui,
+      -apple-system,
+      sans-serif;
+
+    background-color: #ffffff;
+  }
+}
+
+/* Custom Component Classes */
+@layer components {
+  /* Container Styles */
+  .login-container {
+    @apply flex-1 px-4 pb-8 pt-14;
+  }
+
+  .login-content {
+    @apply flex-1 items-start justify-center;
+  }
+
+  .logo-container {
+    @apply mb-4 flex w-full items-center justify-center;
+  }
+
+  .logo-circle {
+    @apply mb-4 h-16 w-16 items-center justify-center rounded-full bg-primary shadow-button;
+  }
+
+  .logo-inner-circle {
+    @apply h-12 w-12 items-center justify-center rounded-full bg-white;
+  }
+
+  /* Typography Styles */
+  .login-title {
+    @apply mb-2 text-center text-title text-text-primary;
+  }
+
+  .login-subtitle {
+    @apply mb-8 px-4 text-center text-subtitle text-text-secondary;
+  }
+
+  /* Form Styles */
+  .form-container {
+    @apply w-full;
+  }
+
+  .input-group {
+    @apply space-y-2;
+  }
+
+  .input-label {
+    @apply text-base text-label font-medium text-text-primary;
+  }
+
+  .input-container {
+    @apply relative;
+  }
+
+  .input-field {
+    @apply h-14 w-full rounded-input border border-border-light bg-white px-4 pl-12 text-body text-text-primary shadow-input placeholder:text-placeholder focus:border-primary focus:outline-none;
+  }
+
+  .input-field-error {
+    @apply border-error;
+  }
+
+  .input-icon {
+    @apply absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-border-light;
+  }
+
+  .input-icon-error {
+    @apply text-error;
+  }
+
+  .password-toggle {
+    @apply absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-border-light;
+  }
+
+  .error-text {
+    @apply mt-1 text-sm text-error;
+  }
+
+  /* Button Styles */
+  .forgot-password-link {
+    @apply my-2 text-right text-body font-medium text-primary;
+  }
+
+  .login-button {
+    @apply flex h-14 w-full items-center justify-center rounded-button bg-primary shadow-button;
+  }
+
+  .login-button-text {
+    @apply text-button text-white;
+  }
+
+  .login-button:disabled {
+    @apply bg-gray-300 shadow-none;
+  }
+
+  /* Divider Styles */
+  .divider-container {
+    @apply my-4 flex flex-row items-center;
+  }
+
+  .divider-line {
+    @apply h-px flex-1 bg-border-light;
+  }
+
+  .divider-text {
+    @apply px-4 text-label text-text-secondary;
+  }
+
+  /* Social Login Styles */
+  .social-button {
+    @apply mb-4 flex h-14 w-full flex-row items-center justify-center gap-4 space-x-3 rounded-input border border-border-light bg-white shadow-input;
+  }
+
+  .social-button-text {
+    @apply text-body font-medium text-text-primary;
+  }
+
+  /* Sign Up Link */
+  .signup-container {
+    @apply mt-4 w-full flex-row items-center justify-center;
+  }
+
+  .signup-text {
+    @apply text-center text-body text-text-secondary;
+  }
+
+  .signup-link {
+    @apply ml-1 text-body font-medium text-primary;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  .shadow-elevated {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .transition-all {
+    transition: all 0.2s ease-in-out;
+  }
+}
