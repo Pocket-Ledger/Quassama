@@ -9,9 +9,13 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // or react-native-vector-icons
-import Logo from 'components/Logo';
+import { Logo } from 'components/Logo';
+import { BackButton } from 'components/BackButton';
+import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -66,31 +70,24 @@ const LoginScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-white ">
       <ScrollView
-        className="login-container"
+        className="container"
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header with Back Button */}
 
-        <View className="login-content relative">
+        <View className="login-content relative ">
           {/* Logo */}
-
-          <View className="absolute left-0 top-0 flex-row items-center ">
-            <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-[10px] border border-border-light">
-              <Ionicons name="chevron-back" size={24} color="rgba(0, 0, 0, 0.7)" />
-            </TouchableOpacity>
-          </View>
+          <BackButton />
           <View className="logo-container">
             <Logo />
           </View>
-
           {/* Title and Subtitle */}
           <View>
-            <Text className="login-title">Login</Text>
-            <Text className="login-subtitle">
+            <Text className="title">Login</Text>
+            <Text className="subtitle">
               Please enter your email and password to enjoy the experience
             </Text>
           </View>
-
           {/* Form */}
           <View className="form-container">
             <View className="gap-4">
@@ -172,21 +169,19 @@ const LoginScreen = () => {
               </View>
             </View>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
               <Text className="forgot-password-link">Forget Password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="login-button" onPress={handleLogin} disabled={isLoading}>
-              <Text className="login-button-text">{isLoading ? 'Logging in...' : 'Login'}</Text>
+            <TouchableOpacity className="btn-primary" onPress={handleLogin} disabled={isLoading}>
+              <Text className="btn-primary-text">{isLoading ? 'Logging in...' : 'Login'}</Text>
             </TouchableOpacity>
           </View>
-
           <View className="divider-container">
             <View className="divider-line" />
             <Text className="divider-text">Or Continue with</Text>
             <View className="divider-line" />
           </View>
-
           <View className="flex w-full flex-row gap-4">
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Google')}>
               <Image
@@ -194,17 +189,18 @@ const LoginScreen = () => {
                 className="h-5 w-5"
                 resizeMode="contain"
               />
+              <Text className="text-label">Google</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Apple')}>
               <Ionicons name="logo-apple" size={20} color="#000000" />
+              <Text className="text-label">Apple</Text>
             </TouchableOpacity>
           </View>
-
           {/* Sign Up Link - UNCOMMENTED */}
           <View className="signup-container">
             <Text className="signup-text">Didn't have an account? </Text>
-            <TouchableOpacity onPress={handleSignUp}>
+            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text className="signup-link">Sign Up</Text>
             </TouchableOpacity>
           </View>

@@ -1,3 +1,5 @@
+import { green, red } from 'react-native-reanimated/lib/typescript/Colors';
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   // NOTE: Update this to include the paths to all of your component files.
@@ -6,6 +8,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        green: {
+          DEFAULT: '#34C759',
+          500: '#34C759',
+        },
+        gray: {
+          DEFAULT: '#00000040',
+          200: '#00000033',
+          250: '#00000040',
+        },
+        red: {
+          DEFAULT: '#ff3b30',
+          500: '#ff3b30',
+        },
         primary: {
           DEFAULT: '#2979FF',
           50: '#E3F2FD',
@@ -44,7 +59,7 @@ module.exports = {
         subtitle: ['16px', { lineHeight: '24px', fontWeight: '400' }],
         body: ['16px', { lineHeight: '24px', fontWeight: '400' }],
         label: ['16px', { lineHeight: '20px', fontWeight: '400' }],
-        button: ['16px', { lineHeight: '24px', fontWeight: '600' }],
+        button: ['16px', { lineHeight: '24px', fontWeight: '700' }],
       },
       spacing: {
         18: '72px',

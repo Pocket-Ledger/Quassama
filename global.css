@@ -22,7 +22,7 @@
 /* Custom Component Classes */
 @layer components {
   /* Container Styles */
-  .login-container {
+  .container {
     @apply flex-1 px-4 pb-8 pt-14;
   }
 
@@ -43,11 +43,11 @@
   }
 
   /* Typography Styles */
-  .login-title {
+  .title {
     @apply mb-2 text-center text-title text-text-primary;
   }
 
-  .login-subtitle {
+  .subtitle {
     @apply mb-8 px-4 text-center text-subtitle text-text-secondary;
   }
 
@@ -97,15 +97,15 @@
     @apply my-2 text-right text-body font-medium text-primary;
   }
 
-  .login-button {
+  .btn-primary {
     @apply flex h-14 w-full items-center justify-center rounded-button bg-primary shadow-button;
   }
 
-  .login-button-text {
+  .btn-primary-text {
     @apply text-button text-white;
   }
 
-  .login-button:disabled {
+  .btn-primary:disabled {
     @apply bg-gray-300 shadow-none;
   }
 

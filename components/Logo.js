@@ -2,14 +2,24 @@
 import React from 'react';
 import { Image } from 'react-native';
 
-const Logo = ({ width = 200, height = 200 }) => {
+export const Logo = ({ width, height }) => {
   return (
     <Image
       source={require('../assets/logo-icon.png')}
       resizeMode="fill"
-      className="h-[96px] w-[87px]"
+      className={`
+        ${width ? `w-[${width}px]` : 'w-[87px]'}
+        ${height ? `h-[${height}px]` : 'h-[96px]'}
+      `}
     />
   );
 };
-
-export default Logo;
+export const SmallLogo = ({ width, height }) => {
+  return (
+    <Image
+      source={require('../assets/logo-icon-small.png')}
+      resizeMode="fill"
+      className="h-[47px] w-[43px]"
+    />
+  );
+};
