@@ -93,7 +93,7 @@ const LoginScreen = () => {
 
           {/* Form */}
           <View className="form-container">
-            <View className="gap-2">
+            <View className="gap-4">
               <View className="input-group">
                 <Text className="input-label">Email</Text>
                 <View className="input-container">
@@ -183,23 +183,21 @@ const LoginScreen = () => {
 
           <View className="divider-container">
             <View className="divider-line" />
-            <Text className="divider-text">OR</Text>
+            <Text className="divider-text">Or Continue with</Text>
             <View className="divider-line" />
           </View>
 
-          <View className="w-full">
+          <View className="flex w-full flex-row gap-4">
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Google')}>
               <Image
                 source={require('../../assets/google.png')}
                 className="h-5 w-5"
                 resizeMode="contain"
               />
-              <Text className="social-button-text">Continue with Google</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Apple')}>
               <Ionicons name="logo-apple" size={20} color="#000000" />
-              <Text className="social-button-text">Continue with Apple</Text>
             </TouchableOpacity>
           </View>
 

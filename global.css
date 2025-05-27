@@ -57,11 +57,11 @@
   }
 
   .input-group {
-    @apply space-y-2;
+    @apply gap-2;
   }
 
   .input-label {
-    @apply text-base text-label font-medium text-text-primary;
+    @apply text-label text-text-primary;
   }
 
   .input-container {
@@ -124,7 +124,7 @@
 
   /* Social Login Styles */
   .social-button {
-    @apply mb-4 flex h-14 w-full flex-row items-center justify-center gap-4 space-x-3 rounded-input border border-border-light bg-white shadow-input;
+    @apply mb-4 flex h-14 flex-1 flex-row items-center justify-center gap-4 space-x-3 rounded-input border border-border-light bg-white shadow-input;
   }
 
   .social-button-text {
