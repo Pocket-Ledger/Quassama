@@ -14,8 +14,10 @@ module.exports = {
         },
         gray: {
           DEFAULT: '#00000040',
+          100: 'rgba(0, 0, 0, 0.1)',
           200: '#00000033',
           250: '#00000040',
+          500: 'rgba(0, 0, 0, 0.5)',
         },
         red: {
           DEFAULT: '#ff3b30',
@@ -68,6 +70,7 @@ module.exports = {
       borderRadius: {
         input: '8px',
         button: '8px',
+        md: '8px',
       },
       boxShadow: {
         input: '0 1px 3px rgba(0, 0, 0, 0.1)',
