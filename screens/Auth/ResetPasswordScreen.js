@@ -67,7 +67,7 @@ const ResetPasswordScreen = () => {
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="login-content relative">
+        <View className="relative ">
           {/* Header with Back Button */}
           <View className="absolute left-0 top-0 flex-row items-center">
             <TouchableOpacity
@@ -85,7 +85,7 @@ const ResetPasswordScreen = () => {
 
           {/* Form */}
           <View className="form-container">
-            <View className="gap-4">
+            <View className="gap-6">
               {/* New Password Input */}
               <View className="input-group">
                 <Text className="input-label">New Password</Text>
@@ -175,14 +175,13 @@ const ResetPasswordScreen = () => {
                   <Text className="error-text">{errors.confirmPassword}</Text>
                 )}
               </View>
+              <TouchableOpacity
+                className="btn-primary "
+                onPress={handleSavePassword}
+                disabled={isLoading}>
+                <Text className="btn-primary-text">{isLoading ? 'Saving...' : 'Save'}</Text>
+              </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              className="btn-primary mt-8"
-              onPress={handleSavePassword}
-              disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? 'Saving...' : 'Save'}</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

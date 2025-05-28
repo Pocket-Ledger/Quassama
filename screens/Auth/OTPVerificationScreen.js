@@ -113,7 +113,7 @@ const OTPVerificationScreen = () => {
             <SmallLogo />
           </View>
 
-          <View className="top-[107px]">
+          <View className="mt-16">
             {/* Title and Subtitle */}
             <View className="">
               <Text className="title">Enter Code</Text>
