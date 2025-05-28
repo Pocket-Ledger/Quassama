@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons'; // or react-native-vector-icons
 import { Logo } from 'components/Logo';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
+import Login from 'models/auth/Login';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -43,19 +44,21 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!validateForm()) return;
-
+  
     setIsLoading(true);
-    // Add your login logic here
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log('Login successful');
+      const loginInstance = new Login(email, password);
+      const userCredential = await loginInstance.login();
+      console.log('Login successful:', userCredential.user);
+      navigation.navigate('MainTabs');
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login failed:', error.message);
+      setErrors({ general: error.message });
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleSocialLogin = (provider) => {
     console.log(`Login with ${provider}`);

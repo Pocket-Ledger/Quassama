@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
+import Register from 'models/auth/Register';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -77,19 +78,23 @@ const RegisterScreen = () => {
 
   const handleRegister = async () => {
     if (!validateForm()) return;
-
+  
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log('Registration successful');
-      console.log('Remember me:', rememberMe);
+      const registerInstance = new Register(email, password, confirmPassword);
+      const userCredential = await registerInstance.register();
+  
+      console.log('Registration successful:', userCredential.user);
+  
+      navigation.navigate('MainTabs');
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('Registration error:', error.message);
+      setErrors({ general: error.message });
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleSocialLogin = (provider) => {
     console.log(`Register with ${provider}`);

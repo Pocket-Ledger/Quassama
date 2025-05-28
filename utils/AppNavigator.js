@@ -2,16 +2,17 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
-import ResetPasswordScreen from '../screens/Auth/ResetPasswordScreen';
+/* import ResetPasswordScreen from '../screens/Auth/ResetPasswordScreen'; */
 import OTPVerificationScreen from '../screens/Auth/OTPVerificationScreen';
 
 import { TabNavigator } from './TabNavigator';
+import { useAuth } from './AuthContext';
 
 const Stack = createNativeStackNavigator();
 
 function AppNavigator() {
-  //const { user } = useAuth();
-  const user = true;
+  const { user } = useAuth();
+  //const user = true;
   return (
     <Stack.Navigator
       screenOptions={{
@@ -25,9 +26,9 @@ function AppNavigator() {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgetPasswordScreen} />
+          {/* <Stack.Screen name="ForgotPassword" component={ForgetPasswordScreen} /> */}
           <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
-          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+          {/* <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} /> */}
         </>
       )}
     </Stack.Navigator>
