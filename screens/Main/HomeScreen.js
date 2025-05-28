@@ -126,10 +126,10 @@ const HomeScreen = () => {
           {recentActivity.map((item) => (
             <View
               key={item.id}
-              className="flex-row items-center justify-between border-b border-gray-100 py-3">
+              className="flex-row items-center justify-between border-gray-100 py-2">
               <View className="flex-1 flex-row items-center">
                 <View
-                  className="mr-3 h-10 w-10 items-center justify-center rounded-full"
+                  className="mr-3 h-[55px] w-[55px] items-center justify-center rounded-full"
                   style={{ backgroundColor: item.iconBg }}>
                   <Feather name={item.icon} size={20} color={item.iconColor} />
                 </View>
