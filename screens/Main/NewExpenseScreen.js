@@ -1,10 +1,190 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { BackButton } from 'components/BackButton';
+import { useNavigation } from '@react-navigation/native';
 
-export default function NewExpenseScreen() {
+const NewExpenseScreen = () => {
+  const navigation = useNavigation();
+
+  const [expenseName, setExpenseName] = useState('');
+  const [amount, setAmount] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [note, setNote] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const categories = [
+    { id: 'grocerie', name: 'Grocerie', icon: 'shopping-basket', color: '#2979FF' },
+    { id: 'internet', name: 'Internet', icon: 'wifi', color: '#2979FF' },
+    { id: 'cleaning', name: 'Cleaning', icon: 'check-circle', color: '#2979FF' },
+    { id: 'rent', name: 'Rent', icon: 'home', color: '#2979FF' },
+    { id: 'other', name: 'Other', icon: 'plus', color: '#2979FF' },
+  ];
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!expenseName.trim()) {
+      newErrors.expenseName = 'Expense name is required';
+    }
+
+    if (!amount.trim()) {
+      newErrors.amount = 'Amount is required';
+    } else if (isNaN(amount) || parseFloat(amount) <= 0) {
+      newErrors.amount = 'Please enter a valid amount';
+    }
+
+    if (!selectedCategory) {
+      newErrors.category = 'Please select a category';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleAddExpense = () => {
+    if (!validateForm()) return;
+
+    console.log('Adding expense:', {
+      name: expenseName,
+      amount: parseFloat(amount),
+      category: selectedCategory,
+      note: note.trim(),
+    });
+
+    // Navigate back or show success message
+    navigation.goBack();
+  };
+
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-2xl font-bold">New Expense Screen</Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView
+        className="container "
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Header */}
+        <View className="mb-6 flex flex-row items-center justify-start px-4 pb-4">
+          <BackButton />
+          <Text className="ml-12 mt-2 text-xl font-bold text-black ">Add New Expense</Text>
+        </View>
+
+        <View className="flex-1 gap-6 px-4">
+          {/* Expense Name */}
+          <View className="input-group ">
+            <Text className="input-label text-base font-medium text-black">Expense Name</Text>
+            <View className="input-container">
+              <TextInput
+                className={`input-field rounded-lg border  px-4 py-4 text-black ${
+                  errors.expenseName ? 'border-red-500' : 'border-gray-200'
+                }`}
+                placeholder="T9edia"
+                placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                value={expenseName}
+                onChangeText={(text) => {
+                  setExpenseName(text);
+                  if (errors.expenseName) {
+                    setErrors((prev) => ({ ...prev, expenseName: null }));
+                  }
+                }}
+                autoCapitalize="words"
+              />
+            </View>
+            {errors.expenseName && (
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.expenseName}</Text>
+            )}
+          </View>
+
+          {/* Amount */}
+          <View className="input-group ">
+            <Text className="input-label text-base font-medium text-black">Amount</Text>
+            <View className="input-container relative">
+              <TextInput
+                className={`input-field rounded-lg border  px-4 py-4 pr-16 text-black ${
+                  errors.amount ? 'border-red-500' : 'border-gray-200'
+                }`}
+                placeholder="250"
+                placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                value={amount}
+                onChangeText={(text) => {
+                  setAmount(text);
+                  if (errors.amount) {
+                    setErrors((prev) => ({ ...prev, amount: null }));
+                  }
+                }}
+                keyboardType="numeric"
+              />
+              <Text className="absolute right-4 top-4 text-base text-black">MAD</Text>
+            </View>
+            {errors.amount && (
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.amount}</Text>
+            )}
+          </View>
+
+          {/* Category */}
+          <View className="">
+            <Text className="input-label mb-3 text-base font-medium text-black">Category</Text>
+            <View className="flex-row flex-wrap justify-between gap-1">
+              {categories.map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  className={`h-78px w-[61px] items-center rounded-lg  p-1`}
+                  onPress={() => {
+                    setSelectedCategory(category.id);
+                    if (errors.category) {
+                      setErrors((prev) => ({ ...prev, category: null }));
+                    }
+                  }}>
+                  <View
+                    className={`mb-2 h-12 w-12 items-center justify-center rounded-full ${
+                      selectedCategory === category.id ? 'bg-primary-50' : 'bg-primary-50'
+                    }`}>
+                    <Feather
+                      name={category.icon === 'plus' ? 'plus' : category.icon}
+                      size={20}
+                      color={selectedCategory === category.id ? '#2979FF' : '#2979FF'}
+                    />
+                  </View>
+                  <Text
+                    className={`text-sm font-medium ${
+                      selectedCategory === category.id ? 'text-primary' : 'text-gray-600'
+                    }`}>
+                    {category.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {errors.category && (
+              <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
+            )}
+          </View>
+
+          {/* Note */}
+          <View className="">
+            <Text className="input-label text-base font-medium text-black">Note</Text>
+            <TextInput
+              className="input-field h-24 rounded-lg border border-gray-200 px-4 py-4 text-black"
+              placeholder="Add description here"
+              placeholderTextColor="rgba(0, 0, 0, 0.4)"
+              value={note}
+              onChangeText={setNote}
+              multiline
+              textAlignVertical="top"
+              autoCapitalize="sentences"
+            />
+          </View>
+
+          {/* Add Expense Button */}
+          <TouchableOpacity
+            className="btn-primary mb-8 rounded-lg bg-primary py-4"
+            onPress={handleAddExpense}>
+            <Text className="btn-primary-text text-center text-base font-semibold text-white">
+              Add Expense
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
-}
+};
+
+export default NewExpenseScreen;
