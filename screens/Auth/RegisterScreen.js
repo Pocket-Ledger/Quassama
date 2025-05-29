@@ -78,14 +78,14 @@ const RegisterScreen = () => {
 
   const handleRegister = async () => {
     if (!validateForm()) return;
-  
+
     setIsLoading(true);
     try {
       const registerInstance = new Register(email, password, confirmPassword);
       const userCredential = await registerInstance.register();
-  
+
       console.log('Registration successful:', userCredential.user);
-  
+
       navigation.navigate('MainTabs');
     } catch (error) {
       console.error('Registration error:', error.message);
@@ -94,7 +94,6 @@ const RegisterScreen = () => {
       setIsLoading(false);
     }
   };
-  
 
   const handleSocialLogin = (provider) => {
     console.log(`Register with ${provider}`);
@@ -206,7 +205,7 @@ const RegisterScreen = () => {
                       autoCorrect={false}
                     />
                     <TouchableOpacity
-                      className="password-toggle"
+                      className="password-toggle z-99"
                       onPress={() => setShowPassword(!showPassword)}>
                       <Ionicons
                         name={showPassword ? 'eye-outline' : 'eye-off-outline'}
@@ -239,7 +238,7 @@ const RegisterScreen = () => {
                       </View>
                       <View className="flex-row items-center">
                         <Ionicons name="checkmark" size={16} color="#00000040" />
-                        <Text className="text-gray-250 ml-2 text-sm">
+                        <Text className="ml-2 text-sm text-gray-250">
                           contain at least 8 characters
                         </Text>
                       </View>
@@ -279,7 +278,7 @@ const RegisterScreen = () => {
                       autoCorrect={false}
                     />
                     <TouchableOpacity
-                      className="password-toggle"
+                      className="password-toggle z-99"
                       onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                       <Ionicons
                         name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}

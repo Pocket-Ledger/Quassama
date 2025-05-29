@@ -44,7 +44,7 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!validateForm()) return;
-  
+
     setIsLoading(true);
     try {
       const loginInstance = new Login(email, password);
@@ -58,7 +58,6 @@ const LoginScreen = () => {
       setIsLoading(false);
     }
   };
-  
 
   const handleSocialLogin = (provider) => {
     console.log(`Login with ${provider}`);
@@ -159,7 +158,7 @@ const LoginScreen = () => {
                     autoCorrect={false}
                   />
                   <TouchableOpacity
-                    className="password-toggle"
+                    className="password-toggle z-99"
                     onPress={() => setShowPassword(!showPassword)}>
                     <Ionicons
                       name={showPassword ? 'eye-outline' : 'eye-off-outline'}
