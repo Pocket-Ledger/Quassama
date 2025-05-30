@@ -18,10 +18,15 @@ module.exports = {
           200: '#00000033',
           250: '#00000040',
           500: 'rgba(0, 0, 0, 0.5)',
+          900: '#374151',
         },
         red: {
           DEFAULT: '#ff3b30',
           500: '#ff3b30',
+        },
+        yellow: {
+          DEFAULT: '#FFCC00',
+          500: '#FFCC00',
         },
         primary: {
           DEFAULT: '#2979FF',

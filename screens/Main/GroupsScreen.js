@@ -81,19 +81,17 @@ const GroupsScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView
-        className="container"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}>
+      <View className="container ">
         {/* Header */}
-        <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
-          <View className="flex-row items-center">
-            <BackButton />
-            <Text className="ml-4 text-xl font-bold text-black">Groups</Text>
+
+        <View className="mb-6 flex flex-row items-center justify-start pb-4">
+          <BackButton />
+          <View className="w-full flex-row items-start justify-between ">
+            <Text className="ml-12 mt-2 text-xl font-bold text-black ">Groups</Text>
+            <TouchableOpacity className="h-12 w-12 items-center justify-center rounded-full bg-primary">
+              <Feather name="plus" size={24} color="white" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity className="h-12 w-12 items-center justify-center rounded-full bg-primary">
-            <Feather name="plus" size={24} color="white" />
-          </TouchableOpacity>
         </View>
 
         {/* Tabs */}
@@ -102,14 +100,11 @@ const GroupsScreen = () => {
             {tabs.map((tab, index) => (
               <TouchableOpacity
                 key={index}
-                className={`mr-4 rounded-full px-4 py-2 ${
-                  activeTab === tab ? 'bg-primary' : 'bg-gray-100'
+                className={`mr-4 rounded-[3px] border border-gray-100 px-4 py-2 ${
+                  activeTab === tab ? 'bg-primary' : 'bg-white'
                 }`}
                 onPress={() => handleTabPress(tab)}>
-                <Text
-                  className={`text-sm font-medium ${
-                    activeTab === tab ? 'text-white' : 'text-gray-600'
-                  }`}>
+                <Text className={`text-sm  ${activeTab === tab ? 'text-white' : 'text-gray-600'}`}>
                   {tab}
                 </Text>
               </TouchableOpacity>
@@ -117,63 +112,63 @@ const GroupsScreen = () => {
           </ScrollView>
         </View>
 
-        {/* Groups List */}
-        <View className="flex-1 px-4">
+        <ScrollView
+          className="flex-1 px-[10px]"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}>
+          {/* Groups List */}
           {groupsData.map((group) => (
             <TouchableOpacity
               key={group.id}
-              className="mb-4 flex-row items-center justify-between rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+              className="mb-4 h-[123px] flex-row items-center justify-between rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
               <View className="flex-1 flex-row items-center">
                 {/* Group Members */}
-                <View className="mr-4 flex-row">
-                  {group.members.map((member, index) => (
-                    <View
-                      key={index}
-                      className={`h-10 w-10 items-center justify-center rounded-full border-2 border-white ${
-                        index > 0 ? '-ml-2' : ''
-                      }`}
-                      style={{ backgroundColor: member.color }}>
-                      <Text className="text-sm font-bold text-white">{member.initial}</Text>
-                    </View>
-                  ))}
-                  {group.additionalMembers > 0 && (
-                    <View className="-ml-2 h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-300">
-                      <Text className="text-xs font-bold text-gray-600">
-                        +{group.additionalMembers}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* Group Info */}
-                <View className="flex-1">
-                  <Text className="text-base font-bold text-black">{group.name}</Text>
-                  <Text className="text-sm text-red-500">{group.amount}</Text>
+                <View className="h-full flex-1 justify-between">
+                  <Text className="text-[20px] font-medium text-black">{group.name}</Text>
+                  <View className="mr-4 flex-row">
+                    {group.members.map((member, index) => (
+                      <View
+                        key={index}
+                        className={`h-10 w-10 items-center justify-center rounded-full border-2 border-white ${
+                          index > 0 ? '-ml-2' : ''
+                        }`}
+                        style={{ backgroundColor: member.color }}>
+                        <Text className="text-sm font-bold text-white">{member.initial}</Text>
+                      </View>
+                    ))}
+                    {group.additionalMembers > 0 && (
+                      <View className="-ml-2 h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-300">
+                        <Text className="text-xs font-bold text-gray-600">
+                          +{group.additionalMembers}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text className="font-bold text-red-500">{group.amount}</Text>
                 </View>
               </View>
 
               {/* Right Side Info */}
-              <View className="flex-row items-center">
-                <View className="mr-3 items-end">
-                  <Text className="text-sm text-gray-500">
-                    {group.lastExpense} - {group.time}
-                  </Text>
-                </View>
-
+              <View className="h-full flex-col items-end justify-between">
                 <TouchableOpacity onPress={() => handleStarPress(group.id)}>
                   <Feather
                     name="star"
                     size={20}
-                    color={group.isStarred ? '#FFD700' : '#E5E5E5'}
-                    fill={group.isStarred ? '#FFD700' : 'none'}
+                    color={group.isStarred ? '#FFCC00' : '#E5E5E5'}
+                    fill={group.isStarred ? '#FFCC00' : 'none'}
                   />
                 </TouchableOpacity>
+                <View className="items-end">
+                  <Text className="text-gray-500">
+                    {group.lastExpense} - {group.time}
+                  </Text>
+                </View>
               </View>
             </TouchableOpacity>
           ))}
 
           {/* Invitation Card */}
-          <View className="mb-6 rounded-xl bg-blue-50 p-4">
+          <View className="my-6 rounded-xl bg-blue-50 p-4">
             <View className="flex-row items-center">
               <View
                 className="mr-3 h-12 w-12 items-center justify-center rounded-full"
@@ -199,12 +194,12 @@ const GroupsScreen = () => {
               <TouchableOpacity
                 className="flex-1 rounded-lg border border-gray-300 py-3"
                 onPress={handleDeclineInvitation}>
-                <Text className="text-center font-semibold text-gray-600">Decline</Text>
+                <Text className="text-center font-semibold text-gray-900">Decline</Text>
               </TouchableOpacity>
             </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
