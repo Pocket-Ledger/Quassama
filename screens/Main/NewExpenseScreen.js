@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
-import { BackButton } from 'components/BackButton';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Expense from "models/expense/Expense";
-import "firebase/compat/auth";
+import { BackButton } from 'components/BackButton';
+import CategorySelector from 'components/categories/CategorySelector';
+import { EXPENSE_CATEGORIES } from 'config/categoriesConfig';
+import Expense from 'models/expense/Expense';
+import 'firebase/compat/auth';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -15,14 +24,6 @@ const NewExpenseScreen = () => {
   const [note, setNote] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState({});
-
-  const categories = [
-    { id: 'shopping', name: 'Shopping', icon: 'shopping-cart', color: '#2979FF' },
-    { id: 'internet', name: 'Internet', icon: 'wifi', color: '#2979FF' },
-    { id: 'cleaning', name: 'Cleaning', icon: 'check-circle', color: '#2979FF' },
-    { id: 'rent', name: 'Rent', icon: 'home', color: '#2979FF' },
-    { id: 'other', name: 'Other', icon: 'plus', color: '#2979FF' },
-  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -45,25 +46,27 @@ const NewExpenseScreen = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategory(categoryId);
+    if (errors.category) {
+      setErrors((prev) => ({ ...prev, category: null }));
+    }
+  };
+
   const handleAddExpense = async () => {
     if (!validateForm()) return;
 
     setIsSaving(true);
     try {
-      const expense = new Expense(
-        expenseName.trim(),
-        amount.trim(),
-        selectedCategory,
-        note.trim()
-      );
+      const expense = new Expense(expenseName.trim(), amount.trim(), selectedCategory, note.trim());
 
       const newDocId = await expense.save();
 
-      Alert.alert("Success", "Expense saved successfully!");
+      Alert.alert('Success', 'Expense saved successfully!');
       navigation.goBack();
     } catch (error) {
-      console.error("Error saving expense:", error);
-      Alert.alert("Error", error.message || "Failed to save expense");
+      console.error('Error saving expense:', error);
+      Alert.alert('Error', error.message || 'Failed to save expense');
     } finally {
       setIsSaving(false);
     }
@@ -72,22 +75,22 @@ const NewExpenseScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
-        className="container "
+        className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header */}
         <View className="mb-6 flex flex-row items-center justify-start px-4 pb-4">
           <BackButton />
-          <Text className="ml-12 mt-2 text-xl font-bold text-black ">Add New Expense</Text>
+          <Text className="ml-12 mt-2 text-xl font-bold text-black">Add New Expense</Text>
         </View>
 
         <View className="flex-1 gap-6 px-4">
           {/* Expense Name */}
-          <View className="input-group ">
+          <View className="input-group">
             <Text className="input-label text-base font-medium text-black">Expense Name</Text>
             <View className="input-container">
               <TextInput
-                className={`input-field rounded-lg border  px-4 py-4 text-black ${
+                className={`input-field rounded-lg border px-4 py-4 text-black ${
                   errors.expenseName ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="T9edia"
@@ -108,11 +111,11 @@ const NewExpenseScreen = () => {
           </View>
 
           {/* Amount */}
-          <View className="input-group ">
+          <View className="input-group">
             <Text className="input-label text-base font-medium text-black">Amount</Text>
             <View className="input-container relative">
               <TextInput
-                className={`input-field rounded-lg border  px-4 py-4 pr-16 text-black ${
+                className={`input-field rounded-lg border px-4 py-4 pr-16 text-black ${
                   errors.amount ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="250"
@@ -133,43 +136,16 @@ const NewExpenseScreen = () => {
             )}
           </View>
 
-          {/* Category */}
-          <View className="">
-            <Text className="input-label mb-3 text-base font-medium text-black">Category</Text>
-            <View className="flex-row flex-wrap justify-between gap-1">
-              {categories.map((category) => (
-                <TouchableOpacity
-                  key={category.id}
-                  className={`h-78px w-[61px] items-center rounded-lg  p-1`}
-                  onPress={() => {
-                    setSelectedCategory(category.id);
-                    if (errors.category) {
-                      setErrors((prev) => ({ ...prev, category: null }));
-                    }
-                  }}>
-                  <View
-                    className={`mb-2 h-12 w-12 items-center justify-center rounded-full ${
-                      selectedCategory === category.id ? 'bg-primary-50' : 'bg-primary-50'
-                    }`}>
-                    <Feather
-                      name={category.icon === 'plus' ? 'plus' : category.icon}
-                      size={20}
-                      color={selectedCategory === category.id ? '#2979FF' : '#2979FF'}
-                    />
-                  </View>
-                  <Text
-                    className={`text-sm font-medium ${
-                      selectedCategory === category.id ? 'text-primary' : 'text-gray-600'
-                    }`}>
-                    {category.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            {errors.category && (
-              <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
-            )}
-          </View>
+          {/* Category Selector - Now using reusable component */}
+          <CategorySelector
+            categories={EXPENSE_CATEGORIES}
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+            title="Category"
+            error={errors.category}
+            size="medium"
+            layout="grid"
+          />
 
           {/* Note */}
           <View className="">
@@ -189,9 +165,10 @@ const NewExpenseScreen = () => {
           {/* Add Expense Button */}
           <TouchableOpacity
             className="btn-primary mb-8 rounded-lg bg-primary py-4"
-            onPress={handleAddExpense}>
+            onPress={handleAddExpense}
+            disabled={isSaving}>
             <Text className="btn-primary-text text-center text-base font-semibold text-white">
-              Add Expense
+              {isSaving ? 'Saving...' : 'Add Expense'}
             </Text>
           </TouchableOpacity>
         </View>
