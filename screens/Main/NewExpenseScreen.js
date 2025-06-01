@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
+import Expense from "models/expense/Expense";
+import "firebase/compat/auth";
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -11,10 +13,11 @@ const NewExpenseScreen = () => {
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [note, setNote] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
   const categories = [
-    { id: 'grocerie', name: 'Grocerie', icon: 'shopping-basket', color: '#2979FF' },
+    { id: 'shopping', name: 'Shopping', icon: 'shopping-cart', color: '#2979FF' },
     { id: 'internet', name: 'Internet', icon: 'wifi', color: '#2979FF' },
     { id: 'cleaning', name: 'Cleaning', icon: 'check-circle', color: '#2979FF' },
     { id: 'rent', name: 'Rent', icon: 'home', color: '#2979FF' },
@@ -42,18 +45,28 @@ const NewExpenseScreen = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleAddExpense = () => {
+  const handleAddExpense = async () => {
     if (!validateForm()) return;
 
-    console.log('Adding expense:', {
-      name: expenseName,
-      amount: parseFloat(amount),
-      category: selectedCategory,
-      note: note.trim(),
-    });
+    setIsSaving(true);
+    try {
+      const expense = new Expense(
+        expenseName.trim(),
+        amount.trim(),
+        selectedCategory,
+        note.trim()
+      );
 
-    // Navigate back or show success message
-    navigation.goBack();
+      const newDocId = await expense.save();
+
+      Alert.alert("Success", "Expense saved successfully!");
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error saving expense:", error);
+      Alert.alert("Error", error.message || "Failed to save expense");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
