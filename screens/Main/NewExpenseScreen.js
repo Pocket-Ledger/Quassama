@@ -86,11 +86,11 @@ const NewExpenseScreen = () => {
 
         <View className="flex-1 gap-6 px-4">
           {/* Expense Name */}
-          <View className="input-group">
+          <View className=" input-group">
             <Text className="input-label text-base font-medium text-black">Expense Name</Text>
             <View className="input-container">
               <TextInput
-                className={`input-field rounded-lg border px-4 py-4 text-black ${
+                className={`input-field rounded-lg border px-4  text-black  ${
                   errors.expenseName ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="T9edia"
@@ -115,7 +115,7 @@ const NewExpenseScreen = () => {
             <Text className="input-label text-base font-medium text-black">Amount</Text>
             <View className="input-container relative">
               <TextInput
-                className={`input-field rounded-lg border px-4 py-4 pr-16 text-black ${
+                className={`input-field rounded-lg border px-4  pr-16 text-black ${
                   errors.amount ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="250"
