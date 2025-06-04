@@ -5,7 +5,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 
 export function CustomTabBar({ state, descriptors, navigation }) {
   return (
-    <View className="shadow-box h-[66px] flex-row justify-between border-t border-gray-200 bg-white px-4 py-2">
+    <View className="h-[66px] flex-row justify-between border-t border-gray-200 bg-white px-4 py-2 shadow-box">
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label = options.tabBarLabel !== undefined ? options.tabBarLabel : route.name;
@@ -49,12 +49,12 @@ export function CustomTabBar({ state, descriptors, navigation }) {
               <Ionicons name={getIcon()} size={24} color={isFocused ? '#2979FF' : '#00000040'} />
               {route.name === 'Profile' && (
                 <View className="absolute -right-2 -top-1.5 h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
-                  <Text className="text-xs font-bold text-white">1</Text>
+                  <Text className="font-dmsans-bold text-xs text-white">1</Text>
                 </View>
               )}
             </View>
             <Text
-              className={`text-xs font-bold ${isFocused ? ' text-blue-500' : ' text-gray-250'}`}>
+              className={`font-dmsans-bold text-xs ${isFocused ? ' text-blue-500' : ' text-gray-250'}`}>
               {label}
             </Text>
           </TouchableOpacity>

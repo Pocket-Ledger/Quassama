@@ -67,7 +67,7 @@ const GroupDetailsScreen = () => {
         {/* Header */}
         <View className="mb-6 flex flex-row items-center justify-start pb-4">
           <BackButton />
-          <Text className="ml-12 mt-2 text-xl font-bold text-black">{groupData.name}</Text>
+          <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black">{groupData.name}</Text>
         </View>
 
         <ScrollView
@@ -105,7 +105,7 @@ const GroupDetailsScreen = () => {
                 <View
                   className="mb-2 h-12 w-12 items-center justify-center rounded-full"
                   style={{ backgroundColor: member.color }}>
-                  <Text className="text-base font-bold text-white">{member.initial}</Text>
+                  <Text className="font-dmsans-bold text-base text-white">{member.initial}</Text>
                 </View>
                 <Text className="mb-1 text-sm text-black/50">{member.name}</Text>
                 <Text

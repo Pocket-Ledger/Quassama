@@ -82,7 +82,7 @@ const AddNewGroupScreen = () => {
         {/* Header */}
         <View className="mb-6 flex flex-row items-center justify-start px-4 pb-4">
           <BackButton />
-          <Text className="ml-12 mt-2 text-xl font-bold text-black">Add New Group</Text>
+          <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black">Add New Group</Text>
         </View>
 
         <View className="flex-1 gap-6 ">
@@ -138,7 +138,7 @@ const AddNewGroupScreen = () => {
                     <View
                       className="h-16 w-16 items-center justify-center rounded-full"
                       style={{ backgroundColor: member.color }}>
-                      <Text className="text-lg font-bold text-white">{member.initial}</Text>
+                      <Text className="font-dmsans-bold text-lg text-white">{member.initial}</Text>
                     </View>
                     <TouchableOpacity
                       className="absolute -right-1 -top-1 h-6 w-6 items-center justify-center rounded-full bg-red-500"

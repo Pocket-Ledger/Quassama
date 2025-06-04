@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
-import Expense from "models/expense/Expense";
-import "firebase/compat/auth";
+import Expense from 'models/expense/Expense';
+import 'firebase/compat/auth';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -50,20 +58,15 @@ const NewExpenseScreen = () => {
 
     setIsSaving(true);
     try {
-      const expense = new Expense(
-        expenseName.trim(),
-        amount.trim(),
-        selectedCategory,
-        note.trim()
-      );
+      const expense = new Expense(expenseName.trim(), amount.trim(), selectedCategory, note.trim());
 
       const newDocId = await expense.save();
 
-      Alert.alert("Success", "Expense saved successfully!");
+      Alert.alert('Success', 'Expense saved successfully!');
       navigation.goBack();
     } catch (error) {
-      console.error("Error saving expense:", error);
-      Alert.alert("Error", error.message || "Failed to save expense");
+      console.error('Error saving expense:', error);
+      Alert.alert('Error', error.message || 'Failed to save expense');
     } finally {
       setIsSaving(false);
     }
@@ -78,7 +81,7 @@ const NewExpenseScreen = () => {
         {/* Header */}
         <View className="mb-6 flex flex-row items-center justify-start px-4 pb-4">
           <BackButton />
-          <Text className="ml-12 mt-2 text-xl font-bold text-black ">Add New Expense</Text>
+          <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black ">Add New Expense</Text>
         </View>
 
         <View className="flex-1 gap-6 px-4">

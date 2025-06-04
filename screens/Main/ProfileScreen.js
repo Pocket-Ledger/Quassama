@@ -79,11 +79,11 @@ const ProfileScreen = () => {
           <View
             className="mb-4 h-20 w-20 items-center justify-center rounded-full"
             style={{ backgroundColor: userProfile.color }}>
-            <Text className="text-2xl font-bold text-white">{userProfile.initial}</Text>
+            <Text className="font-dmsans-bold text-2xl text-white">{userProfile.initial}</Text>
           </View>
 
           {/* Profile Name and Email */}
-          <Text className="mb-2 text-xl font-bold text-black">{userProfile.name}</Text>
+          <Text className="mb-2 font-dmsans-bold text-xl text-black">{userProfile.name}</Text>
           <Text className="text-base text-gray-500">{userProfile.email}</Text>
         </View>
 

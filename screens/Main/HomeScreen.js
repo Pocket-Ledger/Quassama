@@ -58,11 +58,11 @@ const HomeScreen = () => {
       <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
         <View className="flex-row items-center">
           <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
-            <Text className="text-lg font-bold text-white">M</Text>
+            <Text className="font-dmsans-bold text-lg text-white">M</Text>
           </View>
           <View>
             <Text className="text-sm text-gray-500">Good morning 👋</Text>
-            <Text className="text-lg font-bold text-black">Essekhyry EL Mahdi</Text>
+            <Text className="font-dmsans-bold text-lg text-black">Essekhyry EL Mahdi</Text>
           </View>
         </View>
         <TouchableOpacity className="relative">
@@ -76,13 +76,13 @@ const HomeScreen = () => {
         <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
           <View className="mr-2 flex-1">
             <Text className="mb-1 text-lg font-medium text-gray-500">Owe You</Text>
-            <Text className="text-2xl font-bold text-error">
+            <Text className="font-dmsans-bold text-2xl text-error">
               2500 <Text className="text-sm">MAD</Text>
             </Text>
           </View>
           <View className="ml-2 flex-1">
             <Text className="mb-1 text-lg font-medium text-gray-500">You owed</Text>
-            <Text className="text-2xl font-bold text-green-500">
+            <Text className="font-dmsans-bold text-2xl text-green-500">
               2500 <Text className="text-sm">MAD</Text>
             </Text>
           </View>
@@ -161,7 +161,7 @@ const HomeScreen = () => {
                 <View
                   className="mb-2 h-12 w-12 items-center justify-center rounded-full"
                   style={{ backgroundColor: friend.color }}>
-                  <Text className="font-bold text-white">{friend.initial}</Text>
+                  <Text className="font-dmsans-bold text-white">{friend.initial}</Text>
                 </View>
                 <Text className="text-sm font-medium text-gray-500">{friend.name}</Text>
               </View>

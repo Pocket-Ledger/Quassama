@@ -5,8 +5,9 @@ import AppNavigator from 'utils/AppNavigator';
 import {
   useFonts,
   DMSans_400Regular,
-  DMSans_500Medium, // Fixed typo: was DMans_500Medium
+  DMSans_500Medium,
   DMSans_700Bold,
+  DMSans_600SemiBold,
 } from '@expo-google-fonts/dm-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -19,6 +20,7 @@ export default function App() {
     'DM Sans': DMSans_400Regular,
     'DM Sans Medium': DMSans_500Medium,
     'DM Sans Bold': DMSans_700Bold,
+    'DM Sans SemiBold': DMSans_600SemiBold,
   });
 
   useEffect(() => {

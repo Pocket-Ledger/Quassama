@@ -87,7 +87,7 @@ const GroupsScreen = () => {
         <View className="mb-6 flex flex-row items-center justify-start pb-4">
           <BackButton />
           <View className="w-full flex-row items-start justify-between ">
-            <Text className="ml-12 mt-2 text-xl font-bold text-black ">Groups</Text>
+            <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black ">Groups</Text>
             <TouchableOpacity className="h-12 w-12 items-center justify-center rounded-full bg-primary">
               <Feather name="plus" size={24} color="white" />
             </TouchableOpacity>
@@ -133,18 +133,20 @@ const GroupsScreen = () => {
                           index > 0 ? '-ml-2' : ''
                         }`}
                         style={{ backgroundColor: member.color }}>
-                        <Text className="text-sm font-bold text-white">{member.initial}</Text>
+                        <Text className="font-dmsans-bold text-sm text-white">
+                          {member.initial}
+                        </Text>
                       </View>
                     ))}
                     {group.additionalMembers > 0 && (
                       <View className="-ml-2 h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-300">
-                        <Text className="text-xs font-bold text-gray-600">
+                        <Text className="font-dmsans-bold text-xs text-gray-600">
                           +{group.additionalMembers}
                         </Text>
                       </View>
                     )}
                   </View>
-                  <Text className="font-bold text-red-500">{group.amount}</Text>
+                  <Text className="font-dmsans-bold text-red-500">{group.amount}</Text>
                 </View>
               </View>
 
@@ -173,11 +175,11 @@ const GroupsScreen = () => {
               <View
                 className="mr-3 h-12 w-12 items-center justify-center rounded-full"
                 style={{ backgroundColor: invitation.color }}>
-                <Text className="text-lg font-bold text-white">{invitation.initial}</Text>
+                <Text className="font-dmsans-bold text-lg text-white">{invitation.initial}</Text>
               </View>
 
               <View className="flex-1">
-                <Text className="text-base font-bold text-black">
+                <Text className="font-dmsans-bold text-base text-black">
                   Join "{invitation.groupName}" ?
                 </Text>
                 <Text className="text-sm text-gray-500">Invited By {invitation.invitedBy}</Text>
