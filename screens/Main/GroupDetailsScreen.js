@@ -120,7 +120,7 @@ const GroupDetailsScreen = () => {
 
           {/* Recently Expenses Header */}
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-semibold text-black">Recently Expenses</Text>
+            <Text className="text-lg font-medium text-black">Recently Expenses</Text>
             <TouchableOpacity onPress={handleSeeAllExpenses}>
               <Text className="text-base font-medium text-primary">See All</Text>
             </TouchableOpacity>
