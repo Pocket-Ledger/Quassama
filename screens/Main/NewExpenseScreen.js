@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Alert,
   Modal,
   FlatList,
 } from 'react-native';
@@ -14,10 +13,13 @@ import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Expense from 'models/expense/Expense';
+import CustomAlert from 'components/CustomALert';
+import { useAlert } from 'hooks/useAlert';
 import 'firebase/compat/auth';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
+  const { alertConfig, hideAlert, showSuccess, showError } = useAlert(); // Use the hook
 
   const [expenseName, setExpenseName] = useState('');
   const [amount, setAmount] = useState('');
@@ -85,11 +87,16 @@ const NewExpenseScreen = () => {
 
       const newDocId = await expense.save();
 
-      Alert.alert('Success', 'Expense saved successfully!');
-      navigation.goBack();
+      // Show custom success alert
+      showSuccess('Success', 'Your expense was added successfully!', () => {
+        hideAlert();
+        navigation.goBack();
+      });
     } catch (error) {
       console.error('Error saving expense:', error);
-      Alert.alert('Error', error.message || 'Failed to save expense');
+
+      // Show custom error alert
+      showError('Error', error.message || 'Failed to save expense. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -303,6 +310,19 @@ const NewExpenseScreen = () => {
           </View>
         </SafeAreaView>
       </Modal>
+
+      {/* Custom Alert */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </SafeAreaView>
   );
 };
