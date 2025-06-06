@@ -3,6 +3,9 @@ class Group{
     name;
     created_by;
     currency;
+    members;
+    created_at;
+    description;
 }
 
 export default Group;

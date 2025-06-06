@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
+import Expense from 'models/expense/Expense';
+import { useFocusEffect } from '@react-navigation/core';
 
 const HomeScreen = () => {
+  const [RecentlyActivity, setRecentlyActivity] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchRecentlyActivity = async () => {
+        try {
+          const recentActivity = await Expense.RecentlyActivityByUser();
+          setRecentlyActivity(recentActivity);
+        } catch (error) {
+          console.error("Error fetching recent activity:", error);
+        }
+      };
+  
+      fetchRecentlyActivity();
+    }, [])
+  );
+  
+
+  console.log("Recently Activity:", RecentlyActivity);
+
   const expenseData = [
     { category: 'Groceries', percentage: 50, color: '#2979FF' },
     { category: 'Rent', percentage: 30, color: '#2A67BF' },
@@ -43,6 +65,24 @@ const HomeScreen = () => {
       iconColor: '#2979FF',
     },
   ];
+
+  const getIconByCategory = (category) => {
+    switch (category.toLowerCase()) {
+      case "internet":
+        return "wifi";
+      case "shopping":
+        return "shopping-bag";
+      case "groceries":
+        return "shopping-cart";
+      case "rent":
+        return "home";
+      case "cleaning":
+        return "check-circle";
+      default:
+        return "credit-card";
+    }
+  };
+  
 
   const friends = [
     { name: 'Mehdi', initial: 'M', color: '#2979FF' },
@@ -123,24 +163,28 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {recentActivity.map((item) => (
+          {RecentlyActivity.map((item) => (
             <View
               key={item.id}
               className="flex-row items-center justify-between border-gray-100 py-2">
               <View className="flex-1 flex-row items-center">
                 <View
                   className="mr-3 h-[55px] w-[55px] items-center justify-center rounded-full"
-                  style={{ backgroundColor: item.iconBg }}>
-                  <Feather name={item.icon} size={20} color={item.iconColor} />
+                  style={{ backgroundColor: "#E6F0FF" }}>
+                  {/* <Feather name={item.category} size={20} color="2979FF"/> */}
+                  <Feather name={getIconByCategory(item.category)} size={20} color="#2979FF" />
+
                 </View>
                 <View>
                   <Text className="font-medium text-black">{item.title}</Text>
-                  <Text className="text-sm text-gray-500">{item.time}</Text>
+                  <Text className="text-sm text-gray-500">
+                    {item.incurred_at?.toDate ? new Date(item.incurred_at.toDate()).toLocaleDateString() : "Unknown"}
+                  </Text>
                 </View>
               </View>
               <View className="items-end">
                 <Text className="font-medium text-black">{item.amount} MAD</Text>
-                <Text className="text-sm text-gray-500">Paid by {item.paidBy}</Text>
+                <Text className="text-sm text-gray-500">Paid by {item.user_id}</Text>
               </View>
             </View>
           ))}

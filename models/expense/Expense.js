@@ -1,26 +1,28 @@
 import { getAuth } from "firebase/auth";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, query, where, getDocs, orderBy, limit } from "firebase/firestore";
 import { app, db } from "../../firebase"; 
 
 class Expense {
   user_id;
-  name;
+  title;
   amount;
   category;
   description;
   incurred_at;
+  group_id;
 
-  constructor(name, amount, category, note) {
-    this.name = name;
+  constructor(title, amount, category, note) {
+    this.title = title;
     this.amount = parseFloat(amount);
     this.category = category;
     this.description = note || "";
     this.user_id = null;
     this.incurred_at = null;
+    this.group_id = null; // Optional, can be set later if needed
   }
 
   validate() {
-    if (!this.name || !this.amount || !this.category) {
+    if (!this.title || !this.amount || !this.category) {
       throw new Error("All fields (name, amount, category) are required");
     }
     if (isNaN(this.amount) || this.amount <= 0) {
@@ -43,16 +45,65 @@ class Expense {
 
     const expenseData = {
       user_id: this.user_id,
-      name: this.name,
+      title: this.title,
       amount: this.amount,
       category: this.category,
       description: this.description,
       incurred_at: this.incurred_at,
+      group_id: this.group_id || null,
     };
 
     const expensesCollection = collection(db, "expenses"); // Reference to the "expenses" collection
     const docRef = await addDoc(expensesCollection, expenseData); // Add document to the collection
     return docRef.id;
+  }
+
+  static async GetAllExpenseByUser() {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+  
+    if (!currentUser) {
+      throw new Error("No authenticated user found");
+    }
+  
+    const expensesCollection = collection(db, "expenses");
+    const q = query(expensesCollection, where("user_id", "==", currentUser.uid));
+  
+    const snapshot = await getDocs(q);
+  
+    const expenses = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  
+    return expenses;
+  }
+
+  static async RecentlyActivityByUser() {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+  
+    if (!currentUser) {
+      throw new Error("No authenticated user found");
+    }
+  
+    const expensesCollection = collection(db, "expenses");
+  
+    const q = query(
+      expensesCollection,
+      where("user_id", "==", currentUser.uid),
+      orderBy("incurred_at", "desc"),
+      limit(3)
+    );
+  
+    const snapshot = await getDocs(q);
+  
+    const recentExpenses = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  
+    return recentExpenses;
   }
   
 }
