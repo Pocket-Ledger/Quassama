@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,17 +11,33 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Logout from 'models/auth/Logout';
+import User from 'models/auth/user';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userDetails = await User.getUserDetails();
+        setUser(userDetails);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const userProfile = {
-    name: 'Essekhyry El Mahdi',
-    email: 'essekhyry.mahdi@gmail.com',
-    initial: 'M',
+    name: user?.username || 'Essekhyry El Mahdi',
+    email: user?.email || 'essekhyry.mahdi@gmail.com',
+    initial: user?.username ? user.username.charAt(0).toUpperCase() : 'M',
     color: '#2979FF',
   };
+  
+
 
   const menuItems = [
     {

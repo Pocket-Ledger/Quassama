@@ -4,9 +4,24 @@ import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
 import Expense from 'models/expense/Expense';
 import { useFocusEffect, useNavigation } from '@react-navigation/core';
+import User from 'models/auth/user';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userDetails = await User.getUserDetails();
+        setUser(userDetails);
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    }
+    fetchUser();
+  }, []);
 
   const [RecentlyActivity, setRecentlyActivity] = useState([]);
 
@@ -102,7 +117,7 @@ const HomeScreen = () => {
           </View>
           <View>
             <Text className="text-sm text-gray-500">Good morning 👋</Text>
-            <Text className="font-dmsans-bold text-lg text-black">Essekhyry EL Mahdi</Text>
+            <Text className="font-dmsans-bold text-lg text-black">{user.username}</Text>
           </View>
         </View>
         <TouchableOpacity className="relative">

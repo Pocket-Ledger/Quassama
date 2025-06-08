@@ -17,6 +17,7 @@ import { Logo } from 'components/Logo';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Register from 'models/auth/Register';
+import User from 'models/auth/user';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -100,8 +101,11 @@ const RegisterScreen = () => {
     try {
       const registerInstance = new Register(email, password, confirmPassword, username);
       const userCredential = await registerInstance.register();
-
       console.log('Registration successful:', userCredential.user);
+
+      const user = new User(username, email);
+      await user.save();
+      console.log('User saved successfully:', user);
 
       navigation.navigate('MainTabs');
     } catch (error) {
