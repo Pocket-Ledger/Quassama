@@ -9,7 +9,7 @@ import User from 'models/auth/user';
 const HomeScreen = () => {
   const navigation = useNavigation();
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {

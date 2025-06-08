@@ -11,6 +11,8 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
+import Group from 'models/group/group';
+import { getAuth } from 'firebase/auth';
 
 const AddNewGroupScreen = () => {
   const navigation = useNavigation();
@@ -48,22 +50,35 @@ const AddNewGroupScreen = () => {
   };
 
   const handleAddGroup = async () => {
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    setIsCreating(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  setIsCreating(true);
+  try {
 
-      Alert.alert('Success', 'Group created successfully!');
-      navigation.goBack();
-    } catch (error) {
-      console.error('Error creating group:', error);
-      Alert.alert('Error', 'Failed to create group');
-    } finally {
-      setIsCreating(false);
-    }
-  };
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const created_by = user.uid;
+    const currency = "MAD";
+    const description = "";
+
+    const groupInstance = new Group();
+    await groupInstance.creatGroup(
+      groupName,
+      created_by,
+      currency,
+      selectedMembers,
+      description
+    );
+
+    Alert.alert('Success', 'Group created successfully!');
+    navigation.goBack();
+  } catch (error) {
+    console.error('Error creating group:', error);
+    Alert.alert('Error', 'Failed to create group');
+  } finally {
+    setIsCreating(false);
+  }
+};
 
   const handleToggleInviteOthers = () => {
     setAllowInviteOthers(!allowInviteOthers);

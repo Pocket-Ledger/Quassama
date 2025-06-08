@@ -27,7 +27,7 @@ export function TabNavigator() {
       />
       <Tab.Screen
         name="Groups"
-        component={AddNewGroupScreen}
+        component={GroupsScreen}
         options={{ tabBarLabel: 'Groups' }}
       />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
