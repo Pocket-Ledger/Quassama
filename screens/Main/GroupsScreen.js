@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-na
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
+import PlusIconButton from 'components/PlusIconButton';
 
 const GroupsScreen = () => {
   const navigation = useNavigation();
@@ -88,9 +89,7 @@ const GroupsScreen = () => {
           <BackButton />
           <View className="w-full flex-row items-start justify-between ">
             <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black ">Groups</Text>
-            <TouchableOpacity className="h-12 w-12 items-center justify-center rounded-full bg-primary">
-              <Feather name="plus" size={24} color="white" />
-            </TouchableOpacity>
+            <PlusIconButton route="AddNewGroup" />
           </View>
         </View>
 
