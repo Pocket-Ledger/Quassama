@@ -20,6 +20,7 @@ import Register from 'models/auth/Register';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -51,6 +52,14 @@ const RegisterScreen = () => {
   const validateForm = () => {
     const newErrors = {};
 
+    if (!username) {
+      newErrors.username = 'Username is required';
+    } else if (username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      newErrors.username = 'Username can only contain letters, numbers, and underscores';
+    }
+
     if (!email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -61,8 +70,16 @@ const RegisterScreen = () => {
       newErrors.password = 'Password is required';
     } else {
       const requirements = checkPasswordRequirements(password);
-      if (!requirements.length) {
-        newErrors.password = 'Password must be at least 8 characters';
+      const unmetRequirements = [];
+
+      if (!requirements.length) unmetRequirements.push('at least 8 characters');
+      if (!requirements.uppercase) unmetRequirements.push('one uppercase letter');
+      if (!requirements.lowercase) unmetRequirements.push('one lowercase letter');
+      if (!requirements.number) unmetRequirements.push('one number');
+      if (!requirements.special) unmetRequirements.push('one special character');
+
+      if (unmetRequirements.length > 0) {
+        newErrors.password = `Password must contain ${unmetRequirements.join(', ')}`;
       }
     }
 
@@ -81,7 +98,7 @@ const RegisterScreen = () => {
 
     setIsLoading(true);
     try {
-      const registerInstance = new Register(email, password, confirmPassword);
+      const registerInstance = new Register(email, password, confirmPassword, username);
       const userCredential = await registerInstance.register();
 
       console.log('Registration successful:', userCredential.user);
@@ -129,14 +146,46 @@ const RegisterScreen = () => {
             {/* Title and Subtitle */}
             <View className="">
               <Text className="title">Create an Account</Text>
-              <Text className="subtitle">
-                Please enter your email and password to enjoy the experience
-              </Text>
+              <Text className="subtitle">Please enter your details to enjoy the experience</Text>
             </View>
 
             {/* Form */}
             <View className="form-container">
               <View className="gap-4">
+                {/* Username Input */}
+                <View className="input-group">
+                  <Text className="input-label">Username</Text>
+                  <View className="input-container">
+                    <Ionicons
+                      name="person-outline"
+                      size={20}
+                      style={{
+                        position: 'absolute',
+                        left: 16,
+                        top: '50%',
+                        transform: [{ translateY: -10 }],
+                        color: errors.username ? 'red' : 'rgba(0, 0, 0, 0.2)',
+                        zIndex: 1,
+                      }}
+                    />
+                    <TextInput
+                      className={`input-field ${errors.username ? 'input-field-error' : ''}`}
+                      placeholder="johndoe123"
+                      placeholderTextColor="rgba(0, 0, 0, 0.2)"
+                      value={username}
+                      onChangeText={(text) => {
+                        setUsername(text);
+                        if (errors.username) {
+                          setErrors((prev) => ({ ...prev, username: null }));
+                        }
+                      }}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  </View>
+                  {errors.username && <Text className="error-text">{errors.username}</Text>}
+                </View>
+
                 {/* Email Input */}
                 <View className="input-group">
                   <Text className="input-label">Email</Text>
@@ -226,20 +275,52 @@ const RegisterScreen = () => {
                           color={passwordRequirements.length ? '#34C759' : '#ff3b30'}
                         />
                         <Text
-                          className={`ml-2 text-sm ${passwordRequirements.length ? 'text-green-500' : 'text-error'}`}>
-                          contain at least 8 characters
+                          className={`ml-2 text-sm ${passwordRequirements.length ? 'text-green-500' : 'text-red-500'}`}>
+                          At least 8 characters
                         </Text>
                       </View>
                       <View className="flex-row items-center">
-                        <Ionicons name="checkmark" size={16} color="#34C759" />
-                        <Text className="ml-2 text-sm text-green-500">
-                          contain at least 8 characters
+                        <Ionicons
+                          name={passwordRequirements.uppercase ? 'checkmark' : 'close'}
+                          size={16}
+                          color={passwordRequirements.uppercase ? '#34C759' : '#ff3b30'}
+                        />
+                        <Text
+                          className={`ml-2 text-sm ${passwordRequirements.uppercase ? 'text-green-500' : 'text-red-500'}`}>
+                          One uppercase letter
                         </Text>
                       </View>
                       <View className="flex-row items-center">
-                        <Ionicons name="checkmark" size={16} color="#00000040" />
-                        <Text className="ml-2 text-sm text-gray-250">
-                          contain at least 8 characters
+                        <Ionicons
+                          name={passwordRequirements.lowercase ? 'checkmark' : 'close'}
+                          size={16}
+                          color={passwordRequirements.lowercase ? '#34C759' : '#ff3b30'}
+                        />
+                        <Text
+                          className={`ml-2 text-sm ${passwordRequirements.lowercase ? 'text-green-500' : 'text-red-500'}`}>
+                          One lowercase letter
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center">
+                        <Ionicons
+                          name={passwordRequirements.number ? 'checkmark' : 'close'}
+                          size={16}
+                          color={passwordRequirements.number ? '#34C759' : '#ff3b30'}
+                        />
+                        <Text
+                          className={`ml-2 text-sm ${passwordRequirements.number ? 'text-green-500' : 'text-red-500'}`}>
+                          One number
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center">
+                        <Ionicons
+                          name={passwordRequirements.special ? 'checkmark' : 'close'}
+                          size={16}
+                          color={passwordRequirements.special ? '#34C759' : '#ff3b30'}
+                        />
+                        <Text
+                          className={`ml-2 text-sm ${passwordRequirements.special ? 'text-green-500' : 'text-red-500'}`}>
+                          One special character
                         </Text>
                       </View>
                     </View>
