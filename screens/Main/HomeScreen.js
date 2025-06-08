@@ -3,9 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
 import Expense from 'models/expense/Expense';
-import { useFocusEffect } from '@react-navigation/core';
+import { useFocusEffect, useNavigation } from '@react-navigation/core';
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+
   const [RecentlyActivity, setRecentlyActivity] = useState([]);
 
   useFocusEffect(
@@ -15,16 +17,15 @@ const HomeScreen = () => {
           const recentActivity = await Expense.RecentlyActivityByUser();
           setRecentlyActivity(recentActivity);
         } catch (error) {
-          console.error("Error fetching recent activity:", error);
+          console.error('Error fetching recent activity:', error);
         }
       };
-  
+
       fetchRecentlyActivity();
     }, [])
   );
-  
 
-  console.log("Recently Activity:", RecentlyActivity);
+  console.log('Recently Activity:', RecentlyActivity);
 
   const expenseData = [
     { category: 'Groceries', percentage: 50, color: '#2979FF' },
@@ -68,21 +69,20 @@ const HomeScreen = () => {
 
   const getIconByCategory = (category) => {
     switch (category.toLowerCase()) {
-      case "internet":
-        return "wifi";
-      case "shopping":
-        return "shopping-bag";
-      case "groceries":
-        return "shopping-cart";
-      case "rent":
-        return "home";
-      case "cleaning":
-        return "check-circle";
+      case 'internet':
+        return 'wifi';
+      case 'shopping':
+        return 'shopping-bag';
+      case 'groceries':
+        return 'shopping-cart';
+      case 'rent':
+        return 'home';
+      case 'cleaning':
+        return 'check-circle';
       default:
-        return "credit-card";
+        return 'credit-card';
     }
   };
-  
 
   const friends = [
     { name: 'Mehdi', initial: 'M', color: '#2979FF' },
@@ -158,7 +158,7 @@ const HomeScreen = () => {
         <View className="mx-4 ">
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">Recently Activity</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('AllExpenses')}>
               <Text className="font-medium text-primary">See All</Text>
             </TouchableOpacity>
           </View>
@@ -170,15 +170,16 @@ const HomeScreen = () => {
               <View className="flex-1 flex-row items-center">
                 <View
                   className="mr-3 h-[55px] w-[55px] items-center justify-center rounded-full"
-                  style={{ backgroundColor: "#E6F0FF" }}>
+                  style={{ backgroundColor: '#E6F0FF' }}>
                   {/* <Feather name={item.category} size={20} color="2979FF"/> */}
                   <Feather name={getIconByCategory(item.category)} size={20} color="#2979FF" />
-
                 </View>
                 <View>
                   <Text className="font-medium text-black">{item.title}</Text>
                   <Text className="text-sm text-gray-500">
-                    {item.incurred_at?.toDate ? new Date(item.incurred_at.toDate()).toLocaleDateString() : "Unknown"}
+                    {item.incurred_at?.toDate
+                      ? new Date(item.incurred_at.toDate()).toLocaleDateString()
+                      : 'Unknown'}
                   </Text>
                 </View>
               </View>
