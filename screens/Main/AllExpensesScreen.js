@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import ExpenseListItem from 'components/ExpenseListItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
+import Header from 'components/Header';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
@@ -130,10 +131,11 @@ const AllExpensesScreen = () => {
 
   return (
     <SafeAreaView className="container flex-1 bg-white">
-      <View className="mb-6 flex flex-row items-center justify-start px-4 pb-4">
+      {/* <View className="flex flex-row items-center justify-start px-4 pb-4 mb-6">
         <BackButton />
-        <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black">All Expenses</Text>
-      </View>
+        <Text className="mt-2 ml-12 text-xl text-black font-dmsans-bold"></Text>
+      </View> */}
+      <Header title="All Expenses" />
       <View className="mb-4 ">
         <SearchBar
           searchText={searchText}

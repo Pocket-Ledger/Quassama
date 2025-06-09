@@ -13,6 +13,7 @@ import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Group from 'models/group/group';
 import { getAuth } from 'firebase/auth';
+import Header from 'components/Header';
 
 const AddNewGroupScreen = () => {
   const navigation = useNavigation();
@@ -50,35 +51,28 @@ const AddNewGroupScreen = () => {
   };
 
   const handleAddGroup = async () => {
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  setIsCreating(true);
-  try {
+    setIsCreating(true);
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const created_by = user.uid;
+      const currency = 'MAD';
+      const description = '';
 
-    const auth = getAuth();
-    const user = auth.currentUser;
-    const created_by = user.uid;
-    const currency = "MAD";
-    const description = "";
+      const groupInstance = new Group();
+      await groupInstance.creatGroup(groupName, created_by, currency, selectedMembers, description);
 
-    const groupInstance = new Group();
-    await groupInstance.creatGroup(
-      groupName,
-      created_by,
-      currency,
-      selectedMembers,
-      description
-    );
-
-    Alert.alert('Success', 'Group created successfully!');
-    navigation.goBack();
-  } catch (error) {
-    console.error('Error creating group:', error);
-    Alert.alert('Error', 'Failed to create group');
-  } finally {
-    setIsCreating(false);
-  }
-};
+      Alert.alert('Success', 'Group created successfully!');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error creating group:', error);
+      Alert.alert('Error', 'Failed to create group');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   const handleToggleInviteOthers = () => {
     setAllowInviteOthers(!allowInviteOthers);
@@ -95,11 +89,11 @@ const AddNewGroupScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header */}
-        <View className="mb-6 flex flex-row items-center justify-start px-4 pb-4">
+        {/* <View className="flex flex-row items-center justify-start px-4 pb-4 mb-6">
           <BackButton />
-          <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black">Add New Group</Text>
-        </View>
-
+          <Text className="mt-2 ml-12 text-xl text-black font-dmsans-bold"></Text>
+        </View> */}
+        |<Header title="Add New Group" />
         <View className="flex-1 gap-6 ">
           {/* Group Name */}
           <View className="input-group">

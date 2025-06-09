@@ -18,6 +18,7 @@ import { useAlert } from 'hooks/useAlert';
 import 'firebase/compat/auth';
 import CategoryList from 'components/CategoryList';
 import { DEFAULT_CATEGORIES } from 'constants/category';
+import Header from 'components/Header';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -127,10 +128,11 @@ const NewExpenseScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header */}
-        <View className="mb-6 flex flex-row items-center justify-start px-4 pb-4">
+        {/* <View className="flex flex-row items-center justify-start px-4 pb-4 mb-6">
           <BackButton />
-          <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black ">Add New Expense</Text>
-        </View>
+          <Text className="mt-2 ml-12 text-xl text-black font-dmsans-bold ">Add New Expense</Text>
+        </View> */}
+        <Header title="Add New Expense" />
 
         <View className="flex-1 gap-6 px-4">
           {/* Expense Name */}

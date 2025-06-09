@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import PlusIconButton from 'components/PlusIconButton';
+import Header from 'components/Header';
 
 const GroupsScreen = () => {
   const navigation = useNavigation();
@@ -85,13 +86,14 @@ const GroupsScreen = () => {
       <View className="container ">
         {/* Header */}
 
-        <View className="mb-6 flex flex-row items-center justify-start pb-4">
+        {/*  <View className="flex flex-row items-center justify-start pb-4 mb-6">
           <BackButton />
-          <View className="w-full flex-row items-start justify-between ">
-            <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black ">Groups</Text>
+          <View className="flex-row items-start justify-between w-full ">
+            <Text className="mt-2 ml-12 text-xl text-black font-dmsans-bold ">Groups</Text>
             <PlusIconButton route="AddNewGroup" />
           </View>
-        </View>
+        </View> */}
+        <Header title="Groups" showIcon={true} route="AddNewGroup" />
 
         {/* Tabs */}
         <View className="mb-6 px-4">

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-na
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
+import Header from 'components/Header';
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
@@ -65,10 +66,11 @@ const GroupDetailsScreen = () => {
     <SafeAreaView className="flex-1 bg-white">
       <View className="container">
         {/* Header */}
-        <View className="mb-6 flex flex-row items-center justify-start pb-4">
+        {/* <View className="flex flex-row items-center justify-start pb-4 mb-6">
           <BackButton />
-          <Text className="ml-12 mt-2 font-dmsans-bold text-xl text-black">{groupData.name}</Text>
-        </View>
+          <Text className="mt-2 ml-12 text-xl text-black font-dmsans-bold"></Text>
+        </View> */}
+        <Header title={groupData.name} />
 
         <ScrollView
           className="flex-1 "
