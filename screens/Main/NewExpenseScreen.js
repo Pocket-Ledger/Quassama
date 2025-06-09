@@ -16,6 +16,8 @@ import Expense from 'models/expense/Expense';
 import CustomAlert from 'components/CustomALert';
 import { useAlert } from 'hooks/useAlert';
 import 'firebase/compat/auth';
+import CategoryList from 'components/CategoryList';
+import { DEFAULT_CATEGORIES } from 'constants/category';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -29,14 +31,6 @@ const NewExpenseScreen = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState({});
   const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
-
-  const categories = [
-    { id: 'shopping', name: 'Shopping', icon: 'shopping-cart', color: '#2979FF' },
-    { id: 'internet', name: 'Internet', icon: 'wifi', color: '#2979FF' },
-    { id: 'cleaning', name: 'Cleaning', icon: 'check-circle', color: '#2979FF' },
-    { id: 'rent', name: 'Rent', icon: 'home', color: '#2979FF' },
-    { id: 'other', name: 'Other', icon: 'plus', color: '#2979FF' },
-  ];
 
   const groups = [
     { id: 'vacation_tager', name: 'Vacation tager', memberCount: 12 },
@@ -221,8 +215,16 @@ const NewExpenseScreen = () => {
 
           {/* Category */}
           <View className="">
-            <Text className="input-label mb-3 text-base font-medium text-black">Category</Text>
-            <View className="flex-row flex-wrap justify-between gap-1">
+            {/* <Text className="mb-3 text-base font-medium text-black input-label">Category</Text> */}
+            <CategoryList
+              categories={DEFAULT_CATEGORIES}
+              selectedCategories={selectedCategory}
+              onCategorySelect={setSelectedCategory}
+              layout="grid"
+              numColumns={5}
+              title="Category"
+            />
+            {/* <View className="flex-row flex-wrap justify-between gap-1">
               {categories.map((category) => (
                 <TouchableOpacity
                   key={category.id}
@@ -253,8 +255,8 @@ const NewExpenseScreen = () => {
               ))}
             </View>
             {errors.category && (
-              <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
-            )}
+              <Text className="mt-2 text-sm text-red-500 error-text">{errors.category}</Text>
+            )} */}
           </View>
 
           {/* Note */}

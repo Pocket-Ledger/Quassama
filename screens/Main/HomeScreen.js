@@ -5,11 +5,13 @@ import { CircularProgress } from 'components/CircularProgress';
 import Expense from 'models/expense/Expense';
 import { useFocusEffect, useNavigation } from '@react-navigation/core';
 import User from 'models/auth/user';
+import { DEFAULT_CATEGORIES } from 'constants/category';
+import ExpenseListItem from 'components/ExpenseListItem';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
 
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState('');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,7 +21,7 @@ const HomeScreen = () => {
       } catch (error) {
         console.error('Error fetching user details:', error);
       }
-    }
+    };
     fetchUser();
   }, []);
 
@@ -81,6 +83,22 @@ const HomeScreen = () => {
       iconColor: '#2979FF',
     },
   ];
+
+  const transformExpenseData = (activity) => {
+    return {
+      id: activity.id,
+      name: activity.title,
+      amount: activity.amount,
+      category: activity.category,
+      time: activity.time,
+      paidBy: activity.user_id,
+    };
+  };
+
+  const handleExpensePress = (expenseData) => {
+    console.log('Expense pressed:', expenseData);
+    // Navigate to expense details or perform other actions
+  };
 
   const getIconByCategory = (category) => {
     switch (category.toLowerCase()) {
@@ -178,15 +196,26 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {RecentlyActivity.map((item) => (
+          <View>
+            {recentActivity.map((item) => (
+              <ExpenseListItem
+                key={item.id}
+                {...transformExpenseData(item)}
+                //categories={DEFAULT_CATEGORIES}
+                onPress={handleExpensePress}
+                showBorder={false}
+                currency="MAD"
+              />
+            ))}
+          </View>
+          {/* {RecentlyActivity.map((item) => (
             <View
               key={item.id}
-              className="flex-row items-center justify-between border-gray-100 py-2">
-              <View className="flex-1 flex-row items-center">
+              className="flex-row items-center justify-between py-2 border-gray-100">
+              <View className="flex-row items-center flex-1">
                 <View
                   className="mr-3 h-[55px] w-[55px] items-center justify-center rounded-full"
                   style={{ backgroundColor: '#E6F0FF' }}>
-                  {/* <Feather name={item.category} size={20} color="2979FF"/> */}
                   <Feather name={getIconByCategory(item.category)} size={20} color="#2979FF" />
                 </View>
                 <View>
@@ -203,7 +232,7 @@ const HomeScreen = () => {
                 <Text className="text-sm text-gray-500">Paid by {item.user_id}</Text>
               </View>
             </View>
-          ))}
+          ))} */}
         </View>
 
         {/* Faculty Friends */}
