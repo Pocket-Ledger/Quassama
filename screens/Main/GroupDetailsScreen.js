@@ -4,6 +4,8 @@ import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
+import { DEFAULT_CATEGORIES } from 'constants/category';
+import ExpenseListItem from 'components/ExpenseListItem';
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
@@ -60,6 +62,10 @@ const GroupDetailsScreen = () => {
 
   const handleSeeAllExpenses = () => {
     console.log('See all expenses pressed');
+  };
+  const handleExpensePress = (expense) => {
+    // Handle expense item press
+    console.log('Expense pressed:', expense);
   };
 
   return (
@@ -131,10 +137,23 @@ const GroupDetailsScreen = () => {
           {/* Recent Expenses List */}
           <View className="gap-4">
             {groupData.recentExpenses.map((expense) => (
-              <View key={expense.id} className="flex-row items-center justify-between">
+              <>
+                <ExpenseListItem
+                  id={expense.id}
+                  name={expense.name}
+                  amount={expense.amount}
+                  category={expense.category}
+                  time={expense.time}
+                  paidBy={expense.paidBy}
+                  categories={DEFAULT_CATEGORIES}
+                  onPress={handleExpensePress}
+                  showBorder={true}
+                  currency="MAD"
+                />
+                {/* <View key={expense.id} className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
                   <View
-                    className="mr-4 h-12 w-12 items-center justify-center rounded-full"
+                    className="items-center justify-center w-12 h-12 mr-4 rounded-full"
                     style={{ backgroundColor: expense.iconBg }}>
                     <Feather name={expense.icon} size={20} color={expense.iconColor} />
                   </View>
@@ -147,7 +166,8 @@ const GroupDetailsScreen = () => {
                   <Text className="text-base font-semibold text-black">{expense.amount}</Text>
                   <Text className="text-sm text-gray-500">Paid by {expense.paidBy}</Text>
                 </View>
-              </View>
+              </View> */}
+              </>
             ))}
           </View>
         </ScrollView>
