@@ -25,11 +25,7 @@ export function TabNavigator() {
         component={NewExpenseScreen}
         options={{ tabBarLabel: 'New Expense' }}
       />
-      <Tab.Screen
-        name="Groups"
-        component={GroupDetailsScreen}
-        options={{ tabBarLabel: 'Groups' }}
-      />
+      <Tab.Screen name="Groups" component={GroupsScreen} options={{ tabBarLabel: 'Groups' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>
   );

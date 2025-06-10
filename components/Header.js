@@ -6,7 +6,7 @@ import PlusIconButton from './PlusIconButton';
 const Header = ({ title, showIcon = false, route }) => {
   return (
     <View
-      className={`mb-6 flex flex-row items-center  px-4 pb-4 ${
+      className={`mb-6 flex flex-row items-center   px-4 pb-4 ${
         showIcon ? 'justify-between' : 'justify-start'
       }`}>
       <BackButton />
