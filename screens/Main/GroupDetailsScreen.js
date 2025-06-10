@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import ExpenseListItem from 'components/ExpenseListItem';
+import Avatar from 'components/Avatar';
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
@@ -110,12 +111,19 @@ const GroupDetailsScreen = () => {
           <View className="mb-6 flex-row justify-between">
             {groupData.members.map((member) => (
               <View key={member.id} className="items-center">
-                <View
-                  className="mb-2 h-12 w-12 items-center justify-center rounded-full"
+                {/* <View
+                  className="items-center justify-center w-12 h-12 mb-2 rounded-full"
                   style={{ backgroundColor: member.color }}>
-                  <Text className="font-dmsans-bold text-base text-white">{member.initial}</Text>
+                  <Text className="text-base text-white font-dmsans-bold">{member.initial}</Text>
                 </View>
-                <Text className="mb-1 text-sm text-black/50">{member.name}</Text>
+                <Text className="mb-1 text-sm text-black/50">{member.name}</Text> */}
+                <Avatar
+                  initial={member.initial}
+                  name={member.name}
+                  color={member.color}
+                  size="medium"
+                  showName={true}
+                />
                 <Text
                   className={`text-sm  ${
                     member.amount.startsWith('+') ? 'text-green-500' : 'text-red-500'

@@ -7,6 +7,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/core';
 import User from 'models/auth/user';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import ExpenseListItem from 'components/ExpenseListItem';
+import Avatar from 'components/Avatar';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -246,13 +247,14 @@ const HomeScreen = () => {
 
           <View className="flex-row justify-between">
             {friends.map((friend, index) => (
-              <View key={index} className="items-center">
-                <View
-                  className="mb-2 h-12 w-12 items-center justify-center rounded-full"
-                  style={{ backgroundColor: friend.color }}>
-                  <Text className="font-dmsans-bold text-white">{friend.initial}</Text>
-                </View>
-                <Text className="text-sm font-medium text-gray-500">{friend.name}</Text>
+              <View key={index}>
+                <Avatar
+                  initial={friend.initial}
+                  name={friend.name}
+                  color={friend.color}
+                  size="medium"
+                  showName={true}
+                />
               </View>
             ))}
           </View>
