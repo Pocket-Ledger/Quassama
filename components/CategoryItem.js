@@ -30,6 +30,7 @@ const CategoryItem = ({
   size = 'medium',
   showLabel = true,
   customStyle = {},
+  containerPadding,
 }) => {
   // Size configurations
   const sizeConfig = {
@@ -37,19 +38,19 @@ const CategoryItem = ({
       iconContainer: 'h-8 w-8',
       iconSize: 16,
       textSize: 'text-xs',
-      containerPadding: 'p-1',
+      containerPadding: containerPadding || 'p-1',
     },
     medium: {
       iconContainer: 'h-12 w-12',
       iconSize: 20,
       textSize: 'text-sm',
-      containerPadding: 'p-2',
+      containerPadding: containerPadding || 'p-2',
     },
     large: {
       iconContainer: 'h-16 w-16',
       iconSize: 24,
       textSize: 'text-base',
-      containerPadding: 'p-3',
+      containerPadding: containerPadding || 'p-3',
     },
   };
 

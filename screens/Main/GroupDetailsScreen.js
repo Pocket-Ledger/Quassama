@@ -1,5 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import Header from 'components/Header';
@@ -10,6 +17,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Expense from 'models/expense/Expense';
 import User from 'models/auth/user';
+import { extractHourAndMinute, extractHourMinutePeriod } from 'utils/time';
 
 const LIMIT = 3; // Limit for recent expenses
 
@@ -18,12 +26,12 @@ const GroupDetailsScreen = () => {
   const route = useRoute();
   const { groupId } = route.params;
 
-  const [groupData, setGroupData]       = useState(null);
+  const [groupData, setGroupData] = useState(null);
   const [TotalExpenses, setTotalExpenses] = useState(0);
-  const [youPaid, setYouPaid]           = useState(0);
-  const [youOwe, setYouOwe]             = useState(0);
+  const [youPaid, setYouPaid] = useState(0);
+  const [youOwe, setYouOwe] = useState(0);
   const [recentExpenses, setRecentExpenses] = useState([]);
-  const [loading, setLoading]           = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -35,12 +43,7 @@ const GroupDetailsScreen = () => {
           const groupRef = doc(db, 'groups', groupId);
 
           // 1) Fire four independent calls in parallel:
-          const [
-            snap,
-            rawExpenses,
-            allExpenses,
-            userPaidAmount
-          ] = await Promise.all([
+          const [snap, rawExpenses, allExpenses, userPaidAmount] = await Promise.all([
             getDoc(groupRef),
             Expense.getExpensesByGroupWithLimit(groupId, LIMIT),
             Expense.getExpensesByGroup(groupId),
@@ -61,16 +64,16 @@ const GroupDetailsScreen = () => {
           }
 
           // 3) Build a map of user_id → username (fetching each only once)
-          const uniqueUserIds = [...new Set(rawExpenses.map(e => e.user_id))];
+          const uniqueUserIds = [...new Set(rawExpenses.map((e) => e.user_id))];
           const usernameMap = {};
           await Promise.all(
-            uniqueUserIds.map(async id => {
+            uniqueUserIds.map(async (id) => {
               usernameMap[id] = await User.getUsernameById(id).catch(() => id);
             })
           );
 
           // 4) Merge in usernames
-          const expensesWithUsernames = rawExpenses.map(exp => ({
+          const expensesWithUsernames = rawExpenses.map((exp) => ({
             id: exp.id,
             name: exp.title,
             amount: exp.amount,
@@ -97,13 +100,15 @@ const GroupDetailsScreen = () => {
       };
 
       fetchGroupAndExpenses();
-      return () => { mounted = false; };
+      return () => {
+        mounted = false;
+      };
     }, [groupId])
   );
 
   if (loading || !groupData) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-white">
+      <SafeAreaView className="items-center justify-center flex-1 bg-white">
         <ActivityIndicator size="large" color="#2979FF" />
         <Text className="mt-4">Loading…</Text>
       </SafeAreaView>
@@ -111,7 +116,7 @@ const GroupDetailsScreen = () => {
   }
 
   // Destructure real data
-const { name, members } = groupData;
+  const { name, members } = groupData;
 
   const handleSettleUp = () => {
     console.log('Settle up pressed');
@@ -133,21 +138,18 @@ const { name, members } = groupData;
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        >
+          contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Group Summary Card */}
-          <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-            <Text className="text-center text-base text-black/75">Total Group Expenses</Text>
-            <Text className="text-center text-2xl font-medium text-black">
-              $ {TotalExpenses}
-            </Text>
+          <View className="p-6 mb-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+            <Text className="text-base text-center text-black/75">Total Group Expenses</Text>
+            <Text className="text-2xl font-medium text-center text-black">$ {TotalExpenses}</Text>
 
-            <View className="mt-6 flex-row justify-between">
+            <View className="flex-row justify-between mt-6">
               <View className="flex-1">
                 <Text className="text-sm text-black/75">You Paid</Text>
                 <Text className="text-xl text-black">$ {youPaid}</Text>
               </View>
-              <View className="flex-1 items-end">
+              <View className="items-end flex-1">
                 <Text className="text-sm text-black/75">You Owe</Text>
                 <Text className="text-xl text-red-500">-${youOwe}</Text>
               </View>
@@ -155,12 +157,12 @@ const { name, members } = groupData;
           </View>
 
           {/* Settle Up Button */}
-          <TouchableOpacity className="mb-6 rounded-lg bg-primary py-4" onPress={handleSettleUp}>
-            <Text className="text-center text-base font-semibold text-white">Settle Up</Text>
+          <TouchableOpacity className="py-4 mb-6 rounded-lg bg-primary" onPress={handleSettleUp}>
+            <Text className="text-base font-semibold text-center text-white">Settle Up</Text>
           </TouchableOpacity>
 
           {/* Members List */}
-          <View className="mb-6 flex-row">
+          <View className="flex-row mb-6">
             {members.map((member, idx) => (
               <View key={member.id ?? `member-${idx}`} className="items-center mr-4">
                 <Avatar
@@ -175,8 +177,7 @@ const { name, members } = groupData;
                     typeof member.amount === 'string' && member.amount.startsWith('+')
                       ? 'text-green-500'
                       : 'text-red-500'
-                  }`}
-                >
+                  }`}>
                   {member.amount ?? '—'}
                 </Text>
               </View>
@@ -184,7 +185,7 @@ const { name, members } = groupData;
           </View>
 
           {/* Recently Expenses Header */}
-           <View className="mb-4 flex-row items-center justify-between">
+          <View className="flex-row items-center justify-between mb-4">
             <Text className="text-lg font-medium text-black">Recently Expenses</Text>
             <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId })}>
               <Text className="text-base font-medium text-primary">See All</Text>
@@ -192,8 +193,8 @@ const { name, members } = groupData;
           </View>
 
           {/* Recent Expenses List */}
-          <View className="gap-4 px-4">
-            {recentExpenses.map(expense => (
+          <View className="gap-4 ">
+            {recentExpenses.map((expense) => (
               <ExpenseListItem
                 key={expense.id}
                 id={expense.id}
