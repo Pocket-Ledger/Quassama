@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import Header from 'components/Header';
@@ -8,6 +8,10 @@ import ExpenseListItem from 'components/ExpenseListItem';
 import Avatar from 'components/Avatar';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import Expense from 'models/expense/Expense';
+import User from 'models/auth/user';
+
+const LIMIT = 3; // Limit for recent expenses
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
@@ -15,12 +19,16 @@ const GroupDetailsScreen = () => {
   const { groupId } = route.params;
 
   const [groupData, setGroupData] = useState(null);
+  const [TotalExpenses, setTotalExpenses] = useState(0);
+  const [youPaid, setYouPaid] = useState(0);
+  const [youOwe, setYouOwe] = useState(0);
   const [recentExpenses, setRecentExpenses] = useState([]);
+  const [loading, setLoading] = useState(true); // <-- loading state
 
   useFocusEffect(
     useCallback(() => {
-      console.log('Fetching group details for groupId:', groupId);
       let mounted = true;
+      setLoading(true);
 
       const fetchGroupAndExpenses = async () => {
         try {
@@ -29,54 +37,71 @@ const GroupDetailsScreen = () => {
           const snap = await getDoc(groupRef);
           if (snap.exists() && mounted) {
             const data = snap.data();
-            setGroupData({
+            const gd = {
               id: snap.id,
               name: data.name,
               totalExpenses: data.totalExpenses,
               youPaid: data.youPaid,
               youOwe: data.youOwe,
               members: data.members || [],
-            });
+            };
+            setGroupData(gd);
           }
-        } catch (err) {
-          console.error('Error fetching group details', err);
-        }
 
-        try {
           // 2) fetch the LIMIT most recent expenses for this group
           const raw = await Expense.getExpensesByGroupWithLimit(groupId, LIMIT);
+
+          // 3) fetch usernames for each paidBy
+          const expensesWithUsernames = await Promise.all(
+            raw.map(async exp => {
+              let paidByName = exp.user_id;
+              try {
+                paidByName = await User.getUsernameById(exp.user_id);
+              } catch (e) {
+                // fallback to user_id if username not found
+              }
+              return {
+                id: exp.id,
+                name: exp.title,
+                amount: exp.amount,
+                category: exp.category,
+                time: exp.incurred_at.toDate().toLocaleString(),
+                paidBy: paidByName,
+              };
+            })
+          );
+
+          const totalEpense = await Expense.getExpensesByGroup(groupId);
+          const totalAmount = totalEpense.reduce((acc, expense) => acc + expense.amount, 0);
+          setTotalExpenses(totalAmount);
+          console.log('Total Expenses:', totalAmount);
+
           if (mounted) {
-            const formatted = raw.map(exp => ({
-              id: exp.id,
-              name: exp.title,
-              amount: exp.amount,
-              category: exp.category,
-              time: exp.incurred_at.toDate(),   // pass a JS Date
-              paidBy: exp.user_id,
-            }));
-            setRecentExpenses(formatted);
+            setRecentExpenses(expensesWithUsernames);
           }
         } catch (err) {
-          console.error(`Error fetching recent ${LIMIT} expenses`, err);
+          console.error('Error fetching group details or expenses', err);
+        } finally {
+          if (mounted) setLoading(false);
         }
       };
 
       fetchGroupAndExpenses();
-      console.log('Group details fetched successfully', groupData);
       return () => { mounted = false; };
     }, [groupId])
   );
 
-  if (!groupData) {
+  if (loading || !groupData) {
     return (
       <SafeAreaView className="flex-1 justify-center items-center bg-white">
-        <Text>Loading…</Text>
+        <ActivityIndicator size="large" color="#2979FF" />
+        <Text className="mt-4">Loading…</Text>
       </SafeAreaView>
     );
   }
 
   // Destructure real data
-const { name, totalExpenses, youPaid, youOwe, members } = groupData;
+const { name, members } = groupData;
 
   const handleSettleUp = () => {
     console.log('Settle up pressed');
@@ -104,7 +129,7 @@ const { name, totalExpenses, youPaid, youOwe, members } = groupData;
           <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
             <Text className="text-center text-base text-black/75">Total Group Expenses</Text>
             <Text className="text-center text-2xl font-medium text-black">
-              $ {totalExpenses}
+              $ {TotalExpenses}
             </Text>
 
             <View className="mt-6 flex-row justify-between">
@@ -126,8 +151,8 @@ const { name, totalExpenses, youPaid, youOwe, members } = groupData;
 
           {/* Members List */}
           <View className="mb-6 flex-row justify-between">
-            {members.map((member) => (
-              <View key={member.id} className="items-center">
+            {members.map((member, idx) => (
+              <View key={member.id ?? `member-${idx}`} className="items-center">
                 <Avatar
                   initial={member.initial}
                   name={member.name}
@@ -136,13 +161,14 @@ const { name, totalExpenses, youPaid, youOwe, members } = groupData;
                   showName={true}
                 />
                 <Text
-  className={`text-sm ${
-    typeof member.amount === 'string' && member.amount.startsWith('+')
-      ? 'text-green-500'
-      : 'text-red-500'
-  }`}>
-  {member.amount ?? '—'}
-</Text>
+                  className={`text-sm ${
+                    typeof member.amount === 'string' && member.amount.startsWith('+')
+                      ? 'text-green-500'
+                      : 'text-red-500'
+                  }`}
+                >
+                  {member.amount ?? '—'}
+                </Text>
               </View>
             ))}
           </View>
@@ -156,7 +182,7 @@ const { name, totalExpenses, youPaid, youOwe, members } = groupData;
           </View>
 
           {/* Recent Expenses List */}
-          <View className="gap-4">
+          <View className="gap-4 px-4">
             {recentExpenses.map(expense => (
               <ExpenseListItem
                 key={expense.id}
