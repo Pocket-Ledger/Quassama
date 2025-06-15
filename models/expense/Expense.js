@@ -210,6 +210,19 @@ class Expense {
     
     return userExpenses.reduce((total, expense) => total + expense.amount, 0);
   }
+
+  // function that return the total amount of expenses for the current user he paid in all groups
+  static async getTotalExpensesByUser() {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    const expenses = await this.GetAllExpenseByUser();
+    return expenses.reduce((total, expense) => total + expense.amount, 0);
+  }
 }
 
 export default Expense;

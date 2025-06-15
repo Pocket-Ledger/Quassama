@@ -160,9 +160,9 @@ const { name, members } = groupData;
           </TouchableOpacity>
 
           {/* Members List */}
-          <View className="mb-6 flex-row justify-between">
+          <View className="mb-6 flex-row">
             {members.map((member, idx) => (
-              <View key={member.id ?? `member-${idx}`} className="items-center">
+              <View key={member.id ?? `member-${idx}`} className="items-center mr-4">
                 <Avatar
                   initial={member.initial}
                   name={member.name}
