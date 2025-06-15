@@ -1,12 +1,121 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { BackButton } from 'components/BackButton';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import Header from 'components/Header';
+import GroupsList from 'components/GroupsList';
+import Group from 'models/group/group';
+import { getAuth } from 'firebase/auth';
+import Invitation from 'models/invitation/invitation';
+import User from 'models/auth/user';
+
+// A little card just for one invitation
+const InvitationCard = ({ invitation, onAccept, onDecline }) => {
+  const [inviterName, setInviterName] = useState('…')
+
+  useEffect(() => {
+    let mounted = true
+    User.getUsernameById(invitation.user_id)
+      .then(name => {
+        if (mounted) setInviterName(name)
+      })
+      .catch(() => {
+        if (mounted) setInviterName('Unknown')
+      })
+    return () => { mounted = false }
+  }, [invitation.user_id])
+
+  return (
+    <View className="my-6 rounded-xl bg-blue-50 p-4">
+      <View className="flex-row items-center">
+        <View
+          className="mr-3 h-12 w-12 items-center justify-center rounded-full"
+          style={{ backgroundColor: '#E91E63' }}
+        >
+          <Text className="font-dmsans-bold text-lg text-white">
+            {inviterName[0]?.toUpperCase() || '?'}
+          </Text>
+        </View>
+        <View className="flex-1">
+          <Text className="font-dmsans-bold text-base text-black">
+            Join "{invitation.group_name}"?
+          </Text>
+          {/* <-- here we use the looked-up name */}
+          <Text className="text-sm text-gray-500">
+            Invited By {inviterName}
+          </Text>
+        </View>
+      </View>
+
+      <View className="mt-4 flex-row gap-3">
+        <TouchableOpacity
+          className="flex-1 rounded-lg bg-primary py-3"
+          onPress={onAccept}
+        >
+          <Text className="text-center font-semibold text-white">
+            Accept
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-1 rounded-lg border border-gray-300 py-3"
+          onPress={onDecline}
+        >
+          <Text className="text-center font-semibold text-gray-900">
+            Decline
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+}
 
 const GroupsScreen = () => {
+  const auth = getAuth();
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
+  const [groups, setGroups] = useState([]);
+  const [invitations, setInvitations] = useState([]);
+
+  const user = auth.currentUser.uid;
+
+ /*  useEffect(() => {
+    
+    const fetchGroups = async () => {
+      console.log('Fetching groups...');
+      const groupsData = await Group.getGroupsByUser(user);
+      setGroups(groupsData);
+    };
+
+    fetchGroups();
+  }, []); */
+
+  useFocusEffect(
+    useCallback(() => {
+       const fetchGroups = async () => {
+        console.log('Fetching groups...');
+        const groupsData = await Group.getGroupsByUser(user);
+        setGroups(groupsData);
+      };
+      fetchGroups();
+    }, [user])
+  );
+
+  console.log('Groups:', groups);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchInvitations = async () => {
+        console.log('Fetching invitations...');
+        const invitationsData = await Invitation.getInvitationsByUser(user);
+        setInvitations(invitationsData);
+      };
+      fetchInvitations();
+    }, [user])
+  );
+
+  console.log('\n\n\n');
+  console.log('Invitations:', invitations);
+
 
   const tabs = ['All', 'You Owed', 'You Ow', 'Settled'];
 
@@ -66,33 +175,49 @@ const GroupsScreen = () => {
     setActiveTab(tab);
   };
 
+  const handleGroupPress = (group) => {
+    console.log('Navigate to group:', group.name);
+    // navigation.navigate('GroupDetails', { groupId: group.id });
+    navigation.navigate('GroupDetails', { groupId: group.id });
+  };
+
   const handleStarPress = (groupId) => {
-    // Handle star/unstar functionality
     console.log('Toggle star for group:', groupId);
+    // Update the groups data state here
   };
 
-  const handleAcceptInvitation = () => {
-    console.log('Accept invitation');
-  };
+  const userId = getAuth().currentUser.uid; 
 
-  const handleDeclineInvitation = () => {
-    console.log('Decline invitation');
-  };
+const handleAcceptInvitation = async (invId, groupId) => {
+  try {
+    // 1) add to group
+    await Group.addMemberToGroup(groupId, userId);
+
+    // 2) mark invitation accepted
+    await Invitation.accept(invId);
+
+    // 3) refresh both lists
+/*     refreshInvitations();
+    refreshGroups(); */
+  } catch (err) {
+    console.error("Accept failed", err);
+  }
+};
+
+const handleDeclineInvitation = async (invId) => {
+  try {
+    await Invitation.decline(invId);
+/*     refreshInvitations(); */
+  } catch (err) {
+    console.error("Decline failed", err);
+  }
+};
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="container ">
+      <View className="container">
         {/* Header */}
-
-        <View className="mb-6 flex flex-row items-center justify-start pb-4">
-          <BackButton />
-          <View className="w-full flex-row items-start justify-between ">
-            <Text className="ml-12 mt-2 text-xl font-bold text-black ">Groups</Text>
-            <TouchableOpacity className="h-12 w-12 items-center justify-center rounded-full bg-primary">
-              <Feather name="plus" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <Header title="Groups" showIcon={true} route="AddNewGroup" />
 
         {/* Tabs */}
         <View className="mb-6 px-4">
@@ -104,7 +229,7 @@ const GroupsScreen = () => {
                   activeTab === tab ? 'bg-primary' : 'bg-white'
                 }`}
                 onPress={() => handleTabPress(tab)}>
-                <Text className={`text-sm  ${activeTab === tab ? 'text-white' : 'text-gray-600'}`}>
+                <Text className={`text-sm ${activeTab === tab ? 'text-white' : 'text-gray-600'}`}>
                   {tab}
                 </Text>
               </TouchableOpacity>
@@ -112,92 +237,37 @@ const GroupsScreen = () => {
           </ScrollView>
         </View>
 
+        {/* Groups List with Invitation */}
         <ScrollView
-          className="flex-1 px-[10px]"
+          className="flex-1 "
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Groups List */}
-          {groupsData.map((group) => (
-            <TouchableOpacity
-              key={group.id}
-              className="mb-4 h-[123px] flex-row items-center justify-between rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-              <View className="flex-1 flex-row items-center">
-                {/* Group Members */}
-                <View className="h-full flex-1 justify-between">
-                  <Text className="text-[20px] font-medium text-black">{group.name}</Text>
-                  <View className="mr-4 flex-row">
-                    {group.members.map((member, index) => (
-                      <View
-                        key={index}
-                        className={`h-10 w-10 items-center justify-center rounded-full border-2 border-white ${
-                          index > 0 ? '-ml-2' : ''
-                        }`}
-                        style={{ backgroundColor: member.color }}>
-                        <Text className="text-sm font-bold text-white">{member.initial}</Text>
-                      </View>
-                    ))}
-                    {group.additionalMembers > 0 && (
-                      <View className="-ml-2 h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-300">
-                        <Text className="text-xs font-bold text-gray-600">
-                          +{group.additionalMembers}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                  <Text className="font-bold text-red-500">{group.amount}</Text>
-                </View>
-              </View>
-
-              {/* Right Side Info */}
-              <View className="h-full flex-col items-end justify-between">
-                <TouchableOpacity onPress={() => handleStarPress(group.id)}>
-                  <Feather
-                    name="star"
-                    size={20}
-                    color={group.isStarred ? '#FFCC00' : '#E5E5E5'}
-                    fill={group.isStarred ? '#FFCC00' : 'none'}
-                  />
-                </TouchableOpacity>
-                <View className="items-end">
-                  <Text className="text-gray-500">
-                    {group.lastExpense} - {group.time}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+          <GroupsList
+            groups={groups.map(g => ({
+              id: g.id,
+              name: g.name,
+              members: g.members || [],
+              additionalMembers: g.additionalMembers || 0,
+              amount: g.amount || '0 MAD',
+              lastExpense: g.lastExpense || 'No expenses yet',
+              time: g.time || '',
+              isStarred: g.isStarred || false,
+              // add other fields as needed
+            }))}
+            onGroupPress={handleGroupPress}
+            onStarPress={handleStarPress}
+          />
 
           {/* Invitation Card */}
-          <View className="my-6 rounded-xl bg-blue-50 p-4">
-            <View className="flex-row items-center">
-              <View
-                className="mr-3 h-12 w-12 items-center justify-center rounded-full"
-                style={{ backgroundColor: invitation.color }}>
-                <Text className="text-lg font-bold text-white">{invitation.initial}</Text>
-              </View>
-
-              <View className="flex-1">
-                <Text className="text-base font-bold text-black">
-                  Join "{invitation.groupName}" ?
-                </Text>
-                <Text className="text-sm text-gray-500">Invited By {invitation.invitedBy}</Text>
-              </View>
-            </View>
-
-            <View className="mt-4 flex-row gap-3">
-              <TouchableOpacity
-                className="flex-1 rounded-lg bg-primary py-3"
-                onPress={handleAcceptInvitation}>
-                <Text className="text-center font-semibold text-white">Accept</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                className="flex-1 rounded-lg border border-gray-300 py-3"
-                onPress={handleDeclineInvitation}>
-                <Text className="text-center font-semibold text-gray-900">Decline</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+{invitations.map(inv => (
+  <InvitationCard
+    key={inv.id}
+    invitation={inv}
+    onAccept={() => handleAcceptInvitation(inv.id, inv.group_id)}
+    onDecline={() => handleDeclineInvitation(inv.id)}
+  />
+))}
         </ScrollView>
       </View>
     </SafeAreaView>

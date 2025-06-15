@@ -1,9 +1,50 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
+import Expense from 'models/expense/Expense';
+import { useFocusEffect, useNavigation } from '@react-navigation/core';
+import User from 'models/auth/user';
+import { DEFAULT_CATEGORIES } from 'constants/category';
+import ExpenseListItem from 'components/ExpenseListItem';
+import Avatar from 'components/Avatar';
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+
+  const [user, setUser] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userDetails = await User.getUserDetails();
+        setUser(userDetails);
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const [RecentlyActivity, setRecentlyActivity] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchRecentlyActivity = async () => {
+        try {
+          const recentActivity = await Expense.RecentlyActivityByUser();
+          setRecentlyActivity(recentActivity);
+        } catch (error) {
+          console.error('Error fetching recent activity:', error);
+        }
+      };
+
+      fetchRecentlyActivity();
+    }, [])
+  );
+
+  console.log('Recently Activity:', RecentlyActivity);
+
   const expenseData = [
     { category: 'Groceries', percentage: 50, color: '#2979FF' },
     { category: 'Rent', percentage: 30, color: '#2A67BF' },
@@ -44,6 +85,39 @@ const HomeScreen = () => {
     },
   ];
 
+  const transformExpenseData = (activity) => {
+    return {
+      id: activity.id,
+      name: activity.title,
+      amount: activity.amount,
+      category: activity.category,
+      time: activity.time,
+      paidBy: activity.user_id,
+    };
+  };
+
+  const handleExpensePress = (expenseData) => {
+    console.log('Expense pressed:', expenseData);
+    // Navigate to expense details or perform other actions
+  };
+
+  const getIconByCategory = (category) => {
+    switch (category.toLowerCase()) {
+      case 'internet':
+        return 'wifi';
+      case 'shopping':
+        return 'shopping-bag';
+      case 'groceries':
+        return 'shopping-cart';
+      case 'rent':
+        return 'home';
+      case 'cleaning':
+        return 'check-circle';
+      default:
+        return 'credit-card';
+    }
+  };
+
   const friends = [
     { name: 'Mehdi', initial: 'M', color: '#2979FF' },
     { name: 'Sara', initial: 'S', color: '#FF9800' },
@@ -58,11 +132,11 @@ const HomeScreen = () => {
       <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
         <View className="flex-row items-center">
           <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
-            <Text className="text-lg font-bold text-white">M</Text>
+            <Text className="font-dmsans-bold text-lg text-white">M</Text>
           </View>
           <View>
             <Text className="text-sm text-gray-500">Good morning 👋</Text>
-            <Text className="text-lg font-bold text-black">Essekhyry EL Mahdi</Text>
+            <Text className="font-dmsans-bold text-lg text-black">{user.username}</Text>
           </View>
         </View>
         <TouchableOpacity className="relative">
@@ -76,13 +150,13 @@ const HomeScreen = () => {
         <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
           <View className="mr-2 flex-1">
             <Text className="mb-1 text-lg font-medium text-gray-500">Owe You</Text>
-            <Text className="text-2xl font-bold text-error">
+            <Text className="font-dmsans-bold text-2xl text-error">
               2500 <Text className="text-sm">MAD</Text>
             </Text>
           </View>
           <View className="ml-2 flex-1">
             <Text className="mb-1 text-lg font-medium text-gray-500">You owed</Text>
-            <Text className="text-2xl font-bold text-green-500">
+            <Text className="font-dmsans-bold text-2xl text-green-500">
               2500 <Text className="text-sm">MAD</Text>
             </Text>
           </View>
@@ -118,32 +192,48 @@ const HomeScreen = () => {
         <View className="mx-4 ">
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">Recently Activity</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('AllExpenses')}>
               <Text className="font-medium text-primary">See All</Text>
             </TouchableOpacity>
           </View>
 
-          {recentActivity.map((item) => (
+          <View>
+            {recentActivity.map((item) => (
+              <ExpenseListItem
+                key={item.id}
+                {...transformExpenseData(item)}
+                //categories={DEFAULT_CATEGORIES}
+                onPress={handleExpensePress}
+                showBorder={false}
+                currency="MAD"
+              />
+            ))}
+          </View>
+          {/* {RecentlyActivity.map((item) => (
             <View
               key={item.id}
-              className="flex-row items-center justify-between border-gray-100 py-2">
-              <View className="flex-1 flex-row items-center">
+              className="flex-row items-center justify-between py-2 border-gray-100">
+              <View className="flex-row items-center flex-1">
                 <View
                   className="mr-3 h-[55px] w-[55px] items-center justify-center rounded-full"
-                  style={{ backgroundColor: item.iconBg }}>
-                  <Feather name={item.icon} size={20} color={item.iconColor} />
+                  style={{ backgroundColor: '#E6F0FF' }}>
+                  <Feather name={getIconByCategory(item.category)} size={20} color="#2979FF" />
                 </View>
                 <View>
                   <Text className="font-medium text-black">{item.title}</Text>
-                  <Text className="text-sm text-gray-500">{item.time}</Text>
+                  <Text className="text-sm text-gray-500">
+                    {item.incurred_at?.toDate
+                      ? new Date(item.incurred_at.toDate()).toLocaleDateString()
+                      : 'Unknown'}
+                  </Text>
                 </View>
               </View>
               <View className="items-end">
                 <Text className="font-medium text-black">{item.amount} MAD</Text>
-                <Text className="text-sm text-gray-500">Paid by {item.paidBy}</Text>
+                <Text className="text-sm text-gray-500">Paid by {item.user_id}</Text>
               </View>
             </View>
-          ))}
+          ))} */}
         </View>
 
         {/* Faculty Friends */}
@@ -157,13 +247,14 @@ const HomeScreen = () => {
 
           <View className="flex-row justify-between">
             {friends.map((friend, index) => (
-              <View key={index} className="items-center">
-                <View
-                  className="mb-2 h-12 w-12 items-center justify-center rounded-full"
-                  style={{ backgroundColor: friend.color }}>
-                  <Text className="font-bold text-white">{friend.initial}</Text>
-                </View>
-                <Text className="text-sm font-medium text-gray-500">{friend.name}</Text>
+              <View key={index}>
+                <Avatar
+                  initial={friend.initial}
+                  name={friend.name}
+                  color={friend.color}
+                  size="medium"
+                  showName={true}
+                />
               </View>
             ))}
           </View>

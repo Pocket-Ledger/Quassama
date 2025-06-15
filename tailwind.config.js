@@ -57,9 +57,20 @@ module.exports = {
         placeholder: 'rgba(0, 0, 0, 0.2)',
       },
       fontFamily: {
+        DEFAULT: ['DM Sans'],
         dmsans: ['DM Sans'],
         'dmsans-medium': ['DM Sans Medium'],
         'dmsans-bold': ['DM Sans Bold'],
+      },
+      fontWeight: {
+        normal: '400', // Will use DM Sans (regular)
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+
+        light: '300',
+        extrabold: '800',
+        black: '900',
       },
       fontSize: {
         title: ['24px', { lineHeight: '32px', fontWeight: '700' }],

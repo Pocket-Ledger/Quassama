@@ -7,6 +7,8 @@ import GroupsScreen from '../screens/Main/GroupsScreen';
 import ProfileScreen from 'screens/Main/ProfileScreen';
 import HomeScreen from 'screens/Main/HomeScreen';
 import { CustomTabBar } from 'components/CostumTab';
+import AddNewGroupScreen from 'screens/Main/AddNewGroupScreen';
+import GroupDetailsScreen from 'screens/Main/GroupDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,7 +25,11 @@ export function TabNavigator() {
         component={NewExpenseScreen}
         options={{ tabBarLabel: 'New Expense' }}
       />
-      <Tab.Screen name="Groups" component={GroupsScreen} options={{ tabBarLabel: 'Groups' }} />
+      <Tab.Screen
+        name="Groups"
+        component={GroupsScreen}
+        options={{ tabBarLabel: 'Groups' }}
+      />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>
   );

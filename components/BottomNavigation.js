@@ -52,7 +52,7 @@ const BottomNavigation = () => {
               />
               {tab.badge && (
                 <View className="absolute -right-2 -top-1.5 h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
-                  <Text className="text-xs font-bold text-white">1</Text>
+                  <Text className="font-dmsans-bold text-xs text-white">1</Text>
                 </View>
               )}
             </View>

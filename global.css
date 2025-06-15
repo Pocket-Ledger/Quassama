@@ -9,13 +9,29 @@
   }
 
   body {
-    font-family:
-      'DM Sans',
-      system-ui,
-      -apple-system,
-      sans-serif;
+    font-family: 'DM Sans' !important;
+    font-weight: 400;
+  }
 
-    background-color: #ffffff;
+  /* Map font weights to DM Sans variants */
+  .font-normal {
+    font-family: 'DM Sans' !important;
+    font-weight: 400;
+  }
+
+  .font-medium {
+    font-family: 'DM Sans Medium' !important;
+    font-weight: 500;
+  }
+
+  .font-semibold {
+    font-family: 'DM Sans Medium' !important;
+    font-weight: 600;
+  }
+
+  .font-bold {
+    font-family: 'DM Sans Bold' !important;
+    font-weight: 700;
   }
 }
 
