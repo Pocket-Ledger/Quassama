@@ -191,6 +191,25 @@ class Expense {
     const expenses = await this.getExpensesByGroup(groupId);
     return expenses.reduce((total, expense) => total + expense.amount, 0);
   }
+
+  // function that return the total amount of expenses for the current user and the giving group
+  static async getTotalExpensesByUserAndGroup(groupId) {
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("A valid groupId (string) is required");
+    }
+
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    const expenses = await this.getExpensesByGroup(groupId);
+    const userExpenses = expenses.filter(expense => expense.user_id === currentUser.uid);
+    
+    return userExpenses.reduce((total, expense) => total + expense.amount, 0);
+  }
 }
 
 export default Expense;

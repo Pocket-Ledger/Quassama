@@ -18,12 +18,12 @@ const GroupDetailsScreen = () => {
   const route = useRoute();
   const { groupId } = route.params;
 
-  const [groupData, setGroupData] = useState(null);
+  const [groupData, setGroupData]       = useState(null);
   const [TotalExpenses, setTotalExpenses] = useState(0);
-  const [youPaid, setYouPaid] = useState(0);
-  const [youOwe, setYouOwe] = useState(0);
+  const [youPaid, setYouPaid]           = useState(0);
+  const [youOwe, setYouOwe]             = useState(0);
   const [recentExpenses, setRecentExpenses] = useState([]);
-  const [loading, setLoading] = useState(true); // <-- loading state
+  const [loading, setLoading]           = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -32,51 +32,61 @@ const GroupDetailsScreen = () => {
 
       const fetchGroupAndExpenses = async () => {
         try {
-          // 1) fetch basic group info
           const groupRef = doc(db, 'groups', groupId);
-          const snap = await getDoc(groupRef);
+
+          // 1) Fire four independent calls in parallel:
+          const [
+            snap,
+            rawExpenses,
+            allExpenses,
+            userPaidAmount
+          ] = await Promise.all([
+            getDoc(groupRef),
+            Expense.getExpensesByGroupWithLimit(groupId, LIMIT),
+            Expense.getExpensesByGroup(groupId),
+            Expense.getTotalExpensesByUserAndGroup(groupId),
+          ]);
+
+          // 2) If group exists, set its basic data
           if (snap.exists() && mounted) {
             const data = snap.data();
-            const gd = {
+            setGroupData({
               id: snap.id,
               name: data.name,
               totalExpenses: data.totalExpenses,
               youPaid: data.youPaid,
               youOwe: data.youOwe,
               members: data.members || [],
-            };
-            setGroupData(gd);
+            });
           }
 
-          // 2) fetch the LIMIT most recent expenses for this group
-          const raw = await Expense.getExpensesByGroupWithLimit(groupId, LIMIT);
-
-          // 3) fetch usernames for each paidBy
-          const expensesWithUsernames = await Promise.all(
-            raw.map(async exp => {
-              let paidByName = exp.user_id;
-              try {
-                paidByName = await User.getUsernameById(exp.user_id);
-              } catch (e) {
-                // fallback to user_id if username not found
-              }
-              return {
-                id: exp.id,
-                name: exp.title,
-                amount: exp.amount,
-                category: exp.category,
-                time: exp.incurred_at.toDate().toLocaleString(),
-                paidBy: paidByName,
-              };
+          // 3) Build a map of user_id → username (fetching each only once)
+          const uniqueUserIds = [...new Set(rawExpenses.map(e => e.user_id))];
+          const usernameMap = {};
+          await Promise.all(
+            uniqueUserIds.map(async id => {
+              usernameMap[id] = await User.getUsernameById(id).catch(() => id);
             })
           );
 
-          const totalEpense = await Expense.getExpensesByGroup(groupId);
-          const totalAmount = totalEpense.reduce((acc, expense) => acc + expense.amount, 0);
-          setTotalExpenses(totalAmount);
-          console.log('Total Expenses:', totalAmount);
+          // 4) Merge in usernames
+          const expensesWithUsernames = rawExpenses.map(exp => ({
+            id: exp.id,
+            name: exp.title,
+            amount: exp.amount,
+            category: exp.category,
+            time: exp.incurred_at.toDate().toLocaleString(),
+            paidBy: usernameMap[exp.user_id],
+          }));
 
+          // 5) Compute totals
+          const totalAmount = allExpenses.reduce((sum, { amount }) => sum + amount, 0);
+
+          // 6) Update state in one go
           if (mounted) {
+            setTotalExpenses(totalAmount);
+            setYouPaid(userPaidAmount);
+            setYouOwe(totalAmount - userPaidAmount);
             setRecentExpenses(expensesWithUsernames);
           }
         } catch (err) {
