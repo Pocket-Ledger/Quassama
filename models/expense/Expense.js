@@ -32,7 +32,7 @@ class Expense {
   }
 
   async save() {
-    this.validate();
+/*     this.validate(); */
 
     const auth = getAuth(app);
     const currentUser = auth.currentUser;
@@ -106,9 +106,62 @@ class Expense {
     return recentExpenses;
   }
 
-  // function that return expenses by group_id limit 3
+  /**
+   * Fetch all expenses for a given group, ordered by date (newest first).
+   * @param {string} groupId 
+   * @returns {Promise<Array<object>>}
+   */
+  static async getExpensesByGroup(groupId) {
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("A valid groupId (string) is required");
+    }
 
-  // function that return expenses by group_id all
+    const expensesCol = collection(db, "expenses");
+    const q = query(
+      expensesCol,
+      where("group_id", "==", groupId),
+      orderBy("incurred_at", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  }
+
+  /**
+   * Fetch up to `n` expenses for a given group, ordered by date (newest first).
+   * @param {string} groupId 
+   * @param {number} n  — maximum number of expenses to return
+   * @returns {Promise<Array<object>>}
+   */
+  static async getExpensesByGroupWithLimit(groupId, n) {
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("A valid groupId (string) is required");
+    }
+    if (
+      typeof n !== "number" ||
+      !Number.isInteger(n) ||
+      n <= 0
+    ) {
+      throw new Error("Limit `n` must be a positive integer");
+    }
+
+    const expensesCol = collection(db, "expenses");
+    const q = query(
+      expensesCol,
+      where("group_id", "==", groupId),
+      orderBy("incurred_at", "desc"),
+      limit(n)
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  }
 
 
   
