@@ -16,7 +16,8 @@ const ExpenseListItem = ({
   showBorder = true,
   customStyle = {},
 }) => {
-  // Get category details from categories array
+  console.log('time', time);
+
   const getCategoryDetails = (categoryId) => {
     const categoryObj = DEFAULT_CATEGORIES.find((cat) => cat.id === categoryId);
     return categoryObj || { icon: 'credit-card', color: '#2979FF' };
@@ -32,13 +33,13 @@ const ExpenseListItem = ({
 
   return (
     <TouchableOpacity
-      className={`flex-row items-center justify-between  py-2 ${
+      className={`flex-row items-center justify-between   py-2 ${
         showBorder ? 'border-b border-gray-100' : ''
       } ${customStyle.container || ''}`}
       onPress={handlePress}
       activeOpacity={0.7}>
       {/* Left side - Category Icon and Expense Details */}
-      <View className="flex-1 flex-row items-center">
+      <View className="flex-row items-center flex-1 gap-2">
         {/* Category Icon */}
         <View className="">
           <CategoryItem
@@ -53,6 +54,7 @@ const ExpenseListItem = ({
             customStyle={{
               iconContainer: { backgroundColor: '#E6F0FF' },
             }}
+            containerPadding="p-0"
           />
         </View>
 
