@@ -1,5 +1,5 @@
 import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion } from "firebase/firestore";
-import { app, db } from "../../firebase"; 
+import { app, db } from "../../firebase";
 
 class Group{
     name;
@@ -20,11 +20,14 @@ class Group{
 
     // function to create the group and save it to firebase collection groups
     async creatGroup(name, created_by, currency, members, description) {
+        const memberIds = members.map(m => (typeof m === 'string' ? m : m.id));
+
         const groupData = {
             name,
             created_by,
             currency,
             members,
+            memberIds,
             created_at: new Date().toISOString(),
             description,
         };
@@ -44,7 +47,7 @@ class Group{
             GroupsCollection,
             or(
                 where("created_by", "==", user_id),
-                where("members", "array-contains", user_id)
+                where("memberIds", "array-contains", user_id)
             )
         );
         const querySnapshot = await getDocs(q);
@@ -55,10 +58,12 @@ class Group{
         return groups;
     }
 
-    static async addMemberToGroup(groupId, userId) {
+    static async addMemberToGroup(groupId, member) {
         const groupRef = doc(db, "groups", groupId);
+        const memberId = typeof member === 'string' ? member : member.id;
         await updateDoc(groupRef, {
-        members: arrayUnion(userId),
+        members: arrayUnion(member),
+        memberIds: arrayUnion(memberId),
         });
     }
 

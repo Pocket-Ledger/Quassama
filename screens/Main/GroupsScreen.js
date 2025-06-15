@@ -198,8 +198,17 @@ const GroupsScreen = () => {
 
   const handleAcceptInvitation = async (invId, groupId) => {
     try {
-      // 1) add to group
-      await Group.addMemberToGroup(groupId, userId);
+      // 1) build member object for the current user
+      const username = await User.getUsernameById(userId);
+      const memberObj = {
+        id: userId,
+        name: username,
+        initial: username ? username[0].toUpperCase() : '',
+        color: '#2979FF',
+      };
+
+      // add to group
+      await Group.addMemberToGroup(groupId, memberObj);
 
       // 2) mark invitation accepted
       await Invitation.accept(invId);
