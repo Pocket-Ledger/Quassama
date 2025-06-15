@@ -17,27 +17,29 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoadingUser(true);
       try {
         const userDetails = await User.getUserDetails();
         setUser(userDetails);
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsLoadingUser(false);
       }
     };
     fetchUser();
   }, []);
 
   const userProfile = {
-    name: user?.username || 'Essekhyry El Mahdi',
-    email: user?.email || 'essekhyry.mahdi@gmail.com',
+    username: user?.username,
+    email: user?.email,
     initial: user?.username ? user.username.charAt(0).toUpperCase() : 'M',
     color: '#2979FF',
   };
-  
-
 
   const menuItems = [
     {
@@ -90,17 +92,32 @@ const ProfileScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header - Profile Info */}
-        <View className="items-center px-4 pb-8 pt-12">
+        <View className="items-center px-4 pt-12 pb-8">
           {/* Profile Avatar */}
           <View
-            className="mb-4 h-20 w-20 items-center justify-center rounded-full"
-            style={{ backgroundColor: userProfile.color }}>
-            <Text className="font-dmsans-bold text-2xl text-white">{userProfile.initial}</Text>
+            className="items-center justify-center w-20 h-20 mb-4 rounded-full"
+            style={{ backgroundColor: isLoadingUser ? '#E5E5E5' : userProfile.color }}>
+            {isLoadingUser ? (
+              <View className="w-8 h-8 bg-gray-300 rounded-full" />
+            ) : (
+              <Text className="text-2xl text-white font-dmsans-bold">{userProfile.initial}</Text>
+            )}
           </View>
 
           {/* Profile Name and Email */}
-          <Text className="mb-2 font-dmsans-bold text-xl text-black">{userProfile.name}</Text>
-          <Text className="text-base text-gray-500">{userProfile.email}</Text>
+          {isLoadingUser ? (
+            <>
+              <View className="w-48 h-6 mb-2 bg-gray-200 rounded" />
+              <View className="w-64 h-4 bg-gray-200 rounded" />
+            </>
+          ) : (
+            <>
+              <Text className="mb-2 text-xl text-black font-dmsans-bold">
+                {userProfile.username}
+              </Text>
+              <Text className="text-base text-gray-500">{userProfile.email}</Text>
+            </>
+          )}
         </View>
 
         {/* Menu Items */}
@@ -108,12 +125,12 @@ const ProfileScreen = () => {
           {menuItems.map((item) => (
             <TouchableOpacity
               key={item.id}
-              className="mb-1 flex-row items-center justify-between border-b border-gray-250 py-4"
+              className="flex-row items-center justify-between py-4 mb-1 border-b border-gray-250"
               onPress={item.action}
               disabled={item.hasSwitch}>
               <View className="flex-row items-center">
                 {/* Icon */}
-                <View className="mr-4 h-10 w-10 items-center justify-center">
+                <View className="items-center justify-center w-10 h-10 mr-4">
                   <Feather name={item.icon} size={20} color="#666" />
                 </View>
 
@@ -124,7 +141,7 @@ const ProfileScreen = () => {
               {/* Right Side Content */}
               <View className="flex-row items-center">
                 {/* Notification Dot */}
-                {item.hasNotification && <View className="mr-2 h-2 w-2 rounded-full bg-red-500" />}
+                {item.hasNotification && <View className="w-2 h-2 mr-2 bg-red-500 rounded-full" />}
 
                 {/* Right Text */}
                 {item.rightText && (
@@ -149,8 +166,8 @@ const ProfileScreen = () => {
           ))}
 
           {/* Logout Button */}
-          <TouchableOpacity className="mb-1 flex-row items-center py-4" onPress={handleLogout}>
-            <View className="mr-4 h-10 w-10 items-center justify-center">
+          <TouchableOpacity className="flex-row items-center py-4 mb-1" onPress={handleLogout}>
+            <View className="items-center justify-center w-10 h-10 mr-4">
               <Feather name="log-out" size={20} color="#FF3B30" />
             </View>
             <Text className="text-lg text-error">Logout</Text>

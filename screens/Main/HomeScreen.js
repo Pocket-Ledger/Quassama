@@ -13,14 +13,18 @@ const HomeScreen = () => {
   const navigation = useNavigation();
 
   const [user, setUser] = useState('');
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoadingUser(true);
       try {
         const userDetails = await User.getUserDetails();
         setUser(userDetails);
       } catch (error) {
-        console.error('Error fetching user details:', error);
+        console.error(error);
+      } finally {
+        setIsLoadingUser(false);
       }
     };
     fetchUser();
@@ -127,43 +131,52 @@ const HomeScreen = () => {
   ];
 
   return (
-    <ScrollView className="container flex flex-1 gap-6 bg-white pb-6 pt-2 ">
+    <ScrollView className="container flex flex-1 gap-6 pt-2 pb-6 bg-white ">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
+      <View className="flex-row items-center justify-between px-4 pt-12 pb-4">
         <View className="flex-row items-center">
-          <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
-            <Text className="font-dmsans-bold text-lg text-white">M</Text>
+          <View className="items-center justify-center w-12 h-12 mr-3 rounded-full bg-primary">
+            <Text className="text-lg text-white font-dmsans-bold">M</Text>
           </View>
           <View>
             <Text className="text-sm text-gray-500">Good morning 👋</Text>
-            <Text className="font-dmsans-bold text-lg text-black">{user.username}</Text>
+            {/* <Text className="text-lg text-black font-dmsans-bold">{user.username}</Text> */}
+            {isLoadingUser ? (
+              <>
+                <View className="w-48 h-6 mb-2 bg-gray-100 rounded" />
+              </>
+            ) : (
+              <>
+                <Text className="mb-2 text-xl text-black font-dmsans-bold">{user.username}</Text>
+              </>
+            )}
           </View>
         </View>
         <TouchableOpacity className="relative">
           <Feather name="bell" size={24} color="#666" />
-          <View className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-red-500" />
+          <View className="absolute w-3 h-3 bg-red-500 rounded-full -right-1 -top-1" />
         </TouchableOpacity>
       </View>
 
       {/* Balance Cards */}
       <View className="flex gap-8 pb-4">
-        <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
-          <View className="mr-2 flex-1">
+        <View className="flex-row px-4 py-2 border border-gray-100 rounded-md">
+          <View className="flex-1 mr-2">
             <Text className="mb-1 text-lg font-medium text-gray-500">Owe You</Text>
-            <Text className="font-dmsans-bold text-2xl text-error">
+            <Text className="text-2xl font-dmsans-bold text-error">
               2500 <Text className="text-sm">MAD</Text>
             </Text>
           </View>
-          <View className="ml-2 flex-1">
+          <View className="flex-1 ml-2">
             <Text className="mb-1 text-lg font-medium text-gray-500">You owed</Text>
-            <Text className="font-dmsans-bold text-2xl text-green-500">
+            <Text className="text-2xl text-green-500 font-dmsans-bold">
               2500 <Text className="text-sm">MAD</Text>
             </Text>
           </View>
         </View>
 
         {/* Overview Section */}
-        <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        <View className="p-4 bg-white border border-gray-100 shadow-sm rounded-xl">
           <Text className="mb-4 text-lg font-medium text-black">April 2025 Overview</Text>
 
           <View className="flex-row items-center">
@@ -173,10 +186,10 @@ const HomeScreen = () => {
 
             <View className="flex-1">
               {expenseData.map((item, index) => (
-                <View key={index} className="mb-2 flex-row items-center justify-between">
+                <View key={index} className="flex-row items-center justify-between mb-2">
                   <View className="flex-row items-center">
                     <View
-                      className="mr-2 h-3 w-3 rounded-full"
+                      className="w-3 h-3 mr-2 rounded-full"
                       style={{ backgroundColor: item.color }}
                     />
                     <Text className="text-lg font-normal text-gray-500">{item.category}</Text>
@@ -190,7 +203,7 @@ const HomeScreen = () => {
 
         {/* Recent Activity */}
         <View className="mx-4 ">
-          <View className="mb-4 flex-row items-center justify-between">
+          <View className="flex-row items-center justify-between mb-4">
             <Text className="text-lg font-medium text-black">Recently Activity</Text>
             <TouchableOpacity onPress={() => navigation.navigate('AllExpenses')}>
               <Text className="font-medium text-primary">See All</Text>
@@ -238,7 +251,7 @@ const HomeScreen = () => {
 
         {/* Faculty Friends */}
         <View className="mx-4 ">
-          <View className="mb-4 flex-row items-center justify-between">
+          <View className="flex-row items-center justify-between mb-4">
             <Text className="text-lg font-medium text-black">Faculty Friends</Text>
             <TouchableOpacity>
               <Text className="font-medium text-primary">Switch Group</Text>
