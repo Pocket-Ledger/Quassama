@@ -1,5 +1,5 @@
 import { getAuth } from "firebase/auth";
-import { addDoc, collection, getDocs, query, where, Timestamp, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where, Timestamp, doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
 import { app, db } from "../../firebase";
 
 class Invitation {
@@ -80,9 +80,24 @@ class Invitation {
         return `Invitation ${invitationId} deleted`;
     }
 
-    static async accept(invitationId) {
-    const ref = doc(db, "invitations", invitationId);
-    await updateDoc(ref, { status: "accepted" });
+    /** 
+   * Marks this invitation as accepted *and* adds the user to the group. 
+   */
+  static async accept(invitationId) {
+    const invRef = doc(db, "invitations", invitationId);
+
+    // 1) Mark the invitation accepted
+    await updateDoc(invRef, { status: "accepted" });
+
+    // 2) Read back the invitation so we know group_id + member_id
+    const snap = await getDoc(invRef);
+    if (!snap.exists()) {
+      throw new Error("Invitation not found");
+    }
+    const { group_id, member_id } = snap.data();
+
+    // 3) Add the member to the group’s members array
+    await Group.addMemberToGroup(group_id, member_id);
   }
 
   /** mark this invitation as declined (or just delete it) */

@@ -50,7 +50,7 @@ class Notification{
             // Assuming you have a Firestore instance initialized as `db`
             const docRef = await addDoc(collection(db, 'notifications'), notificationData);
             console.log('Notification saved with ID:', docRef.id);
-            return docRef.id; // Return the ID of the saved notification
+            return docRef.id;
         } catch (error) {
             console.error('Error saving notification:', error);
             throw new Error('Failed to save notification');
