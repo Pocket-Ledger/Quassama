@@ -75,13 +75,24 @@ const AddNewGroupScreen = () => {
       const currency = 'MAD';
       const description = '';
 
-      // Create group
+      // Fetch current user's info to include as initial member
+      const currentUserDetails = await User.getUserDetails();
+      const creatorMember = {
+        id: created_by,
+        name: currentUserDetails.username,
+        initial: currentUserDetails.username
+          ? currentUserDetails.username[0].toUpperCase()
+          : '',
+        color: '#2979FF',
+      };
+
+      // Create group with only the creator as a member
       const groupInstance = new Group();
       const groupId = await groupInstance.creatGroup(
         groupName,
         created_by,
         currency,
-        selectedMembers,
+        [creatorMember],
         description
       );
 
