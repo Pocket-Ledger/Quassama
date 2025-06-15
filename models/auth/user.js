@@ -57,6 +57,44 @@ class User{
         return userDetails;
     }
 
+    // search for users by username
+    static async searchUsersByUsername(username) {
+        if (!username || username.trim() === "") {
+            throw new Error("Username is required for search");
+        }
+        
+        const usersCollection = collection(db, "users");
+        const userQuery = query(usersCollection, where("username", "==", username));
+        const querySnapshot = await getDocs(userQuery);
+        
+        const users = [];
+        querySnapshot.forEach((doc) => {
+            users.push({ id: doc.id, ...doc.data() });
+        });
+        
+        return users;
+    }
+
+    static async getUsernameById(userId) {
+    if (!userId) {
+      throw new Error("User ID is required");
+    }
+    const usersCol = collection(db, "users");
+    const q = query(usersCol, where("user_id", "==", userId));
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      throw new Error(`No user found with ID ${userId}`);
+    }
+
+    // assume there's only one matching doc
+    const doc = snap.docs[0];
+    const data = doc.data();
+    return data.username;
+  }
+
+
+
 }
 
 export default User;

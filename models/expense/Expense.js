@@ -11,14 +11,14 @@ class Expense {
   incurred_at;
   group_id;
 
-  constructor(title, amount, category, note) {
+  constructor(title, amount, category, note, group_id) {
     this.title = title;
     this.amount = parseFloat(amount);
     this.category = category;
     this.description = note || "";
     this.user_id = null;
     this.incurred_at = null;
-    this.group_id = null; // Optional, can be set later if needed
+    this.group_id = group_id; // Optional, can be set later if needed
   }
 
   validate() {

@@ -1,12 +1,121 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
 import GroupsList from 'components/GroupsList';
+import Group from 'models/group/group';
+import { getAuth } from 'firebase/auth';
+import Invitation from 'models/invitation/invitation';
+import User from 'models/auth/user';
+
+// A little card just for one invitation
+const InvitationCard = ({ invitation, onAccept, onDecline }) => {
+  const [inviterName, setInviterName] = useState('…')
+
+  useEffect(() => {
+    let mounted = true
+    User.getUsernameById(invitation.user_id)
+      .then(name => {
+        if (mounted) setInviterName(name)
+      })
+      .catch(() => {
+        if (mounted) setInviterName('Unknown')
+      })
+    return () => { mounted = false }
+  }, [invitation.user_id])
+
+  return (
+    <View className="my-6 rounded-xl bg-blue-50 p-4">
+      <View className="flex-row items-center">
+        <View
+          className="mr-3 h-12 w-12 items-center justify-center rounded-full"
+          style={{ backgroundColor: '#E91E63' }}
+        >
+          <Text className="font-dmsans-bold text-lg text-white">
+            {inviterName[0]?.toUpperCase() || '?'}
+          </Text>
+        </View>
+        <View className="flex-1">
+          <Text className="font-dmsans-bold text-base text-black">
+            Join "{invitation.group_name}"?
+          </Text>
+          {/* <-- here we use the looked-up name */}
+          <Text className="text-sm text-gray-500">
+            Invited By {inviterName}
+          </Text>
+        </View>
+      </View>
+
+      <View className="mt-4 flex-row gap-3">
+        <TouchableOpacity
+          className="flex-1 rounded-lg bg-primary py-3"
+          onPress={onAccept}
+        >
+          <Text className="text-center font-semibold text-white">
+            Accept
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-1 rounded-lg border border-gray-300 py-3"
+          onPress={onDecline}
+        >
+          <Text className="text-center font-semibold text-gray-900">
+            Decline
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+}
 
 const GroupsScreen = () => {
+  const auth = getAuth();
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
+  const [groups, setGroups] = useState([]);
+  const [invitations, setInvitations] = useState([]);
+
+  const user = auth.currentUser.uid;
+
+ /*  useEffect(() => {
+    
+    const fetchGroups = async () => {
+      console.log('Fetching groups...');
+      const groupsData = await Group.getGroupsByUser(user);
+      setGroups(groupsData);
+    };
+
+    fetchGroups();
+  }, []); */
+
+  useFocusEffect(
+    useCallback(() => {
+       const fetchGroups = async () => {
+        console.log('Fetching groups...');
+        const groupsData = await Group.getGroupsByUser(user);
+        setGroups(groupsData);
+      };
+      fetchGroups();
+    }, [user])
+  );
+
+  console.log('Groups:', groups);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchInvitations = async () => {
+        console.log('Fetching invitations...');
+        const invitationsData = await Invitation.getInvitationsByUser(user);
+        setInvitations(invitationsData);
+      };
+      fetchInvitations();
+    }, [user])
+  );
+
+  console.log('\n\n\n');
+  console.log('Invitations:', invitations);
+
 
   const tabs = ['All', 'You Owed', 'You Ow', 'Settled'];
 
@@ -69,6 +178,7 @@ const GroupsScreen = () => {
   const handleGroupPress = (group) => {
     console.log('Navigate to group:', group.name);
     // navigation.navigate('GroupDetails', { groupId: group.id });
+    navigation.navigate('GroupDetails', { groupId: group.id });
   };
 
   const handleStarPress = (groupId) => {
@@ -76,13 +186,32 @@ const GroupsScreen = () => {
     // Update the groups data state here
   };
 
-  const handleAcceptInvitation = () => {
-    console.log('Accept invitation');
-  };
+  const userId = getAuth().currentUser.uid; 
 
-  const handleDeclineInvitation = () => {
-    console.log('Decline invitation');
-  };
+const handleAcceptInvitation = async (invId, groupId) => {
+  try {
+    // 1) add to group
+    await Group.addMemberToGroup(groupId, userId);
+
+    // 2) mark invitation accepted
+    await Invitation.accept(invId);
+
+    // 3) refresh both lists
+/*     refreshInvitations();
+    refreshGroups(); */
+  } catch (err) {
+    console.error("Accept failed", err);
+  }
+};
+
+const handleDeclineInvitation = async (invId) => {
+  try {
+    await Invitation.decline(invId);
+/*     refreshInvitations(); */
+  } catch (err) {
+    console.error("Decline failed", err);
+  }
+};
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -115,42 +244,30 @@ const GroupsScreen = () => {
           contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Groups List */}
           <GroupsList
-            groups={groupsData}
+            groups={groups.map(g => ({
+              id: g.id,
+              name: g.name,
+              members: g.members || [],
+              additionalMembers: g.additionalMembers || 0,
+              amount: g.amount || '0 MAD',
+              lastExpense: g.lastExpense || 'No expenses yet',
+              time: g.time || '',
+              isStarred: g.isStarred || false,
+              // add other fields as needed
+            }))}
             onGroupPress={handleGroupPress}
             onStarPress={handleStarPress}
           />
 
           {/* Invitation Card */}
-          <View className="my-6 rounded-xl bg-blue-50 p-4">
-            <View className="flex-row items-center">
-              <View
-                className="mr-3 h-12 w-12 items-center justify-center rounded-full"
-                style={{ backgroundColor: invitation.color }}>
-                <Text className="font-dmsans-bold text-lg text-white">{invitation.initial}</Text>
-              </View>
-
-              <View className="flex-1">
-                <Text className="font-dmsans-bold text-base text-black">
-                  Join "{invitation.groupName}" ?
-                </Text>
-                <Text className="text-sm text-gray-500">Invited By {invitation.invitedBy}</Text>
-              </View>
-            </View>
-
-            <View className="mt-4 flex-row gap-3">
-              <TouchableOpacity
-                className="flex-1 rounded-lg bg-primary py-3"
-                onPress={handleAcceptInvitation}>
-                <Text className="text-center font-semibold text-white">Accept</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                className="flex-1 rounded-lg border border-gray-300 py-3"
-                onPress={handleDeclineInvitation}>
-                <Text className="text-center font-semibold text-gray-900">Decline</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+{invitations.map(inv => (
+  <InvitationCard
+    key={inv.id}
+    invitation={inv}
+    onAccept={() => handleAcceptInvitation(inv.id, inv.group_id)}
+    onDecline={() => handleDeclineInvitation(inv.id)}
+  />
+))}
         </ScrollView>
       </View>
     </SafeAreaView>

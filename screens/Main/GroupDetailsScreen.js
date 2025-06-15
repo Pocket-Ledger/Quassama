@@ -1,103 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { BackButton } from 'components/BackButton';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import Header from 'components/Header';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import ExpenseListItem from 'components/ExpenseListItem';
 import Avatar from 'components/Avatar';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { groupId } = route.params;
+  const [groupData, setGroupData] = useState(null);
 
-  const groupData = {
-    name: 'Vacation Agadir',
-    totalExpenses: '1,2810.50',
-    youPaid: '112.99',
-    youOwe: '112.99',
-    members: [
-      { id: 1, initial: 'M', name: 'You', color: '#2979FF', amount: '+$85.50' },
-      { id: 2, initial: 'S', name: 'Sara', color: '#4CAF50', amount: '-$20.40' },
-      { id: 3, initial: 'A', name: 'Ahmad', color: '#FF9800', amount: '+$30.16' },
-      { id: 4, initial: 'L', name: 'Lina', color: '#E91E63', amount: '-$18.40' },
-      { id: 5, initial: 'F', name: 'Fady', color: '#8D6E63', amount: '-$18.40' },
-    ],
-    recentExpenses: [
-      {
-        id: 1,
-        name: 'Groceries',
-        amount: '180 MAD',
-        time: '2h ago',
-        paidBy: 'Sara',
-        icon: 'shopping-cart',
-        iconColor: '#2979FF',
-        iconBg: '#E3F2FD',
-      },
-      {
-        id: 2,
-        name: 'Internet Bill',
-        amount: '180 MAD',
-        time: 'Yesterday',
-        paidBy: 'Morad',
-        icon: 'wifi',
-        iconColor: '#2979FF',
-        iconBg: '#E3F2FD',
-      },
-      {
-        id: 3,
-        name: 'Cleaning',
-        amount: '60 MAD',
-        time: '2d ago',
-        paidBy: 'Ahmad',
-        icon: 'check-circle',
-        iconColor: '#2979FF',
-        iconBg: '#E3F2FD',
-      },
-    ],
-  };
+  // Fetch group details when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      let mounted = true;
+      const fetchGroup = async () => {
+        try {
+          const groupRef = doc(db, 'groups', groupId);
+          const snap = await getDoc(groupRef);
+          if (snap.exists() && mounted) {
+            const data = snap.data();
+            setGroupData({
+              id: snap.id,
+              name: data.name,
+              totalExpenses: data.totalExpenses,
+              youPaid: data.youPaid,
+              youOwe: data.youOwe,
+              members: data.members || [],
+              recentExpenses: data.recentExpenses || [],
+            });
+          }
+        } catch (err) {
+          console.error('Error fetching group details', err);
+        }
+      };
+      fetchGroup();
+      return () => { mounted = false; };
+    }, [groupId])
+  );
+
+  // Show loading state
+  if (!groupData) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center bg-white">
+        <Text>Loading…</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // Destructure real data
+  const { name, totalExpenses, youPaid, youOwe, members, recentExpenses } = groupData;
 
   const handleSettleUp = () => {
     console.log('Settle up pressed');
   };
 
   const handleSeeAllExpenses = () => {
-    console.log('See all expenses pressed');
+    navigation.navigate('AllExpenses', { groupId });
   };
+
   const handleExpensePress = (expense) => {
-    // Handle expense item press
     console.log('Expense pressed:', expense);
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="container">
-        {/* Header */}
-        {/* <View className="flex flex-row items-center justify-start pb-4 mb-6">
-          <BackButton />
-          <Text className="mt-2 ml-12 text-xl text-black font-dmsans-bold"></Text>
-        </View> */}
-        <Header title={groupData.name} />
+        <Header title={name} />
 
         <ScrollView
-          className="flex-1 "
+          className="flex-1"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}>
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
           {/* Group Summary Card */}
           <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-            <Text className="text-center text-base text-black/75 ">Total Group Expenses</Text>
+            <Text className="text-center text-base text-black/75">Total Group Expenses</Text>
             <Text className="text-center text-2xl font-medium text-black">
-              $ {groupData.totalExpenses}
+              $ {totalExpenses}
             </Text>
 
             <View className="mt-6 flex-row justify-between">
               <View className="flex-1">
                 <Text className="text-sm text-black/75">You Paid</Text>
-                <Text className="text-xl text-black">$ {groupData.youPaid}</Text>
+                <Text className="text-xl text-black">$ {youPaid}</Text>
               </View>
               <View className="flex-1 items-end">
                 <Text className="text-sm text-black/75">You Owe</Text>
-                <Text className="text-xl text-red-500">-${groupData.youOwe}</Text>
+                <Text className="text-xl text-red-500">-${youOwe}</Text>
               </View>
             </View>
           </View>
@@ -109,14 +104,8 @@ const GroupDetailsScreen = () => {
 
           {/* Members List */}
           <View className="mb-6 flex-row justify-between">
-            {groupData.members.map((member) => (
+            {members.map((member) => (
               <View key={member.id} className="items-center">
-                {/* <View
-                  className="items-center justify-center w-12 h-12 mb-2 rounded-full"
-                  style={{ backgroundColor: member.color }}>
-                  <Text className="text-base text-white font-dmsans-bold">{member.initial}</Text>
-                </View>
-                <Text className="mb-1 text-sm text-black/50">{member.name}</Text> */}
                 <Avatar
                   initial={member.initial}
                   name={member.name}
@@ -125,11 +114,13 @@ const GroupDetailsScreen = () => {
                   showName={true}
                 />
                 <Text
-                  className={`text-sm  ${
-                    member.amount.startsWith('+') ? 'text-green-500' : 'text-red-500'
-                  }`}>
-                  {member.amount}
-                </Text>
+  className={`text-sm ${
+    typeof member.amount === 'string' && member.amount.startsWith('+')
+      ? 'text-green-500'
+      : 'text-red-500'
+  }`}>
+  {member.amount ?? '—'}
+</Text>
               </View>
             ))}
           </View>
@@ -144,38 +135,20 @@ const GroupDetailsScreen = () => {
 
           {/* Recent Expenses List */}
           <View className="gap-4">
-            {groupData.recentExpenses.map((expense) => (
-              <>
-                <ExpenseListItem
-                  id={expense.id}
-                  name={expense.name}
-                  amount={expense.amount}
-                  category={expense.category}
-                  time={expense.time}
-                  paidBy={expense.paidBy}
-                  categories={DEFAULT_CATEGORIES}
-                  onPress={handleExpensePress}
-                  showBorder={true}
-                  currency="MAD"
-                />
-                {/* <View key={expense.id} className="flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <View
-                    className="items-center justify-center w-12 h-12 mr-4 rounded-full"
-                    style={{ backgroundColor: expense.iconBg }}>
-                    <Feather name={expense.icon} size={20} color={expense.iconColor} />
-                  </View>
-                  <View>
-                    <Text className="text-base font-medium text-black">{expense.name}</Text>
-                    <Text className="text-sm text-gray-500">{expense.time}</Text>
-                  </View>
-                </View>
-                <View className="items-end">
-                  <Text className="text-base font-semibold text-black">{expense.amount}</Text>
-                  <Text className="text-sm text-gray-500">Paid by {expense.paidBy}</Text>
-                </View>
-              </View> */}
-              </>
+            {recentExpenses.map((expense) => (
+              <ExpenseListItem
+                key={expense.id}
+                id={expense.id}
+                name={expense.name}
+                amount={expense.amount}
+                category={expense.category}
+                time={expense.time}
+                paidBy={expense.paidBy}
+                categories={DEFAULT_CATEGORIES}
+                onPress={() => handleExpensePress(expense)}
+                showBorder={true}
+                currency="MAD"
+              />
             ))}
           </View>
         </ScrollView>

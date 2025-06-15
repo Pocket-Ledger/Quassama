@@ -14,6 +14,8 @@ import { useNavigation } from '@react-navigation/native';
 import Group from 'models/group/group';
 import { getAuth } from 'firebase/auth';
 import Header from 'components/Header';
+import User from 'models/auth/user';
+import Invitation from 'models/invitation/invitation';
 
 const AddNewGroupScreen = () => {
   const navigation = useNavigation();
@@ -24,35 +26,54 @@ const AddNewGroupScreen = () => {
   const [notifyForExpenses, setNotifyForExpenses] = useState(true);
   const [errors, setErrors] = useState({});
   const [isCreating, setIsCreating] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const [selectedMembers, setSelectedMembers] = useState([
-    { id: 1, initial: 'M', name: 'Mehdi', color: '#2979FF' },
-    { id: 2, initial: 'S', name: 'Sara', color: '#FF9800' },
-    { id: 3, initial: 'R', name: 'Rabie', color: '#673AB7' },
-  ]);
+  // Now holds { docId, id, username, email }
+  const [selectedMembers, setSelectedMembers] = useState([]);
+
+  const handleSearch = async () => {
+    if (!memberInput.trim()) return;
+    setIsSearching(true);
+    try {
+      const users = await User.searchUsersByUsername(memberInput.trim());
+      // map each Firestore doc to { docId, id: user_id, ... }
+      setSearchResults(
+        users.map(u => ({
+          docId: u.id,
+          id: u.user_id,
+          username: u.username,
+          email: u.email,
+        }))
+      );
+    } catch (error) {
+      console.error('Error searching for users:', error);
+      Alert.alert('Error', 'Failed to search for users');
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors = {};
-
     if (!groupName.trim()) {
       newErrors.groupName = 'Group name is required';
     }
-
     if (selectedMembers.length === 0) {
       newErrors.members = 'Please add at least one member';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleRemoveMember = (memberId) => {
-    setSelectedMembers(selectedMembers.filter((member) => member.id !== memberId));
+    setSelectedMembers(m =>
+      m.filter(member => member.id !== memberId)
+    );
   };
 
   const handleAddGroup = async () => {
     if (!validateForm()) return;
-
     setIsCreating(true);
     try {
       const auth = getAuth();
@@ -61,8 +82,34 @@ const AddNewGroupScreen = () => {
       const currency = 'MAD';
       const description = '';
 
+      // Create group
       const groupInstance = new Group();
-      await groupInstance.creatGroup(groupName, created_by, currency, selectedMembers, description);
+      const groupId = await groupInstance.creatGroup(
+        groupName,
+        created_by,
+        currency,
+        selectedMembers,
+        description
+      );
+
+      // Send invitations by UID!
+      for (const member of selectedMembers) {
+        if (member.id !== created_by) {
+          try {
+            const invitation = new Invitation(
+              created_by,    // sender
+              groupId,       // group
+              groupName,     // group name
+              'pending',     // status
+              member.id      // receiver UID
+            );
+            await invitation.createNew(member.id);
+            console.log('Invitation sent to', member.id);
+          } catch (err) {
+            console.error('Error inviting', member.name, err);
+          }
+        }
+      }
 
       Alert.alert('Success', 'Group created successfully!');
       navigation.goBack();
@@ -74,30 +121,26 @@ const AddNewGroupScreen = () => {
     }
   };
 
-  const handleToggleInviteOthers = () => {
-    setAllowInviteOthers(!allowInviteOthers);
-  };
+  const handleToggleInviteOthers = () =>
+    setAllowInviteOthers(v => !v);
 
-  const handleToggleNotifications = () => {
-    setNotifyForExpenses(!notifyForExpenses);
-  };
+  const handleToggleNotifications = () =>
+    setNotifyForExpenses(v => !v);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
-        className="container "
+        className="container"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}>
-        {/* Header */}
-        {/* <View className="flex flex-row items-center justify-start px-4 pb-4 mb-6">
-          <BackButton />
-          <Text className="mt-2 ml-12 text-xl text-black font-dmsans-bold"></Text>
-        </View> */}
-        |<Header title="Add New Group" />
-        <View className="flex-1 gap-6 ">
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <Header title="Add New Group" />
+        <View className="flex-1 gap-6">
           {/* Group Name */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">Group Name</Text>
+            <Text className="input-label text-base font-medium text-black">
+              Group Name
+            </Text>
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4 py-4 text-black ${
@@ -106,71 +149,121 @@ const AddNewGroupScreen = () => {
                 placeholder='Eg: "Roommates", "Vacation Agadir"'
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={groupName}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setGroupName(text);
                   if (errors.groupName) {
-                    setErrors((prev) => ({ ...prev, groupName: null }));
+                    setErrors(e => ({ ...e, groupName: null }));
                   }
                 }}
                 autoCapitalize="words"
               />
             </View>
             {errors.groupName && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.groupName}</Text>
+              <Text className="error-text mt-1 text-sm text-red-500">
+                {errors.groupName}
+              </Text>
             )}
           </View>
 
-          {/* Add Members */}
-          <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">Add Members</Text>
-            <View className="input-container">
-              <TextInput
-                className="input-field rounded-lg border border-gray-200 px-4 py-4 text-black"
-                placeholder='Eg: "user02718"'
-                placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                value={memberInput}
-                onChangeText={setMemberInput}
-                autoCapitalize="none"
-              />
-            </View>
-            {errors.members && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.members}</Text>
-            )}
+          {/* Member Search */}
+          <View className="input-container flex-row">
+            <TextInput
+              className="input-field flex-1 rounded-lg border border-gray-200 px-4 py-4 text-black"
+              placeholder='Eg: "user02718"'
+              placeholderTextColor="rgba(0, 0, 0, 0.4)"
+              value={memberInput}
+              onChangeText={setMemberInput}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              className="ml-2 rounded-lg bg-primary px-4 justify-center"
+              onPress={handleSearch}
+              disabled={isSearching}
+            >
+              <Text className="text-white">
+                {isSearching ? '...' : 'Search'}
+              </Text>
+            </TouchableOpacity>
           </View>
+          {searchResults.length > 0 ? (
+            <View className="mt-2">
+              <Text className="mb-2 text-sm text-gray-600">
+                Search Results:
+              </Text>
+              {searchResults.map(user => (
+                <TouchableOpacity
+                  key={user.id}
+                  className="mb-2 flex-row items-center rounded-lg border border-gray-200 px-4 py-2"
+                  onPress={() => {
+                    if (!selectedMembers.some(m => m.id === user.id)) {
+                      setSelectedMembers(prev => [
+                        ...prev,
+                        {
+                          id: user.id,        // the UID
+                          docId: user.docId,  // in case you need it
+                          name: user.username,
+                          initial:
+                            user.username[0]?.toUpperCase() || '',
+                          color: '#2979FF',
+                        },
+                      ]);
+                      setSearchResults([]);
+                      setMemberInput('');
+                    }
+                  }}
+                >
+                  <Text className="text-base text-black">
+                    {user.username}
+                  </Text>
+                  <Text className="ml-2 text-xs text-gray-400">
+                    {user.email}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            !isSearching &&
+            memberInput.trim() !== '' && (
+              <Text className="mt-2 text-sm text-gray-500">
+                No matching users
+              </Text>
+            )
+          )}
 
           {/* Selected Members */}
           {selectedMembers.length > 0 && (
-            <View className="flex-row flex-wrap gap-4">
-              {selectedMembers.map((member) => (
-                <View key={member.id} className="items-center">
-                  <View className="relative">
-                    <View
-                      className="h-16 w-16 items-center justify-center rounded-full"
-                      style={{ backgroundColor: member.color }}>
-                      <Text className="font-dmsans-bold text-lg text-white">{member.initial}</Text>
-                    </View>
-                    <TouchableOpacity
-                      className="absolute -right-1 -top-1 h-6 w-6 items-center justify-center rounded-full bg-red-500"
-                      onPress={() => handleRemoveMember(member.id)}>
-                      <Feather name="x" size={12} color="white" />
-                    </TouchableOpacity>
-                  </View>
-                  <Text className="mt-2 text-sm text-gray-600">{member.name}</Text>
+            <View className="mb-4">
+              <Text className="text-sm text-gray-600 mb-1">
+                Added Members:
+              </Text>
+              {selectedMembers.map(m => (
+                <View
+                  key={m.id}
+                  className="flex-row items-center justify-between mb-2 px-4 py-2 border rounded-lg"
+                >
+                  <Text>{m.name}</Text>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveMember(m.id)}
+                  >
+                    <Feather name="x" size={20} />
+                  </TouchableOpacity>
                 </View>
               ))}
             </View>
           )}
 
           {/* Settings */}
-          <View className="gap-2 ">
-            {/* Allow members to invite others */}
+          <View className="gap-2">
             <View className="flex-row items-center justify-between py-2">
-              <Text className="text-base text-black">Allow members to invite others</Text>
+              <Text className="text-base text-black">
+                Allow members to invite others
+              </Text>
               <TouchableOpacity
                 className={`h-8 w-14 rounded-full ${
                   allowInviteOthers ? 'bg-primary' : 'bg-gray-300'
                 }`}
-                onPress={handleToggleInviteOthers}>
+                onPress={handleToggleInviteOthers}
+              >
                 <View
                   className={`h-6 w-6 rounded-full bg-white shadow-sm ${
                     allowInviteOthers ? 'ml-7 mt-1' : 'ml-1 mt-1'
@@ -178,15 +271,16 @@ const AddNewGroupScreen = () => {
                 />
               </TouchableOpacity>
             </View>
-
-            {/* Notify for new expenses */}
-            <View className="flex-row items-center justify-between border-b-[0.5px] border-gray-250  py-2">
-              <Text className="text-base text-black">Notify for new expenses</Text>
+            <View className="flex-row items-center justify-between border-b-[0.5px] border-gray-250 py-2">
+              <Text className="text-base text-black">
+                Notify for new expenses
+              </Text>
               <TouchableOpacity
                 className={`h-8 w-14 rounded-full ${
                   notifyForExpenses ? 'bg-primary' : 'bg-gray-300'
                 }`}
-                onPress={handleToggleNotifications}>
+                onPress={handleToggleNotifications}
+              >
                 <View
                   className={`h-6 w-6 rounded-full bg-white shadow-sm ${
                     notifyForExpenses ? 'ml-7 mt-1' : 'ml-1 mt-1'
@@ -196,13 +290,14 @@ const AddNewGroupScreen = () => {
             </View>
           </View>
 
-          {/* Add Group Button */}
+          {/* Create */}
           <TouchableOpacity
             className={`btn-primary mb-8 rounded-lg py-4 ${
               isCreating ? 'bg-gray-400' : 'bg-primary'
             }`}
             onPress={handleAddGroup}
-            disabled={isCreating}>
+            disabled={isCreating}
+          >
             <Text className="btn-primary-text text-center text-base font-semibold text-white">
               {isCreating ? 'Creating...' : 'Add Group'}
             </Text>

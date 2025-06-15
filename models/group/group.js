@@ -1,4 +1,4 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion } from "firebase/firestore";
 import { app, db } from "../../firebase"; 
 
 class Group{
@@ -36,7 +36,31 @@ class Group{
     }
 
     // function to get the group by the current user_id or members id
-    
+    static async getGroupsByUser(user_id) {
+        console.log("Fetching groups for user:", user_id);
+        const GroupsCollection = collection(db, "groups");
+        // Query: user is creator OR is in members array
+        const q = query(
+            GroupsCollection,
+            or(
+                where("created_by", "==", user_id),
+                where("members", "array-contains", user_id)
+            )
+        );
+        const querySnapshot = await getDocs(q);
+        const groups = [];
+        querySnapshot.forEach((doc) => {
+            groups.push({ id: doc.id, ...doc.data() });
+        });
+        return groups;
+    }
+
+    static async addMemberToGroup(groupId, userId) {
+        const groupRef = doc(db, "groups", groupId);
+        await updateDoc(groupRef, {
+        members: arrayUnion(userId),
+        });
+    }
 
     
 }

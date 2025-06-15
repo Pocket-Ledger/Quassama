@@ -9,6 +9,8 @@ import { TabNavigator } from './TabNavigator';
 import { useAuth } from './AuthContext';
 import AddNewGroupScreen from 'screens/Main/AddNewGroupScreen';
 import AllExpensesScreen from 'screens/Main/AllExpensesScreen';
+import GroupDetailsScreen from 'screens/Main/GroupDetailsScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +28,9 @@ function AppNavigator() {
           <Stack.Screen name="MainTabs" component={TabNavigator} />
           <Stack.Screen name="AddNewGroup" component={AddNewGroupScreen} />
           <Stack.Screen name="AllExpenses" component={AllExpensesScreen} />
+          <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
+          {/* Add other authenticated screens here */}
+
         </>
       ) : (
         // Authentication screens
