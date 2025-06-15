@@ -13,14 +13,17 @@ const GroupDetailsScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { groupId } = route.params;
-  const [groupData, setGroupData] = useState(null);
 
-  // Fetch group details when screen is focused
+  const [groupData, setGroupData] = useState(null);
+  const [recentExpenses, setRecentExpenses] = useState([]);
+
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
-      const fetchGroup = async () => {
+
+      const fetchGroupAndExpenses = async () => {
         try {
+          // 1) fetch basic group info
           const groupRef = doc(db, 'groups', groupId);
           const snap = await getDoc(groupRef);
           if (snap.exists() && mounted) {
@@ -32,19 +35,36 @@ const GroupDetailsScreen = () => {
               youPaid: data.youPaid,
               youOwe: data.youOwe,
               members: data.members || [],
-              recentExpenses: data.recentExpenses || [],
             });
           }
         } catch (err) {
           console.error('Error fetching group details', err);
         }
+
+        try {
+          // 2) fetch the LIMIT most recent expenses for this group
+          const raw = await Expense.getExpensesByGroupWithLimit(groupId, LIMIT);
+          if (mounted) {
+            const formatted = raw.map(exp => ({
+              id: exp.id,
+              name: exp.title,
+              amount: exp.amount,
+              category: exp.category,
+              time: exp.incurred_at.toDate(),   // pass a JS Date
+              paidBy: exp.user_id,
+            }));
+            setRecentExpenses(formatted);
+          }
+        } catch (err) {
+          console.error(`Error fetching recent ${LIMIT} expenses`, err);
+        }
       };
-      fetchGroup();
+
+      fetchGroupAndExpenses();
       return () => { mounted = false; };
     }, [groupId])
   );
 
-  // Show loading state
   if (!groupData) {
     return (
       <SafeAreaView className="flex-1 justify-center items-center bg-white">
@@ -54,7 +74,7 @@ const GroupDetailsScreen = () => {
   }
 
   // Destructure real data
-  const { name, totalExpenses, youPaid, youOwe, members, recentExpenses } = groupData;
+const { name, totalExpenses, youPaid, youOwe, members } = groupData;
 
   const handleSettleUp = () => {
     console.log('Settle up pressed');
@@ -126,16 +146,16 @@ const GroupDetailsScreen = () => {
           </View>
 
           {/* Recently Expenses Header */}
-          <View className="mb-4 flex-row items-center justify-between">
+           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">Recently Expenses</Text>
-            <TouchableOpacity onPress={handleSeeAllExpenses}>
+            <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId })}>
               <Text className="text-base font-medium text-primary">See All</Text>
             </TouchableOpacity>
           </View>
 
           {/* Recent Expenses List */}
           <View className="gap-4">
-            {recentExpenses.map((expense) => (
+            {recentExpenses.map(expense => (
               <ExpenseListItem
                 key={expense.id}
                 id={expense.id}
@@ -145,7 +165,7 @@ const GroupDetailsScreen = () => {
                 time={expense.time}
                 paidBy={expense.paidBy}
                 categories={DEFAULT_CATEGORIES}
-                onPress={() => handleExpensePress(expense)}
+                onPress={() => console.log('Expense pressed:', expense)}
                 showBorder={true}
                 currency="MAD"
               />

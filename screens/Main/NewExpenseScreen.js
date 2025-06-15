@@ -95,19 +95,20 @@ const NewExpenseScreen = () => {
   };
 
   const handleAddExpense = async () => {
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    setIsSaving(true);
+  setIsSaving(true);
     try {
       const expense = new Expense(
-        expenseName.trim(),
-        groups.find(g => g.id === selectedGroup)?.name || 'Personal',
-        amount.trim(),
-        selectedCategory,
-        note.trim(),
-        selectedGroup // <-- This is the group ID
+        expenseName.trim(),   // title
+        amount.trim(),        // amount
+        selectedCategory,     // category
+        note.trim(),          // note/description
+        selectedGroup         // group_id
       );
       await expense.save();
+
+      console.log('Expense saved successfully:', expense);
 
       showSuccess('Success', 'Your expense was added successfully!', () => {
         hideAlert();
@@ -120,6 +121,7 @@ const NewExpenseScreen = () => {
       setIsSaving(false);
     }
   };
+
 
   const handleGroupSelect = (groupId) => {
     setSelectedGroup(groupId);
