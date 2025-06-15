@@ -16,8 +16,6 @@ const ExpenseListItem = ({
   showBorder = true,
   customStyle = {},
 }) => {
-  console.log('time', time);
-
   const getCategoryDetails = (categoryId) => {
     const categoryObj = DEFAULT_CATEGORIES.find((cat) => cat.id === categoryId);
     return categoryObj || { icon: 'credit-card', color: '#2979FF' };

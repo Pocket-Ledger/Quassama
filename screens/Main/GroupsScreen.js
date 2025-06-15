@@ -109,7 +109,7 @@ const GroupsScreen = () => {
     }, [user])
   ); */
 
-  console.log('Groups:', groups);
+  console.log('Groups:', groups[0]);
 
   useFocusEffect(
     useCallback(() => {
