@@ -105,6 +105,12 @@ class Expense {
   
     return recentExpenses;
   }
+
+  // function that return expenses by group_id limit 3
+
+  // function that return expenses by group_id all
+
+
   
 }
 
