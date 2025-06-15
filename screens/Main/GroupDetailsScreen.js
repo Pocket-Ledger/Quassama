@@ -19,6 +19,7 @@ const GroupDetailsScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
+      console.log('Fetching group details for groupId:', groupId);
       let mounted = true;
 
       const fetchGroupAndExpenses = async () => {
@@ -61,6 +62,7 @@ const GroupDetailsScreen = () => {
       };
 
       fetchGroupAndExpenses();
+      console.log('Group details fetched successfully', groupData);
       return () => { mounted = false; };
     }, [groupId])
   );
