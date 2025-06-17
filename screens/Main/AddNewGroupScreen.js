@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
@@ -23,13 +31,25 @@ const AddNewGroupScreen = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   // Now holds { docId, id, username, email }
   const [selectedMembers, setSelectedMembers] = useState([]);
+  const avatarColors = [
+    '#2979FF', // Blue
+    '#FF9800', // Orange
+    '#9C27B0', // Purple
+    '#4CAF50', // Green
+    '#F44336', // Red
+    '#00BCD4', // Cyan
+    '#FF5722', // Deep Orange
+    '#3F51B5', // Indigo
+  ];
 
   const handleSearch = async () => {
     if (!memberInput.trim()) return;
     setIsSearching(true);
+    setHasSearched(true);
     try {
       const users = await User.searchUsersByUsername(memberInput.trim());
       // map each Firestore doc to { docId, id: user_id, ... }
@@ -80,9 +100,7 @@ const AddNewGroupScreen = () => {
       const creatorMember = {
         id: created_by,
         name: currentUserDetails.username,
-        initial: currentUserDetails.username
-          ? currentUserDetails.username[0].toUpperCase()
-          : '',
+        initial: currentUserDetails.username ? currentUserDetails.username[0].toUpperCase() : '',
         color: '#2979FF',
       };
 
@@ -131,6 +149,33 @@ const AddNewGroupScreen = () => {
 
   const handleToggleNotifications = () => setNotifyForExpenses((v) => !v);
 
+  // Helper function to render members in grid or horizontal scroll
+  const renderMembers = () => {
+    if (selectedMembers.length <= 6) {
+      // Horizontal scroll for 6 or fewer members
+      return (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 4 }}
+          className="flex-row">
+          {selectedMembers.map((m) => (
+            <MemberAvatar key={m.id} member={m} onRemove={handleRemoveMember} />
+          ))}
+        </ScrollView>
+      );
+    } else {
+      // Grid layout for more than 6 members
+      return (
+        <View className="flex-row flex-wrap justify-start">
+          {selectedMembers.map((m) => (
+            <MemberAvatar key={m.id} member={m} onRemove={handleRemoveMember} isGrid={true} />
+          ))}
+        </View>
+      );
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
@@ -141,7 +186,7 @@ const AddNewGroupScreen = () => {
         <View className="flex-1 gap-6">
           {/* Group Name */}
           <View className="input-group">
-            <Text className="text-base font-medium text-black input-label">Group Name</Text>
+            <Text className="input-label text-base font-medium text-black">Group Name</Text>
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4 py-4 text-black ${
@@ -160,77 +205,116 @@ const AddNewGroupScreen = () => {
               />
             </View>
             {errors.groupName && (
-              <Text className="mt-1 text-sm text-red-500 error-text">{errors.groupName}</Text>
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.groupName}</Text>
             )}
           </View>
 
           {/* Member Search */}
-          <View className="flex-row input-container">
-            <TextInput
-              className="flex-1 px-4 py-4 text-black border border-gray-200 rounded-lg input-field"
-              placeholder='Eg: "user02718"'
-              placeholderTextColor="rgba(0, 0, 0, 0.4)"
-              value={memberInput}
-              onChangeText={setMemberInput}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              className="justify-center px-4 ml-2 rounded-lg bg-primary"
-              onPress={handleSearch}
-              disabled={isSearching}>
-              <Text className="text-white">{isSearching ? '...' : 'Search'}</Text>
-            </TouchableOpacity>
-          </View>
-          {searchResults.length > 0 ? (
-            <View className="mt-2">
-              <Text className="mb-2 text-sm text-gray-600">Search Results:</Text>
-              {searchResults.map((user) => (
-                <TouchableOpacity
-                  key={user.id}
-                  className="flex-row items-center px-4 py-2 mb-2 border border-gray-200 rounded-lg"
-                  onPress={() => {
-                    if (!selectedMembers.some((m) => m.id === user.id)) {
-                      setSelectedMembers((prev) => [
-                        ...prev,
-                        {
-                          id: user.id, // the UID
-                          docId: user.docId, // in case you need it
-                          name: user.username,
-                          initial: user.username[0]?.toUpperCase() || '',
-                          color: '#2979FF',
-                        },
-                      ]);
-                      setSearchResults([]);
-                      setMemberInput('');
-                    }
-                  }}>
-                  <Text className="text-base text-black">{user.username}</Text>
-                  <Text className="ml-2 text-xs text-gray-400">{user.email}</Text>
-                </TouchableOpacity>
-              ))}
+          <View>
+            <Text className="mb-2 text-base font-medium text-black">Add Members</Text>
+            <View className="input-container flex-row">
+              <TextInput
+                className="input-field flex-1 rounded-lg border border-gray-200 px-4 py-4 text-black"
+                placeholder='Search by username: "user02718"'
+                placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                value={memberInput}
+                onChangeText={(text) => {
+                  setMemberInput(text);
+                  // Clear search results when input is empty
+                  if (text.trim() === '') {
+                    setSearchResults([]);
+                    setHasSearched(false);
+                  }
+                }}
+                autoCapitalize="none"
+                onSubmitEditing={handleSearch}
+                returnKeyType="search"
+              />
+              <TouchableOpacity
+                className="ml-2 justify-center rounded-lg bg-primary px-4"
+                onPress={handleSearch}>
+                <Feather name="search" size={20} color="white" />
+              </TouchableOpacity>
             </View>
-          ) : (
-            !isSearching &&
-            memberInput.trim() !== '' && (
-              <Text className="mt-2 text-sm text-gray-500">No matching users</Text>
-            )
-          )}
+
+            {/* Loading Indicator */}
+            {isSearching && (
+              <View className="mt-3 flex-row items-center justify-center px-2">
+                <ActivityIndicator size="small" color="#2979FF" />
+                <Text className="ml-2 text-sm text-gray-600">Searching...</Text>
+              </View>
+            )}
+
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <View className="mt-3 rounded-lg border border-gray-100 bg-gray-50">
+                <Text className="border-b border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                  Search Results
+                </Text>
+                {searchResults.map((user, index) => (
+                  <TouchableOpacity
+                    key={user.id}
+                    className={`flex-row items-center px-4 py-3 ${
+                      index !== searchResults.length - 1 ? 'border-b border-gray-100' : ''
+                    } ${selectedMembers.some((m) => m.id === user.id) ? 'bg-blue-50' : 'bg-white'}`}
+                    onPress={() => {
+                      if (!selectedMembers.some((m) => m.id === user.id)) {
+                        setSelectedMembers((prev) => [
+                          ...prev,
+                          {
+                            id: user.id,
+                            docId: user.docId,
+                            name: user.username,
+                            initial: user.username[0]?.toUpperCase() || '',
+                            color: avatarColors[prev.length % avatarColors.length],
+                          },
+                        ]);
+                        setSearchResults([]);
+                        setMemberInput('');
+                      }
+                    }}
+                    disabled={selectedMembers.some((m) => m.id === user.id)}>
+                    <View className="flex-1">
+                      <Text className="text-base font-medium text-black">{user.username}</Text>
+                      <Text className="text-sm text-gray-500">{user.email}</Text>
+                    </View>
+
+                    {selectedMembers.some((m) => m.id === user.id) ? (
+                      <View className="h-6 w-6 items-center justify-center rounded-full bg-primary">
+                        <Feather name="check" size={14} color="white" />
+                      </View>
+                    ) : (
+                      <Feather name="plus-circle" size={20} color="#2979FF" />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {/* No Results */}
+            {!isSearching &&
+              hasSearched &&
+              memberInput.trim() !== '' &&
+              searchResults.length === 0 && (
+                <View className="mt-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                  <Text className="text-center text-sm text-gray-500">No users found</Text>
+                </View>
+              )}
+          </View>
 
           {/* Selected Members */}
           {selectedMembers.length > 0 && (
             <View className="mb-4">
-              <Text className="mb-1 text-sm text-gray-600">Added Members:</Text>
-              {selectedMembers.map((m) => (
-                <View
-                  key={m.id}
-                  className="flex-row items-center justify-between px-4 py-2 mb-2 border rounded-lg">
-                  <Text>{m.name}</Text>
-                  <TouchableOpacity onPress={() => handleRemoveMember(m.id)}>
-                    <Feather name="x" size={20} />
-                  </TouchableOpacity>
-                </View>
-              ))}
+              <Text className="mb-3 text-base font-medium text-black">
+                Selected Members ({selectedMembers.length})
+              </Text>
+              {renderMembers()}
             </View>
+          )}
+
+          {/* Validation Error */}
+          {errors.members && (
+            <Text className="error-text -mt-4 text-sm text-red-500">{errors.members}</Text>
           )}
 
           {/* Settings */}
@@ -272,7 +356,7 @@ const AddNewGroupScreen = () => {
             }`}
             onPress={handleAddGroup}
             disabled={isCreating}>
-            <Text className="text-base font-semibold text-center text-white btn-primary-text">
+            <Text className="btn-primary-text text-center text-base font-semibold text-white">
               {isCreating ? 'Creating...' : 'Add Group'}
             </Text>
           </TouchableOpacity>
@@ -292,6 +376,37 @@ const AddNewGroupScreen = () => {
         cancelText={alertConfig.cancelText}
       />
     </SafeAreaView>
+  );
+};
+
+// Separate component for member avatars
+const MemberAvatar = ({ member, onRemove, isGrid = false }) => {
+  return (
+    <View className={`items-center ${isGrid ? 'mb-4 w-1/4' : 'mr-6 p-2'}`}>
+      {/* Avatar Container */}
+      <View className="relative">
+        <View
+          className="h-12 w-12 items-center justify-center rounded-full"
+          style={{ backgroundColor: member.color }}>
+          <Text className="text-lg font-semibold text-white">{member.initial}</Text>
+        </View>
+
+        {/* Red X Remove Button */}
+        <TouchableOpacity
+          className="absolute -right-1 -top-1 h-5 w-5 items-center justify-center rounded-full bg-red-500 shadow-md"
+          onPress={() => onRemove(member.id)}
+          activeOpacity={0.7}>
+          <Feather name="x" size={12} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Name */}
+      <Text
+        className={`mt-2 text-center text-xs text-gray-700 ${isGrid ? 'max-w-16' : 'max-w-14'}`}
+        numberOfLines={1}>
+        {member.name}
+      </Text>
+    </View>
   );
 };
 
