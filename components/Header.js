@@ -6,11 +6,13 @@ import PlusIconButton from './PlusIconButton';
 const Header = ({ title, showIcon = false, route }) => {
   return (
     <View
-      className={`mb-6 flex flex-row items-center   px-4 pb-4 ${
+      className={`items mb-6 flex flex-row items-center     ${
         showIcon ? 'justify-between' : 'justify-start'
       }`}>
-      <BackButton />
-      <Text className="ml-12 font-dmsans-bold text-xl text-black">{title}</Text>
+      <View className="flex-row items-end gap-2">
+        <BackButton />
+        <Text className="font-dmsans-bold text-xl text-black">{title}</Text>
+      </View>
       {showIcon && <PlusIconButton route={route} />}
     </View>
   );
