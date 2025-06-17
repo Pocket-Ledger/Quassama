@@ -118,7 +118,7 @@ const OTPVerificationScreen = () => {
             <View className="">
               <Text className="title">Enter Code</Text>
               <Text className="subtitle">
-                We've sent an email with an activation code to your phone john.doe@gmail.com
+                We&apos;ve sent an email with an activation code to your phone john.doe@gmail.com
               </Text>
             </View>
 
@@ -154,7 +154,9 @@ const OTPVerificationScreen = () => {
             {/* Resend Link */}
             <View className="mb-8 ">
               <View className="flex-row items-center justify-center p-0 text-label">
-                <Text className="text-center text-text-secondary">Didn't receive the code? </Text>
+                <Text className="text-center text-text-secondary">
+                  Didn&apos;t receive the code?{' '}
+                </Text>
                 <TouchableOpacity onPress={handleResendCode} disabled={!canResend}>
                   <Text
                     className={`${canResend ? 'font-medium text-primary' : 'font-medium text-gray-300'}`}>

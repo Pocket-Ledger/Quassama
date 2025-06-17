@@ -38,7 +38,7 @@ const InvitationCard = ({ invitation, onAccept, onDecline }) => {
         </View>
         <View className="flex-1">
           <Text className="text-base text-black font-dmsans-bold">
-            Join "{invitation.group_name}"?
+            Join &quot;{invitation.group_name}&quot;?
           </Text>
           {/* <-- here we use the looked-up name */}
           <Text className="text-sm text-gray-500">Invited By {inviterName}</Text>

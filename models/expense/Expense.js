@@ -192,6 +192,20 @@ class Expense {
     return expenses.reduce((total, expense) => total + expense.amount, 0);
   }
 
+  // Return an object mapping each user to their total spent in the group
+  static async getTotalExpensesPerUserByGroup(groupId) {
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("A valid groupId (string) is required");
+    }
+
+    const expenses = await this.getExpensesByGroup(groupId);
+    return expenses.reduce((totals, { user_id, amount }) => {
+      if (!totals[user_id]) totals[user_id] = 0;
+      totals[user_id] += amount;
+      return totals;
+    }, {});
+  }
+
   // function that return the total amount of expenses for the current user and the giving group
   static async getTotalExpensesByUserAndGroup(groupId) {
     if (!groupId || typeof groupId !== "string") {

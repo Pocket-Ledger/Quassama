@@ -1,6 +1,18 @@
 import { getAuth } from "firebase/auth";
-import { addDoc, collection, getDocs, query, where, Timestamp, doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+  doc,
+  deleteDoc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
 import { app, db } from "../../firebase";
+import Group from "models/group/group";
 
 class Invitation {
     user_id;

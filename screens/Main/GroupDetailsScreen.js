@@ -43,12 +43,21 @@ const GroupDetailsScreen = () => {
           const groupRef = doc(db, 'groups', groupId);
 
           // 1) Fire four independent calls in parallel:
-          const [snap, rawExpenses, allExpenses, userPaidAmount] = await Promise.all([
+          const [
+            snap,
+            rawExpenses,
+            allExpenses,
+            userPaidAmount,
+            totalsByUser,
+          ] = await Promise.all([
             getDoc(groupRef),
             Expense.getExpensesByGroupWithLimit(groupId, LIMIT),
             Expense.getExpensesByGroup(groupId),
             Expense.getTotalExpensesByUserAndGroup(groupId),
+            Expense.getTotalExpensesPerUserByGroup(groupId),
           ]);
+
+          console.log('Total spent by each user:', totalsByUser);
 
           // 2) If group exists, set its basic data
           if (snap.exists() && mounted) {
