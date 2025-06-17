@@ -19,7 +19,7 @@ import Expense from 'models/expense/Expense';
 import User from 'models/auth/user';
 import { extractHourAndMinute, extractHourMinutePeriod } from 'utils/time';
 
-const LIMIT = 3; // Limit for recent expenses
+const LIMIT = 5; // Limit for recent expenses
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
@@ -49,15 +49,21 @@ const GroupDetailsScreen = () => {
             allExpenses,
             userPaidAmount,
             totalsByUser,
+            balanceByUser,
+            balanceByAllUsersInGroup,
           ] = await Promise.all([
             getDoc(groupRef),
             Expense.getExpensesByGroupWithLimit(groupId, LIMIT),
             Expense.getExpensesByGroup(groupId),
             Expense.getTotalExpensesByUserAndGroup(groupId),
             Expense.getTotalExpensesPerUserByGroup(groupId),
+            Expense.getBalanceByUserAndGroup(groupId),
+            Expense.getBalanceByAllUsersInGroup(groupId),
           ]);
 
           console.log('Total spent by each user:', totalsByUser);
+          console.log('Balance by user:', balanceByUser);
+          console.log('Balance by all users in group:', balanceByAllUsersInGroup);
 
           // 2) If group exists, set its basic data
           if (snap.exists() && mounted) {
@@ -192,6 +198,8 @@ const GroupDetailsScreen = () => {
               </View>
             ))}
           </View>
+
+
 
           {/* Recently Expenses Header */}
           <View className="flex-row items-center justify-between mb-4">

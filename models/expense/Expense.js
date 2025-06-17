@@ -237,6 +237,49 @@ class Expense {
     const expenses = await this.GetAllExpenseByUser();
     return expenses.reduce((total, expense) => total + expense.amount, 0);
   }
+
+  // a function the return if the member is + or - in the group 
+  // by deviding the total amount of expenses by the number of members in the group and then subtracting the total amount of expenses by the current user
+  static async getBalanceByUserAndGroup(groupId) {
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("A valid groupId (string) is required");
+    }
+
+    const totalExpenses = await this.getTotalExpensesByGroup(groupId);
+    const totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    const userExpense = totalExpensesPerUser[currentUser.uid] || 0;
+    const balance = userExpense - (totalExpenses / Object.keys(totalExpensesPerUser).length);
+
+    return balance;
+  }
+
+  // same function as above but for all members in the group
+  static async getBalanceByAllUsersInGroup(groupId) {
+    if (!groupId || typeof groupId !== "string") {
+      throw new Error("A valid groupId (string) is required");
+    }
+
+    const totalExpenses = await this.getTotalExpensesByGroup(groupId);
+    const totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+
+    const balances = {};
+    for (const userId in totalExpensesPerUser) {
+      const userExpense = totalExpensesPerUser[userId] || 0;
+      balances[userId] = userExpense - (totalExpenses / Object.keys(totalExpensesPerUser).length);
+    }
+
+    return balances;
+  }
+
+
 }
 
 export default Expense;

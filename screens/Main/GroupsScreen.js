@@ -127,58 +127,6 @@ const GroupsScreen = () => {
 
   const tabs = ['All', 'You Owed', 'You Ow', 'Settled'];
 
-  const groupsData = [
-    {
-      id: 1,
-      name: 'Faculty SM',
-      members: [
-        { initial: 'M', color: '#2979FF' },
-        { initial: 'S', color: '#FF9800' },
-        { initial: 'R', color: '#00BCD4' },
-      ],
-      additionalMembers: 2,
-      amount: '250 MAD',
-      lastExpense: 'Groceries',
-      time: '2h Ago',
-      isStarred: true,
-    },
-    {
-      id: 2,
-      name: 'Faculty SM',
-      members: [
-        { initial: 'M', color: '#2979FF' },
-        { initial: 'S', color: '#FF9800' },
-        { initial: 'R', color: '#00BCD4' },
-      ],
-      additionalMembers: 2,
-      amount: '250 MAD',
-      lastExpense: 'Internet',
-      time: 'Yesterday',
-      isStarred: false,
-    },
-    {
-      id: 3,
-      name: 'Faculty SM',
-      members: [
-        { initial: 'M', color: '#2979FF' },
-        { initial: 'S', color: '#FF9800' },
-        { initial: 'R', color: '#00BCD4' },
-      ],
-      additionalMembers: 2,
-      amount: '250 MAD',
-      lastExpense: 'Cleaning',
-      time: '1d Ago',
-      isStarred: false,
-    },
-  ];
-
-  const invitation = {
-    groupName: 'Gueliz Appartement',
-    invitedBy: 'Salim',
-    initial: 'S',
-    color: '#E91E63',
-  };
-
   const handleTabPress = (tab) => {
     setActiveTab(tab);
   };
