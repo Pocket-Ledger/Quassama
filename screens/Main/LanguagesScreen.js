@@ -12,16 +12,16 @@ const LanguagesScreen = () => {
 
   const languages = [
     {
-      code: 'en',
-      name: 'English',
-      flag: '🇺🇸',
-      nativeName: 'English',
-    },
-    {
       code: 'ar',
       name: 'Arabic',
       flag: '🇲🇦',
       nativeName: 'العربية',
+    },
+    {
+      code: 'en',
+      name: 'English',
+      flag: '🇺🇸',
+      nativeName: 'English',
     },
     {
       code: 'fr',
@@ -29,7 +29,7 @@ const LanguagesScreen = () => {
       flag: '🇫🇷',
       nativeName: 'Français',
     },
-    {
+    /* {
       code: 'es',
       name: 'Spanish',
       flag: '🇪🇸',
@@ -40,7 +40,7 @@ const LanguagesScreen = () => {
       name: 'German',
       flag: '🇩🇪',
       nativeName: 'Deutsch',
-    },
+    }, */
   ];
 
   const handleLanguageSelect = (language) => {

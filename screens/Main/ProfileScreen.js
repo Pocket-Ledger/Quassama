@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Switch,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Switch } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Logout from 'models/auth/Logout';
 import User from 'models/auth/user';
 import LogoutModal from 'components/LogoutModal';
+import { useAlert } from 'hooks/useAlert';
+import CustomAlert from 'components/CustomALert';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -21,6 +15,9 @@ const ProfileScreen = () => {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Add custom alert hook
+  const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -88,9 +85,11 @@ const ProfileScreen = () => {
     try {
       await logoutInstance.logout();
       setShowLogoutModal(false);
-      Alert.alert('Success', 'You have been logged out.');
+      // Use custom success alert instead of native Alert
+      showSuccess('Success', 'You have been logged out successfully.');
     } catch (error) {
-      Alert.alert('Error', 'Failed to log out. Please try again.');
+      // Use custom error alert instead of native Alert
+      showError('Error', 'Failed to log out. Please try again.');
     } finally {
       setIsLoggingOut(false);
     }
@@ -193,12 +192,25 @@ const ProfileScreen = () => {
         </View>
       </ScrollView>
 
-      {/* Logout Modal */}
+      {/* Logout Modal - Keep this for logout confirmation */}
       <LogoutModal
         visible={showLogoutModal}
         onClose={handleLogoutCancel}
         onConfirm={handleLogoutConfirm}
         isLoading={isLoggingOut}
+      />
+
+      {/* Custom Alert - Add this for success/error messages */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
       />
     </SafeAreaView>
   );
