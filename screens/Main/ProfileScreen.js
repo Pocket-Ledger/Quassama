@@ -12,12 +12,15 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Logout from 'models/auth/Logout';
 import User from 'models/auth/user';
+import LogoutModal from 'components/LogoutModal';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -47,7 +50,7 @@ const ProfileScreen = () => {
       title: 'Profile',
       icon: 'user',
       hasArrow: true,
-      action: () => navigation.navigate('EditProfile'),
+      action: () => navigation.navigate('ProfileDetails'),
     },
     {
       id: 'settings',
@@ -63,7 +66,7 @@ const ProfileScreen = () => {
       icon: 'globe',
       hasArrow: true,
       rightText: 'English',
-      action: () => navigation.navigate('Language'),
+      action: () => navigation.navigate('Languages'),
     },
     {
       id: 'darkmode',
@@ -75,14 +78,26 @@ const ProfileScreen = () => {
     },
   ];
 
-  const handleLogout = async () => {
+  const handleLogoutPress = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setIsLoggingOut(true);
     const logoutInstance = new Logout();
     try {
       await logoutInstance.logout();
+      setShowLogoutModal(false);
       Alert.alert('Success', 'You have been logged out.');
     } catch (error) {
       Alert.alert('Error', 'Failed to log out. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
     }
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
   };
 
   return (
@@ -166,7 +181,7 @@ const ProfileScreen = () => {
           ))}
 
           {/* Logout Button */}
-          <TouchableOpacity className="flex-row items-center py-4 mb-1" onPress={handleLogout}>
+          <TouchableOpacity className="flex-row items-center py-4 mb-1" onPress={handleLogoutPress}>
             <View className="items-center justify-center w-10 h-10 mr-4">
               <Feather name="log-out" size={20} color="#FF3B30" />
             </View>
@@ -177,6 +192,14 @@ const ProfileScreen = () => {
           <View className="h-20" />
         </View>
       </ScrollView>
+
+      {/* Logout Modal */}
+      <LogoutModal
+        visible={showLogoutModal}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+        isLoading={isLoggingOut}
+      />
     </SafeAreaView>
   );
 };
