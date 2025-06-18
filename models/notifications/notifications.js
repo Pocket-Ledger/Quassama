@@ -1,5 +1,5 @@
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getFirestore, collection, addDoc, query, where, getDocs, orderBy } from "firebase/firestore";
 import { app, db } from '../../firebase';
 
 class Notification{
@@ -44,8 +44,14 @@ class Notification{
             type: this.type,
             message: this.message,
             created_at: this.created_at,
-            read: this.read
+            read: this.read,
         };
+        if (this.groupId) {
+            notificationData.group_id = this.groupId;
+        }
+        if (this.expenseId) {
+            notificationData.expense_id = this.expenseId;
+        }
         try {
             // Assuming you have a Firestore instance initialized as `db`
             const docRef = await addDoc(collection(db, 'notifications'), notificationData);
@@ -60,13 +66,17 @@ class Notification{
     // function to get notifications for the current user
     static async getNotificationsForUser() {
         const auth = getAuth();
-        const currentUser = auth.currentUser.uid;
+        const currentUser = auth.currentUser;
         if (!currentUser) {
             throw new Error('No authenticated user found');
         }
         const db = getFirestore();
         const notificationsRef = collection(db, 'notifications');
-        const q = query(notificationsRef, where('receiver_id', '==', currentUser));
+        const q = query(
+            notificationsRef,
+            where('receiver_id', '==', currentUser.uid),
+            orderBy('created_at', 'desc')
+        );
         try {
             const querySnapshot = await getDocs(q);
             const notifications = [];

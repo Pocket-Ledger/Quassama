@@ -1,4 +1,4 @@
-import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion } from "firebase/firestore";
+import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion, getDoc } from "firebase/firestore";
 import { app, db } from "../../firebase";
 import Notification from "models/notifications/notifications";
 
@@ -75,6 +75,15 @@ class Group{
         members: arrayUnion(member),
         memberIds: arrayUnion(memberId),
         });
+    }
+
+    static async getGroupById(groupId) {
+        const ref = doc(db, 'groups', groupId);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+            throw new Error('Group not found');
+        }
+        return { id: snap.id, ...snap.data() };
     }
 
     
