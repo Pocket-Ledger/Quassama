@@ -11,6 +11,8 @@ import {
 } from 'firebase/firestore';
 import { app, db } from '../../firebase';
 import Notification from 'models/notifications/notifications';
+import Group from 'models/group/group';
+import User from 'models/auth/user';
 
 class Expense {
   user_id;
@@ -73,16 +75,45 @@ class Expense {
       group_id: this.group_id || null,
     };
 
-    const expensesCollection = collection(db, 'expenses'); // Reference to the "expenses" collection
-    const docRef = await addDoc(expensesCollection, expenseData); // Add document to the collection
-    // Create a notification for the user
-    const notification = new Notification(
+    const expensesCollection = collection(db, 'expenses');
+    const docRef = await addDoc(expensesCollection, expenseData);
+
+    const creatorName = await User.getUsernameById(this.user_id).catch(() => 'Someone');
+
+    const selfNotification = new Notification(
       this.user_id,
-      this.user_id, // Assuming the user is notified about their own expense
+      this.user_id,
       'expense_created',
       `You have created a new expense: ${this.title} of amount ${this.amount}`
     );
-    await notification.save(); // Save the notification
+    selfNotification.groupId = this.group_id;
+    selfNotification.expenseId = docRef.id;
+    await selfNotification.save();
+
+    if (this.group_id) {
+      try {
+        const group = await Group.getGroupById(this.group_id);
+        const members = group.members || [];
+        await Promise.all(
+          members.map(async (m) => {
+            if (m.id !== this.user_id) {
+              const notif = new Notification(
+                this.user_id,
+                m.id,
+                'group_expense',
+                `${creatorName} added a new expense "${this.title}" of ${this.amount}`
+              );
+              notif.groupId = this.group_id;
+              notif.expenseId = docRef.id;
+              await notif.save();
+            }
+          })
+        );
+      } catch (err) {
+        console.error('Error sending group expense notifications:', err);
+      }
+    }
+
     console.log('Expense saved with ID:', docRef.id);
     return docRef.id;
   }

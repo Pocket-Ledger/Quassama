@@ -13,6 +13,8 @@ import {
 } from "firebase/firestore";
 import { app, db } from "../../firebase";
 import Group from "models/group/group";
+import Notification from "models/notifications/notifications";
+import User from "models/auth/user";
 
 class Invitation {
     user_id;
@@ -64,6 +66,20 @@ class Invitation {
 
         const docRef = await addDoc(invitationsCollection, invitationData);
         createdIds.push(docRef.id);
+
+        try {
+            const inviterName = await User.getUsernameById(this.user_id);
+            const notification = new Notification(
+                this.user_id,
+                member_id,
+                'group_invitation',
+                `${inviterName} invited you to join the group ${this.group_name}`
+            );
+            notification.groupId = this.group_id;
+            await notification.save();
+        } catch (err) {
+            console.error('Error sending invite notification:', err);
+        }
     }
 
     return createdIds; // returns an array of created invitation IDs
@@ -106,10 +122,24 @@ class Invitation {
     if (!snap.exists()) {
       throw new Error("Invitation not found");
     }
-    const { group_id, member_id } = snap.data();
+    const { group_id, member_id, user_id, group_name } = snap.data();
 
     // 3) Add the member to the group’s members array
     await Group.addMemberToGroup(group_id, member_id);
+
+    try {
+      const memberName = await User.getUsernameById(member_id);
+      const notification = new Notification(
+        member_id,
+        user_id,
+        'invitation_accepted',
+        `${memberName} accepted your invitation to join ${group_name}`
+      );
+      notification.groupId = group_id;
+      await notification.save();
+    } catch (err) {
+      console.error('Error sending acceptance notification:', err);
+    }
   }
 
   /** mark this invitation as declined (or just delete it) */
