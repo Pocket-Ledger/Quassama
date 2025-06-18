@@ -57,12 +57,12 @@ const SettingsScreen = () => {
         <View className="relative pt-4">
           <View className="form-container">
             {/* Notifications Setting */}
-            <View className="flex-row items-center justify-between py-4 mb-4 border-b border-gray-200">
-              <View className="flex-row items-center">
-                <View className="items-center justify-center w-10 h-10 mr-4">
+            <View className="flex-row items-center justify-between px-0 py-4 border-gray-200">
+              <View className="flex-row items-center ">
+                <View className="items-center justify-center w-10 h-10 ">
                   <Ionicons name="notifications-outline" size={20} color="#666" />
                 </View>
-                <Text className="text-lg text-black">Notifications</Text>
+                <Text className="text-lg font-normal text-black">Notifications</Text>
               </View>
               <Switch
                 value={notificationsEnabled}

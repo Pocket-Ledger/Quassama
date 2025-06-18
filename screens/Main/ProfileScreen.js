@@ -150,7 +150,7 @@ const ProfileScreen = () => {
                 </View>
 
                 {/* Title */}
-                <Text className="text-lg text-black">{item.title}</Text>
+                <Text className="text-lg font-normal text-black">{item.title}</Text>
               </View>
 
               {/* Right Side Content */}
@@ -185,7 +185,7 @@ const ProfileScreen = () => {
             <View className="items-center justify-center w-10 h-10 mr-4">
               <Feather name="log-out" size={20} color="#FF3B30" />
             </View>
-            <Text className="text-lg text-error">Logout</Text>
+            <Text className="text-lg font-normal text-error">Logout</Text>
           </TouchableOpacity>
 
           {/* Bottom Spacing */}

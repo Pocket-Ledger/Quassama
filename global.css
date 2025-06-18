@@ -43,19 +43,19 @@
   }
 
   .login-content {
-    @apply flex-1 items-start justify-center;
+    @apply items-start justify-center flex-1;
   }
 
   .logo-container {
-    @apply mb-4 flex w-full items-center justify-center;
+    @apply flex items-center justify-center w-full mb-4;
   }
 
   .logo-circle {
-    @apply mb-4 h-16 w-16 items-center justify-center rounded-full bg-primary shadow-button;
+    @apply items-center justify-center w-16 h-16 mb-4 rounded-full bg-primary shadow-button;
   }
 
   .logo-inner-circle {
-    @apply h-12 w-12 items-center justify-center rounded-full bg-white;
+    @apply items-center justify-center w-12 h-12 bg-white rounded-full;
   }
 
   /* Typography Styles */
@@ -64,7 +64,7 @@
   }
 
   .subtitle {
-    @apply mb-8 px-4 text-center text-subtitle text-text-secondary;
+    @apply px-4 mb-8 text-center text-subtitle text-text-secondary;
   }
 
   /* Form Styles */
@@ -77,7 +77,7 @@
   }
 
   .input-label {
-    @apply text-label text-text-primary;
+    @apply font-medium text-label text-text-primary;
   }
 
   .input-container {
@@ -85,7 +85,7 @@
   }
 
   .input-field {
-    @apply h-14 w-full rounded-input border border-border-light bg-white px-4 pl-12 text-body text-text-primary shadow-input placeholder:text-placeholder focus:border-primary focus:outline-none;
+    @apply w-full px-4 pl-12 bg-white border h-14 rounded-input border-border-light text-body text-text-primary shadow-input placeholder:text-placeholder focus:border-primary focus:outline-none;
   }
 
   .input-field-error {
@@ -93,7 +93,7 @@
   }
 
   .input-icon {
-    @apply absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-border-light;
+    @apply absolute w-5 h-5 transform -translate-y-1/2 left-4 top-1/2 text-border-light;
   }
 
   .input-icon-error {
@@ -101,7 +101,7 @@
   }
 
   .password-toggle {
-    @apply absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-border-light;
+    @apply absolute w-5 h-5 transform -translate-y-1/2 right-4 top-1/2 text-border-light;
   }
 
   .error-text {
@@ -110,15 +110,15 @@
 
   /* Button Styles */
   .forgot-password-link {
-    @apply my-2 text-right text-body font-medium text-primary;
+    @apply my-2 font-medium text-right text-body text-primary;
   }
 
   .btn-primary {
-    @apply flex h-14 w-full items-center justify-center rounded-button bg-primary shadow-button;
+    @apply flex items-center justify-center w-full h-14 rounded-button bg-primary shadow-button;
   }
 
   .btn-primary-text {
-    @apply text-button text-white;
+    @apply text-white text-button;
   }
 
   .btn-primary:disabled {
@@ -127,11 +127,11 @@
 
   /* Divider Styles */
   .divider-container {
-    @apply my-4 flex flex-row items-center;
+    @apply flex flex-row items-center my-4;
   }
 
   .divider-line {
-    @apply h-px flex-1 bg-border-light;
+    @apply flex-1 h-px bg-border-light;
   }
 
   .divider-text {
@@ -140,16 +140,16 @@
 
   /* Social Login Styles */
   .social-button {
-    @apply mb-4 flex h-14 flex-1 flex-row items-center justify-center gap-4 space-x-3 rounded-input border border-border-light bg-white shadow-input;
+    @apply flex flex-row items-center justify-center flex-1 gap-4 mb-4 space-x-3 bg-white border h-14 rounded-input border-border-light shadow-input;
   }
 
   .social-button-text {
-    @apply text-body font-medium text-text-primary;
+    @apply font-medium text-body text-text-primary;
   }
 
   /* Sign Up Link */
   .signup-container {
-    @apply mt-4 w-full flex-row items-center justify-center;
+    @apply flex-row items-center justify-center w-full mt-4;
   }
 
   .signup-text {
@@ -157,7 +157,7 @@
   }
 
   .signup-link {
-    @apply ml-1 text-body font-medium text-primary;
+    @apply ml-1 font-medium text-body text-primary;
   }
 }
 
