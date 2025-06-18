@@ -10,6 +10,7 @@ import {
   limit,
 } from 'firebase/firestore';
 import { app, db } from '../../firebase';
+import Notification from 'models/notifications/notifications';
 
 class Expense {
   user_id;
@@ -74,6 +75,15 @@ class Expense {
 
     const expensesCollection = collection(db, 'expenses'); // Reference to the "expenses" collection
     const docRef = await addDoc(expensesCollection, expenseData); // Add document to the collection
+    // Create a notification for the user
+    const notification = new Notification(
+      this.user_id,
+      this.user_id, // Assuming the user is notified about their own expense
+      'expense_created',
+      `You have created a new expense: ${this.title} of amount ${this.amount}`
+    );
+    await notification.save(); // Save the notification
+    console.log('Expense saved with ID:', docRef.id);
     return docRef.id;
   }
 

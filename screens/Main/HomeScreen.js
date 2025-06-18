@@ -152,7 +152,9 @@ const HomeScreen = () => {
             )}
           </View>
         </View>
-        <TouchableOpacity className="relative">
+        <TouchableOpacity className="relative"
+          onPress={() => navigation.navigate('Notifications')}
+        >
           <Feather name="bell" size={24} color="#666" />
           <View className="absolute w-3 h-3 bg-red-500 rounded-full -right-1 -top-1" />
         </TouchableOpacity>

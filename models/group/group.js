@@ -1,5 +1,6 @@
 import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion } from "firebase/firestore";
 import { app, db } from "../../firebase";
+import Notification from "models/notifications/notifications";
 
 class Group{
     name;
@@ -35,6 +36,15 @@ class Group{
         const GroupsCollection = collection(db, "groups");
         const docRef = await addDoc(GroupsCollection, groupData);
         console.log("Group created with ID: ", docRef.id);
+        // Notify the creator about the group creation
+        const notification = new Notification(
+            created_by,
+            created_by,
+            'group_created',
+            `You have created a new group: ${name}`
+        );
+        await notification.save(); // Save the notification
+        console.log("Notification sent for group creation");
         return docRef.id;
     }
 

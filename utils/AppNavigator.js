@@ -10,6 +10,7 @@ import { useAuth } from './AuthContext';
 import AddNewGroupScreen from 'screens/Main/AddNewGroupScreen';
 import AllExpensesScreen from 'screens/Main/AllExpensesScreen';
 import GroupDetailsScreen from 'screens/Main/GroupDetailsScreen';
+import NotificationsScreen from 'screens/Main/NotificationsScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +30,7 @@ function AppNavigator() {
           <Stack.Screen name="AddNewGroup" component={AddNewGroupScreen} />
           <Stack.Screen name="AllExpenses" component={AllExpensesScreen} />
           <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
           {/* Add other authenticated screens here */}
 
         </>

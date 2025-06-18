@@ -1,5 +1,5 @@
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { app, db } from '../../firebase';
 
 class Notification{
@@ -55,6 +55,37 @@ class Notification{
             console.error('Error saving notification:', error);
             throw new Error('Failed to save notification');
         }
+    }
+
+    // function to get notifications for the current user
+    static async getNotificationsForUser() {
+        const auth = getAuth();
+        const currentUser = auth.currentUser.uid;
+        if (!currentUser) {
+            throw new Error('No authenticated user found');
+        }
+        const db = getFirestore();
+        const notificationsRef = collection(db, 'notifications');
+        const q = query(notificationsRef, where('receiver_id', '==', currentUser));
+        try {
+            const querySnapshot = await getDocs(q);
+            const notifications = [];
+            querySnapshot.forEach((doc) => {
+                notifications.push({ id: doc.id, ...doc.data() });
+            });
+            return notifications;
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+            throw new Error('Failed to fetch notifications');
+        }
+    }
+
+    // add notification for the giving group and expense
+    static async addNotificationForGroupExpense(groupId, expenseId, senderId, receiverId, type, message) {
+        const notification = new Notification(senderId, receiverId, type, message);
+        notification.groupId = groupId;
+        notification.expenseId = expenseId;
+        return await notification.save();
     }
 }
 
