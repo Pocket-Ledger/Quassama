@@ -11,6 +11,9 @@ import AddNewGroupScreen from 'screens/Main/AddNewGroupScreen';
 import AllExpensesScreen from 'screens/Main/AllExpensesScreen';
 import GroupDetailsScreen from 'screens/Main/GroupDetailsScreen';
 import NotificationsScreen from 'screens/Main/NotificationsScreen';
+import LanguagesScreen from 'screens/Main/LanguagesScreen';
+import ProfileDetailsScreen from 'screens/Main/ProfileDetails';
+import SettingsScreen from 'screens/Main/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,10 +29,14 @@ function AppNavigator() {
         // Authenticated user screens
         <>
           <Stack.Screen name="MainTabs" component={TabNavigator} />
-          {/* <Stack.Screen name="AddNewGroup" component={AddNewGroupScreen} />
+          <Stack.Screen name="AddNewGroup" component={AddNewGroupScreen} />
           <Stack.Screen name="AllExpenses" component={AllExpensesScreen} />
           <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
-          <Stack.Screen name="Notifications" component={NotificationsScreen} /> */}
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
+          <Stack.Screen name="Languages" component={LanguagesScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+
           {/* Add other authenticated screens here */}
         </>
       ) : (
