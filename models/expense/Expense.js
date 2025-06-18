@@ -168,23 +168,19 @@ class Expense {
 
   /**
    * Fetch all expenses for a given group, ordered by date (newest first).
-   * @param {string} groupId 
+   * @param {string} groupId
    * @returns {Promise<Array<object>>}
    */
   static async getExpensesByGroup(groupId) {
-    if (!groupId || typeof groupId !== "string") {
-      throw new Error("A valid groupId (string) is required");
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
     }
 
-    const expensesCol = collection(db, "expenses");
-    const q = query(
-      expensesCol,
-      where("group_id", "==", groupId),
-      orderBy("incurred_at", "desc")
-    );
+    const expensesCol = collection(db, 'expenses');
+    const q = query(expensesCol, where('group_id', '==', groupId), orderBy('incurred_at', 'desc'));
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -192,32 +188,28 @@ class Expense {
 
   /**
    * Fetch up to `n` expenses for a given group, ordered by date (newest first).
-   * @param {string} groupId 
+   * @param {string} groupId
    * @param {number} n  — maximum number of expenses to return
    * @returns {Promise<Array<object>>}
    */
   static async getExpensesByGroupWithLimit(groupId, n) {
-    if (!groupId || typeof groupId !== "string") {
-      throw new Error("A valid groupId (string) is required");
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
     }
-    if (
-      typeof n !== "number" ||
-      !Number.isInteger(n) ||
-      n <= 0
-    ) {
-      throw new Error("Limit `n` must be a positive integer");
+    if (typeof n !== 'number' || !Number.isInteger(n) || n <= 0) {
+      throw new Error('Limit `n` must be a positive integer');
     }
 
-    const expensesCol = collection(db, "expenses");
+    const expensesCol = collection(db, 'expenses');
     const q = query(
       expensesCol,
-      where("group_id", "==", groupId),
-      orderBy("incurred_at", "desc"),
+      where('group_id', '==', groupId),
+      orderBy('incurred_at', 'desc'),
       limit(n)
     );
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -225,8 +217,8 @@ class Expense {
 
   // function that return the total amount of expenses for a given group
   static async getTotalExpensesByGroup(groupId) {
-    if (!groupId || typeof groupId !== "string") {
-      throw new Error("A valid groupId (string) is required");
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
     }
 
     const expenses = await this.getExpensesByGroup(groupId);
@@ -235,8 +227,8 @@ class Expense {
 
   // Return an object mapping each user to their total spent in the group
   static async getTotalExpensesPerUserByGroup(groupId) {
-    if (!groupId || typeof groupId !== "string") {
-      throw new Error("A valid groupId (string) is required");
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
     }
 
     const expenses = await this.getExpensesByGroup(groupId);
@@ -249,8 +241,8 @@ class Expense {
 
   // function that return the total amount of expenses for the current user and the giving group
   static async getTotalExpensesByUserAndGroup(groupId) {
-    if (!groupId || typeof groupId !== "string") {
-      throw new Error("A valid groupId (string) is required");
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
     }
 
     const auth = getAuth(app);
@@ -261,8 +253,8 @@ class Expense {
     }
 
     const expenses = await this.getExpensesByGroup(groupId);
-    const userExpenses = expenses.filter(expense => expense.user_id === currentUser.uid);
-    
+    const userExpenses = expenses.filter((expense) => expense.user_id === currentUser.uid);
+
     return userExpenses.reduce((total, expense) => total + expense.amount, 0);
   }
 
@@ -279,11 +271,11 @@ class Expense {
     return expenses.reduce((total, expense) => total + expense.amount, 0);
   }
 
-  // a function the return if the member is + or - in the group 
+  // a function the return if the member is + or - in the group
   // by deviding the total amount of expenses by the number of members in the group and then subtracting the total amount of expenses by the current user
   static async getBalanceByUserAndGroup(groupId) {
-    if (!groupId || typeof groupId !== "string") {
-      throw new Error("A valid groupId (string) is required");
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
     }
 
     const totalExpenses = await this.getTotalExpensesByGroup(groupId);
@@ -297,15 +289,15 @@ class Expense {
     }
 
     const userExpense = totalExpensesPerUser[currentUser.uid] || 0;
-    const balance = userExpense - (totalExpenses / Object.keys(totalExpensesPerUser).length);
+    const balance = userExpense - totalExpenses / Object.keys(totalExpensesPerUser).length;
 
     return balance;
   }
 
   // same function as above but for all members in the group
   static async getBalanceByAllUsersInGroup(groupId) {
-    if (!groupId || typeof groupId !== "string") {
-      throw new Error("A valid groupId (string) is required");
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
     }
 
     const totalExpenses = await this.getTotalExpensesByGroup(groupId);
@@ -314,13 +306,41 @@ class Expense {
     const balances = {};
     for (const userId in totalExpensesPerUser) {
       const userExpense = totalExpensesPerUser[userId] || 0;
-      balances[userId] = userExpense - (totalExpenses / Object.keys(totalExpensesPerUser).length);
+      balances[userId] = userExpense - totalExpenses / Object.keys(totalExpensesPerUser).length;
     }
 
     return balances;
   }
 
+  // Return the total amount others owe the current user across all groups
+  static async getTotalOwedToUser() {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
 
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    const groups = await Group.getGroupsByUser(currentUser.uid);
+    const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
+
+    return balances.filter((b) => b > 0).reduce((sum, b) => sum + b, 0);
+  }
+
+  // Return the total amount the current user owes to others across all groups
+  static async getTotalYouOwe() {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    const groups = await Group.getGroupsByUser(currentUser.uid);
+    const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
+
+    return balances.filter((b) => b < 0).reduce((sum, b) => sum + Math.abs(b), 0);
+  }
 }
 
 export default Expense;
