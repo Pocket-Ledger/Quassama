@@ -30,24 +30,47 @@ const RegisterScreen = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordRequirements, setPasswordRequirements] = useState({
     length: false,
-    uppercase: false,
-    lowercase: false,
-    number: false,
-    special: false,
+    complexity: false, // Combined uppercase, lowercase, number, special
   });
 
   const checkPasswordRequirements = (password) => {
     const requirements = {
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      length: password.length >= 6, // Reduced from 8 to 6
+      complexity:
+        (/[A-Z]/.test(password) ? 1 : 0) + // uppercase
+          (/[a-z]/.test(password) ? 1 : 0) + // lowercase
+          (/\d/.test(password) ? 1 : 0) + // number
+          (/[!@#$%^&*(),.?":{}|<>]/.test(password) ? 1 : 0) >=
+        2, // at least 2 of 4 types
     };
+
+    // Calculate password strength (0-100)
+    let strength = 0;
+    if (password.length >= 6) strength += 30;
+    if (password.length >= 8) strength += 20;
+    if (/[A-Z]/.test(password)) strength += 15;
+    if (/[a-z]/.test(password)) strength += 15;
+    if (/\d/.test(password)) strength += 10;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 10;
+
+    setPasswordStrength(strength);
     setPasswordRequirements(requirements);
     return requirements;
+  };
+
+  const getPasswordStrengthColor = () => {
+    if (passwordStrength < 40) return '#ff3b30'; // Red
+    if (passwordStrength < 70) return '#ff9500'; // Orange
+    return '#34C759'; // Green
+  };
+
+  const getPasswordStrengthText = () => {
+    if (passwordStrength < 40) return 'Weak';
+    if (passwordStrength < 70) return 'Medium';
+    return 'Strong';
   };
 
   const validateForm = () => {
@@ -71,16 +94,12 @@ const RegisterScreen = () => {
       newErrors.password = 'Password is required';
     } else {
       const requirements = checkPasswordRequirements(password);
-      const unmetRequirements = [];
 
-      if (!requirements.length) unmetRequirements.push('at least 8 characters');
-      if (!requirements.uppercase) unmetRequirements.push('one uppercase letter');
-      if (!requirements.lowercase) unmetRequirements.push('one lowercase letter');
-      if (!requirements.number) unmetRequirements.push('one number');
-      if (!requirements.special) unmetRequirements.push('one special character');
-
-      if (unmetRequirements.length > 0) {
-        newErrors.password = `Password must contain ${unmetRequirements.join(', ')}`;
+      if (!requirements.length) {
+        newErrors.password = 'Password must be at least 6 characters';
+      } else if (!requirements.complexity) {
+        newErrors.password =
+          'Password needs at least 2 of: uppercase, lowercase, number, or special character';
       }
     }
 
@@ -140,7 +159,7 @@ const RegisterScreen = () => {
           className="container "
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={true}>
-          <View className="login-content relative">
+          <View className="relative login-content">
             {/* Header with Back Button and Logo */}
             <BackButton />
             <View className="logo-container">
@@ -269,64 +288,74 @@ const RegisterScreen = () => {
                   </View>
                   {errors.password && <Text className="error-text">{errors.password}</Text>}
 
-                  {/* Password Requirements */}
+                  {/* Simplified Password Strength Indicator */}
                   {password.length > 0 && (
-                    <View className="mt-2 gap-1">
-                      <View className="flex-row items-center">
-                        <Ionicons
-                          name={passwordRequirements.length ? 'checkmark' : 'close'}
-                          size={16}
-                          color={passwordRequirements.length ? '#34C759' : '#ff3b30'}
-                        />
-                        <Text
-                          className={`ml-2 text-sm ${passwordRequirements.length ? 'text-green-500' : 'text-red-500'}`}>
-                          At least 8 characters
-                        </Text>
+                    <View className="mt-3">
+                      {/* Password Strength Bar */}
+                      <View className="mb-2">
+                        <View className="flex-row items-center justify-between mb-1">
+                          <Text className="text-sm text-gray-600">Password Strength</Text>
+                          <Text
+                            className="text-sm font-medium"
+                            style={{ color: getPasswordStrengthColor() }}>
+                            {getPasswordStrengthText()}
+                          </Text>
+                        </View>
+                        <View className="h-2 overflow-hidden bg-gray-200 rounded-full">
+                          <View
+                            className="h-full transition-all duration-300 rounded-full"
+                            style={{
+                              width: `${passwordStrength}%`,
+                              backgroundColor: getPasswordStrengthColor(),
+                            }}
+                          />
+                        </View>
                       </View>
-                      <View className="flex-row items-center">
-                        <Ionicons
-                          name={passwordRequirements.uppercase ? 'checkmark' : 'close'}
-                          size={16}
-                          color={passwordRequirements.uppercase ? '#34C759' : '#ff3b30'}
-                        />
-                        <Text
-                          className={`ml-2 text-sm ${passwordRequirements.uppercase ? 'text-green-500' : 'text-red-500'}`}>
-                          One uppercase letter
-                        </Text>
+
+                      {/* Simple Requirements */}
+                      <View className="gap-2">
+                        <View className="flex-row items-center">
+                          <Ionicons
+                            name={
+                              passwordRequirements.length ? 'checkmark-circle' : 'ellipse-outline'
+                            }
+                            size={16}
+                            color={passwordRequirements.length ? '#34C759' : '#D1D5DB'}
+                          />
+                          <Text
+                            className={`ml-2 text-sm ${passwordRequirements.length ? 'text-green-600' : 'text-gray-500'}`}>
+                            At least 6 characters
+                          </Text>
+                        </View>
+                        <View className="flex-row items-center">
+                          <Ionicons
+                            name={
+                              passwordRequirements.complexity
+                                ? 'checkmark-circle'
+                                : 'ellipse-outline'
+                            }
+                            size={16}
+                            color={passwordRequirements.complexity ? '#34C759' : '#D1D5DB'}
+                          />
+                          <Text
+                            className={`ml-2 text-sm ${passwordRequirements.complexity ? 'text-green-600' : 'text-gray-500'}`}>
+                            Mix of letters, numbers, or symbols
+                          </Text>
+                        </View>
                       </View>
-                      <View className="flex-row items-center">
-                        <Ionicons
-                          name={passwordRequirements.lowercase ? 'checkmark' : 'close'}
-                          size={16}
-                          color={passwordRequirements.lowercase ? '#34C759' : '#ff3b30'}
-                        />
-                        <Text
-                          className={`ml-2 text-sm ${passwordRequirements.lowercase ? 'text-green-500' : 'text-red-500'}`}>
-                          One lowercase letter
-                        </Text>
-                      </View>
-                      <View className="flex-row items-center">
-                        <Ionicons
-                          name={passwordRequirements.number ? 'checkmark' : 'close'}
-                          size={16}
-                          color={passwordRequirements.number ? '#34C759' : '#ff3b30'}
-                        />
-                        <Text
-                          className={`ml-2 text-sm ${passwordRequirements.number ? 'text-green-500' : 'text-red-500'}`}>
-                          One number
-                        </Text>
-                      </View>
-                      <View className="flex-row items-center">
-                        <Ionicons
-                          name={passwordRequirements.special ? 'checkmark' : 'close'}
-                          size={16}
-                          color={passwordRequirements.special ? '#34C759' : '#ff3b30'}
-                        />
-                        <Text
-                          className={`ml-2 text-sm ${passwordRequirements.special ? 'text-green-500' : 'text-red-500'}`}>
-                          One special character
-                        </Text>
-                      </View>
+
+                      {/* Helpful Tips */}
+                      {passwordStrength < 70 && (
+                        <View className="p-2 mt-2 rounded-lg bg-blue-50">
+                          <Text className="text-xs text-blue-700">
+                            💡 Tip: Try adding {password.length < 8 ? 'more characters, ' : ''}
+                            {!/[A-Z]/.test(password) ? 'uppercase letters, ' : ''}
+                            {!/\d/.test(password) ? 'numbers, ' : ''}
+                            {!/[!@#$%^&*(),.?":{}|<>]/.test(password) ? 'symbols ' : ''}
+                            for a stronger password
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   )}
                 </View>
@@ -375,12 +404,29 @@ const RegisterScreen = () => {
                   {errors.confirmPassword && (
                     <Text className="error-text">{errors.confirmPassword}</Text>
                   )}
+
+                  {/* Password Match Indicator */}
+                  {confirmPassword.length > 0 && (
+                    <View className="flex-row items-center mt-1">
+                      <Ionicons
+                        name={password === confirmPassword ? 'checkmark-circle' : 'close-circle'}
+                        size={16}
+                        color={password === confirmPassword ? '#34C759' : '#ff3b30'}
+                      />
+                      <Text
+                        className={`ml-2 text-sm ${password === confirmPassword ? 'text-green-600' : 'text-red-500'}`}>
+                        {password === confirmPassword
+                          ? 'Passwords match'
+                          : 'Passwords do not match'}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
 
               {/* Remember Me Checkbox */}
               <TouchableOpacity
-                className="mb-6 mt-4 flex-row items-center"
+                className="flex-row items-center mt-4 mb-6"
                 onPress={() => setRememberMe(!rememberMe)}>
                 <View
                   className={`mr-3 h-5 w-5 items-center justify-center rounded border-2 ${
@@ -388,7 +434,7 @@ const RegisterScreen = () => {
                   }`}>
                   {rememberMe && <Ionicons name="checkmark" size={14} color="white" />}
                 </View>
-                <Text className="text-body font-medium text-primary">Remember me</Text>
+                <Text className="font-medium text-body text-primary">Remember me</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -408,13 +454,13 @@ const RegisterScreen = () => {
             </View>
 
             {/* Social Login Buttons */}
-            <View className="flex w-full flex-row gap-4">
+            <View className="flex flex-row w-full gap-4">
               <TouchableOpacity
                 className="social-button"
                 onPress={() => handleSocialLogin('Google')}>
                 <Image
                   source={require('../../assets/google.png')}
-                  className="h-5 w-5"
+                  className="w-5 h-5"
                   resizeMode="contain"
                 />
                 <Text className="text-label">Google</Text>
@@ -429,7 +475,7 @@ const RegisterScreen = () => {
             </View>
 
             {/* Login Link */}
-            <View className="signup-container mt-6">
+            <View className="mt-6 signup-container">
               <Text className="signup-text">Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <Text className="signup-link">Log In</Text>
