@@ -6,16 +6,96 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Alert,
+  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import User from 'models/auth/user';
 import Header from 'components/Header';
+import { useAlert } from 'hooks/useAlert';
+import CustomAlert from 'components/CustomALert';
 
+const SkeletonPlaceholder = ({ width, height, style = {} }) => {
+  const shimmerValue = new Animated.Value(0);
+
+  useEffect(() => {
+    const shimmerAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerValue, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(shimmerValue, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+      ])
+    );
+    shimmerAnimation.start();
+    return () => shimmerAnimation.stop();
+  }, []);
+
+  const backgroundColor = shimmerValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#E5E7EB', '#F3F4F6'],
+  });
+
+  return (
+    <Animated.View
+      style={[
+        {
+          width,
+          height,
+          backgroundColor,
+          borderRadius: 8,
+        },
+        style,
+      ]}
+    />
+  );
+};
+
+// Input Field Skeleton
+const InputFieldSkeleton = () => (
+  <View className="input-group">
+    <SkeletonPlaceholder width={60} height={16} style={{ marginBottom: 8 }} />
+    <View className="input-container">
+      <SkeletonPlaceholder width="100%" height={56} style={{ borderRadius: 12 }} />
+    </View>
+  </View>
+);
+
+// Loading Screen Component
+const LoadingScreen = () => (
+  <SafeAreaView className="flex-1 bg-white">
+    <ScrollView
+      className="container"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ flexGrow: 1 }}>
+      <Header title="Profile" />
+      <SkeletonPlaceholder width="80%" height={16} style={{ marginBottom: 16 }} />
+      <View className="relative pt-4">
+        <View className="gap-4 form-container">
+          <View className="gap-4">
+            <InputFieldSkeleton />
+            <InputFieldSkeleton />
+            <SkeletonPlaceholder
+              width="100%"
+              height={56}
+              style={{ borderRadius: 12, marginTop: 8 }}
+            />
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  </SafeAreaView>
+);
 const ProfileDetailsScreen = () => {
   const navigation = useNavigation();
+  const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
@@ -31,6 +111,7 @@ const ProfileDetailsScreen = () => {
         setEmail(userDetails?.email || '');
       } catch (error) {
         console.error('Error fetching user details:', error);
+        showError('Error', 'Failed to fetch user details. Please try again.');
       } finally {
         setIsLoadingUser(false);
       }
@@ -62,27 +143,19 @@ const ProfileDetailsScreen = () => {
     try {
       // Add your update profile logic here
       // await User.updateProfile({ name, email });
-      Alert.alert('Success', 'Profile updated successfully');
+      showSuccess('Success', 'Profile updated successfully');
       navigation.goBack();
     } catch (error) {
       console.error('Update failed:', error.message);
-      Alert.alert('Error', 'Failed to update profile. Please try again.');
+      showError('Error', 'Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Show skeleton loading screen while user data is loading
   if (isLoadingUser) {
-    return (
-      <SafeAreaView className="flex-1 bg-white">
-        <View className="px-4 pt-4">
-          <BackButton />
-        </View>
-        <View className="items-center justify-center flex-1">
-          <Text className="text-gray-500">Loading...</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -162,18 +235,37 @@ const ProfileDetailsScreen = () => {
                 </View>
                 {errors.email && <Text className="error-text">{errors.email}</Text>}
               </View>
+
               <TouchableOpacity
-                className="btn-primary"
+                className={`btn-primary ${isLoading ? 'opacity-50' : ''}`}
                 onPress={handleUpdateProfile}
                 disabled={isLoading}>
-                <Text className="btn-primary-text">
-                  {isLoading ? 'Updating...' : 'Update Info'}
-                </Text>
+                {isLoading ? (
+                  <View className="flex-row items-center justify-center">
+                    <SkeletonPlaceholder
+                      width={20}
+                      height={20}
+                      style={{ borderRadius: 10, marginRight: 8 }}
+                    />
+                    <Text className="btn-primary-text">Updating...</Text>
+                  </View>
+                ) : (
+                  <Text className="btn-primary-text">Update Info</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </ScrollView>
+
+      {/* Custom Alert */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+      />
     </SafeAreaView>
   );
 };

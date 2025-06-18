@@ -72,14 +72,14 @@ const CustomAlert = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View className="flex-1 items-center justify-center bg-black/50 px-6">
+      <View className="items-center justify-center flex-1 px-6 bg-black/50">
         <View
-          className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg"
+          className="w-full max-w-sm p-6 bg-white shadow-lg rounded-2xl"
           style={{ maxWidth: width * 0.85 }}>
           {/* Icon */}
-          <View className="mb-4 items-center">
+          <View className="items-center mb-4">
             <View
-              className="h-16 w-16 items-center justify-center rounded-full"
+              className="items-center justify-center w-16 h-16 rounded-full"
               style={{ backgroundColor: config.backgroundColor }}>
               <Feather name={config.iconName} size={32} color={config.iconColor} />
             </View>
@@ -88,7 +88,7 @@ const CustomAlert = ({
           {/* Title */}
           {title && (
             <Text
-              className="mb-2 text-center text-lg font-semibold"
+              className="mb-2 text-lg font-semibold text-center"
               style={{ color: config.titleColor }}>
               {title}
             </Text>
@@ -96,16 +96,16 @@ const CustomAlert = ({
 
           {/* Message */}
           {message && (
-            <Text className="mb-6 text-center text-base leading-5 text-gray-600">{message}</Text>
+            <Text className="mb-6 text-base leading-5 text-center text-gray-600">{message}</Text>
           )}
 
           {/* Buttons */}
           <View className={`${showCancel ? 'flex-row gap-3' : ''}`}>
             {showCancel && (
               <TouchableOpacity
-                className="flex-1 rounded-lg border border-gray-300 py-3"
+                className="flex-1 py-3 border border-gray-300 rounded-lg"
                 onPress={onClose}>
-                <Text className="text-center text-base font-medium text-gray-700">
+                <Text className="text-base font-medium text-center text-gray-700">
                   {cancelText}
                 </Text>
               </TouchableOpacity>
@@ -115,7 +115,7 @@ const CustomAlert = ({
               className={`rounded-lg py-3 ${showCancel ? 'flex-1' : 'w-full'}`}
               style={{ backgroundColor: config.iconColor }}
               onPress={handleConfirm}>
-              <Text className="text-center text-base font-semibold text-white">{confirmText}</Text>
+              <Text className="text-base font-semibold text-center text-white">{confirmText}</Text>
             </TouchableOpacity>
           </View>
         </View>
