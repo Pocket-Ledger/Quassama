@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, FlatList, SafeAreaView, Text } from 'react-native';
+import { View, FlatList, SafeAreaView, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from 'components/FilterSearchBar';
 import FilterModal from 'components/FilterModal';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import ExpenseListItem from 'components/ExpenseListItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
@@ -144,13 +144,32 @@ const AllExpensesScreen = () => {
           onFilterPress={() => setIsFilterModalVisible(true)}
         />
       </View>
-      <FlatList
-        data={expenses}
-        renderItem={renderExpenseItem}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      />
+      {expenses.length > 0 ? (
+        <FlatList
+          data={expenses}
+          renderItem={renderExpenseItem}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      ) : (
+        <View className="items-center px-4 py-12">
+          <View className="items-center justify-center mb-4">
+            <Ionicons name="receipt" size={70} color="#2979FF" />{' '}
+          </View>
+          <Text className="mb-2 font-dmsans-bold text-[24px] ">No Expenses Yet</Text>
+          <Text className="mb-6 text-center text-gray-500">
+            Start by adding your first expense. Keep track of who paid what and split it fairly
+            between your group members.
+          </Text>
+          <TouchableOpacity
+            className="px-6 py-3 rounded-lg bg-primary"
+            onPress={() => navigation.navigate('NewExpense')}>
+            <Text className="font-semibold text-white">Add Your First Expense</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <FilterModal
         visible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}

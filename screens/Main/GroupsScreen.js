@@ -28,17 +28,17 @@ const InvitationCard = ({ invitation, onAccept, onDecline }) => {
   }, [invitation.user_id]);
 
   return (
-    <View className="my-6 rounded-xl bg-blue-50 p-4">
+    <View className="p-4 my-6 rounded-xl bg-blue-50">
       <View className="flex-row items-center">
         <View
-          className="mr-3 h-12 w-12 items-center justify-center rounded-full"
+          className="items-center justify-center w-12 h-12 mr-3 rounded-full"
           style={{ backgroundColor: '#E91E63' }}>
-          <Text className="font-dmsans-bold text-lg text-white">
+          <Text className="text-lg text-white font-dmsans-bold">
             {inviterName[0]?.toUpperCase() || '?'}
           </Text>
         </View>
         <View className="flex-1">
-          <Text className="font-dmsans-bold text-base text-black">
+          <Text className="text-base text-black font-dmsans-bold">
             Join &quot;{invitation.group_name}&quot;?
           </Text>
           {/* <-- here we use the looked-up name */}
@@ -46,14 +46,14 @@ const InvitationCard = ({ invitation, onAccept, onDecline }) => {
         </View>
       </View>
 
-      <View className="mt-4 flex-row gap-3">
-        <TouchableOpacity className="flex-1 rounded-lg bg-primary py-3" onPress={onAccept}>
-          <Text className="text-center font-semibold text-white">Accept</Text>
+      <View className="flex-row gap-3 mt-4">
+        <TouchableOpacity className="flex-1 py-3 rounded-lg bg-primary" onPress={onAccept}>
+          <Text className="font-semibold text-center text-white">Accept</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="flex-1 rounded-lg border border-gray-300 py-3"
+          className="flex-1 py-3 border border-gray-300 rounded-lg"
           onPress={onDecline}>
-          <Text className="text-center font-semibold text-gray-900">Decline</Text>
+          <Text className="font-semibold text-center text-gray-900">Decline</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -186,7 +186,7 @@ const GroupsScreen = () => {
         <Header title="Groups" showIcon={true} route="AddNewGroup" />
 
         {/* Tabs */}
-        <View className="mb-6 px-4">
+        <View className="px-4 mb-6">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
             {tabs.map((tab, index) => (
               <TouchableOpacity
@@ -213,9 +213,9 @@ const GroupsScreen = () => {
             // Loading skeleton
             <View className="px-4">
               {[1, 2, 3].map((item) => (
-                <View key={item} className="mb-4 rounded-xl bg-gray-100 p-4">
-                  <View className="mb-2 h-4 w-3/4 rounded bg-gray-200" />
-                  <View className="h-3 w-1/2 rounded bg-gray-200" />
+                <View key={item} className="p-4 mb-4 bg-gray-100 rounded-xl">
+                  <View className="w-3/4 h-4 mb-2 bg-gray-200 rounded" />
+                  <View className="w-1/2 h-3 bg-gray-200 rounded" />
                 </View>
               ))}
             </View>
@@ -237,16 +237,16 @@ const GroupsScreen = () => {
           ) : (
             // Empty state
             <View className="items-center px-4 py-12">
-              <View className="mb-4 items-center justify-center">
+              <View className="items-center justify-center mb-4">
                 <Ionicons name="people" size={70} color="#2979FF" />{' '}
               </View>
-              <Text className="mb-2 font-dmsans-bold text-[24px] text-gray-900">No Groups Yet</Text>
+              <Text className="mb-2 font-dmsans-bold text-[24px] ">No Groups Yet</Text>
               <Text className="mb-6 text-center text-gray-500">
                 Start by creating a group for your trip, event, or shared expenses. It only takes a
                 few seconds!
               </Text>
               <TouchableOpacity
-                className="rounded-lg bg-primary px-6 py-3"
+                className="px-6 py-3 rounded-lg bg-primary"
                 onPress={() => navigation.navigate('AddNewGroup')}>
                 <Text className="font-semibold text-white">Create Your First Group</Text>
               </TouchableOpacity>
