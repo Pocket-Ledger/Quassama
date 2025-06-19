@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Modal, Pressable, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 const SwitchGroupModal = ({
   visible,
@@ -8,14 +9,19 @@ const SwitchGroupModal = ({
   groups,
   selectedGroupId,
   onGroupSelect,
-  title = 'Select Group',
+  title = '',
   showCreateNewOption = false,
   onCreateNew = null,
 }) => {
+  const { t } = useTranslation();
+
   const handleGroupSelection = (groupId, groupName) => {
     onGroupSelect(groupId, groupName);
     onClose();
   };
+
+  // Use translation for title if not provided
+  const modalTitle = title || t('group.selectGroup');
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -23,7 +29,7 @@ const SwitchGroupModal = ({
         <View className="max-h-[70%] min-w-[280px] max-w-[90%] rounded-xl bg-white p-5 shadow-lg">
           {/* Header */}
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="font-dmsans-bold text-lg text-gray-800">{title}</Text>
+            <Text className="font-dmsans-bold text-lg text-gray-800">{modalTitle}</Text>
             <Pressable onPress={onClose} className="rounded p-1 active:bg-gray-100">
               <Feather name="x" size={20} color="#666" />
             </Pressable>
@@ -34,7 +40,7 @@ const SwitchGroupModal = ({
             {groups.length === 0 ? (
               <View className="items-center py-5">
                 <Feather name="users" size={32} color="#ccc" />
-                <Text className="mt-2 text-sm text-gray-400">No groups available</Text>
+                <Text className="mt-2 text-sm text-gray-400">{t('group.noGroupsAvailable')}</Text>
               </View>
             ) : (
               groups.map((group) => (
@@ -58,7 +64,7 @@ const SwitchGroupModal = ({
                       </Text>
                       {group.memberCount && (
                         <Text className="mt-0.5 text-xs text-gray-500">
-                          {group.memberCount} members
+                          {t('group.memberCount', { count: group.memberCount })}
                         </Text>
                       )}
                     </View>
@@ -82,7 +88,9 @@ const SwitchGroupModal = ({
                 }}
                 className="flex-row items-center rounded-lg px-3 py-3 active:bg-gray-50">
                 <Feather name="plus" size={16} color="#2979FF" className="mr-2" />
-                <Text className="ml-2 text-base font-medium text-primary">Create New Group</Text>
+                <Text className="ml-2 text-base font-medium text-primary">
+                  {t('group.createNewGroup')}
+                </Text>
               </Pressable>
             </>
           )}
@@ -90,7 +98,7 @@ const SwitchGroupModal = ({
           {/* Cancel Button */}
           <View className="my-3 h-px bg-gray-200" />
           <Pressable onPress={onClose} className="items-center rounded-lg py-3 active:bg-red-50">
-            <Text className="text-base font-medium text-red-500">Cancel</Text>
+            <Text className="text-base font-medium text-red-500">{t('common.cancel')}</Text>
           </Pressable>
         </View>
       </View>

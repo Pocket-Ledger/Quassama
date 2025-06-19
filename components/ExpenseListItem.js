@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import CategoryItem from './CategoryItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
+import { useTranslation } from 'react-i18next';
 
 const ExpenseListItem = ({
   id,
@@ -16,6 +17,8 @@ const ExpenseListItem = ({
   showBorder = true,
   customStyle = {},
 }) => {
+  const { t } = useTranslation();
+
   const getCategoryDetails = (categoryId) => {
     const categoryObj = DEFAULT_CATEGORIES.find((cat) => cat.id === categoryId);
     return categoryObj || { icon: 'credit-card', color: '#2979FF' };
@@ -29,6 +32,19 @@ const ExpenseListItem = ({
     }
   };
 
+  // Get translated currency
+  const getDisplayCurrency = () => {
+    if (currency === 'MAD') {
+      return t('common.currency');
+    }
+    return currency;
+  };
+
+  // Format the "Paid by" text with translation
+  const getPaidByText = () => {
+    return t('expense.paidBy', { name: paidBy });
+  };
+
   return (
     <TouchableOpacity
       className={`flex-row items-center justify-between   py-2 ${
@@ -37,7 +53,7 @@ const ExpenseListItem = ({
       onPress={handlePress}
       activeOpacity={0.7}>
       {/* Left side - Category Icon and Expense Details */}
-      <View className="flex-row items-center flex-1 gap-2">
+      <View className="flex-1 flex-row items-center gap-2">
         {/* Category Icon */}
         <View className="">
           <CategoryItem
@@ -72,10 +88,10 @@ const ExpenseListItem = ({
       {/* Right side - Amount and Paid By */}
       <View className="items-end">
         <Text className={`text-base font-semibold text-black ${customStyle.amountText || ''}`}>
-          {amount} {currency}
+          {amount} {getDisplayCurrency()}
         </Text>
         <Text className={`text-sm text-gray-500 ${customStyle.paidByText || ''}`} numberOfLines={1}>
-          Paid by {paidBy}
+          {getPaidByText()}
         </Text>
       </View>
     </TouchableOpacity>

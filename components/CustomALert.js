@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -12,9 +13,11 @@ const CustomAlert = ({
   onClose,
   onConfirm,
   showCancel = false,
-  confirmText = 'OK',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
 }) => {
+  const { t } = useTranslation();
+
   const getAlertConfig = () => {
     switch (type) {
       case 'success':
@@ -70,43 +73,59 @@ const CustomAlert = ({
     }
   };
 
+  // Get default texts with fallback to English
+  const getDefaultTitle = () => {
+    return (
+      title ||
+      t(`customAlert.titles.${type}`, {
+        defaultValue: type.charAt(0).toUpperCase() + type.slice(1),
+      })
+    );
+  };
+
+  const getConfirmText = () => {
+    return confirmText || t('customAlert.buttons.ok', { defaultValue: 'OK' });
+  };
+
+  const getCancelText = () => {
+    return cancelText || t('customAlert.buttons.cancel', { defaultValue: 'Cancel' });
+  };
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View className="items-center justify-center flex-1 px-6 bg-black/50">
+      <View className="flex-1 items-center justify-center bg-black/50 px-6">
         <View
-          className="w-full max-w-sm p-6 bg-white shadow-lg rounded-2xl"
+          className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg"
           style={{ maxWidth: width * 0.85 }}>
           {/* Icon */}
-          <View className="items-center mb-4">
+          <View className="mb-4 items-center">
             <View
-              className="items-center justify-center w-16 h-16 rounded-full"
+              className="h-16 w-16 items-center justify-center rounded-full"
               style={{ backgroundColor: config.backgroundColor }}>
               <Feather name={config.iconName} size={32} color={config.iconColor} />
             </View>
           </View>
 
           {/* Title */}
-          {title && (
-            <Text
-              className="mb-2 text-lg font-semibold text-center"
-              style={{ color: config.titleColor }}>
-              {title}
-            </Text>
-          )}
+          <Text
+            className="mb-2 text-center text-lg font-semibold"
+            style={{ color: config.titleColor }}>
+            {getDefaultTitle()}
+          </Text>
 
           {/* Message */}
           {message && (
-            <Text className="mb-6 text-base leading-5 text-center text-gray-600">{message}</Text>
+            <Text className="mb-6 text-center text-base leading-5 text-gray-600">{message}</Text>
           )}
 
           {/* Buttons */}
           <View className={`${showCancel ? 'flex-row gap-3' : ''}`}>
             {showCancel && (
               <TouchableOpacity
-                className="flex-1 py-3 border border-gray-300 rounded-lg"
+                className="flex-1 rounded-lg border border-gray-300 py-3"
                 onPress={onClose}>
-                <Text className="text-base font-medium text-center text-gray-700">
-                  {cancelText}
+                <Text className="text-center text-base font-medium text-gray-700">
+                  {getCancelText()}
                 </Text>
               </TouchableOpacity>
             )}
@@ -115,7 +134,9 @@ const CustomAlert = ({
               className={`rounded-lg py-3 ${showCancel ? 'flex-1' : 'w-full'}`}
               style={{ backgroundColor: config.iconColor }}
               onPress={handleConfirm}>
-              <Text className="text-base font-semibold text-center text-white">{confirmText}</Text>
+              <Text className="text-center text-base font-semibold text-white">
+                {getConfirmText()}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

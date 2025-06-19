@@ -11,12 +11,15 @@ import Avatar from 'components/Avatar';
 import Group from 'models/group/group';
 import { auth } from 'firebase';
 import SwitchGroupModal from 'components/SwitchGroupModal';
+import { useTranslation } from 'react-i18next';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const { t, i18n } = useTranslation();
 
   const [user, setUser] = useState('');
   const [isLoadingUser, setIsLoadingUser] = useState(true);
+  console.log('User', user);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,7 +40,7 @@ const HomeScreen = () => {
   const [transformedRecentActivity, setTransformedRecentActivity] = useState([]);
   const [oweYou, setOweYou] = useState(0);
   const [youOwe, setYouOwe] = useState(0);
-  const [groupName, setGroupName] = useState('No group set yet');
+  const [groupName, setGroupName] = useState(t('home.noGroupSet'));
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -72,14 +75,17 @@ const HomeScreen = () => {
       setOverviewData({
         categoryData: [],
         totalAmount: 0,
-        monthName: new Date().toLocaleDateString('en-US', { month: 'long' }),
+        monthName: new Date().toLocaleDateString(
+          i18n.language === 'ar' ? 'ar-SA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US',
+          { month: 'long' }
+        ),
         year: new Date().getFullYear(),
         expenseCount: 0,
       });
     } finally {
       setIsLoadingOverview(false);
     }
-  }, [selectedGroup]);
+  }, [selectedGroup, i18n.language]);
 
   // Function to fetch balances
   const fetchBalances = useCallback(async () => {
@@ -163,6 +169,8 @@ const HomeScreen = () => {
 
           console.log('Group Members:', members);
           console.log('Initial Group Activity:', recentActivity);
+        } else {
+          setGroupName(t('home.noGroupSet'));
         }
       } catch (error) {
         console.error(error);
@@ -171,7 +179,7 @@ const HomeScreen = () => {
       }
     };
     fetchUser();
-  }, []);
+  }, [t]);
 
   // Function to handle group selection
   const handleGroupSelection = async (groupId, groupName) => {
@@ -226,7 +234,7 @@ const HomeScreen = () => {
         amount: activity.amount,
         category: activity.category,
         time: activity.time,
-        paidBy: 'Unknown User',
+        paidBy: t('common.unknownUser', { defaultValue: 'Unknown User' }),
       };
     }
   };
@@ -238,7 +246,7 @@ const HomeScreen = () => {
 
   // Convert group members to friends format for display
   const friends = groupMembers.map((member, index) => ({
-    name: member.name || member.username || 'Unknown',
+    name: member.name || member.username || t('common.unknownUser', { defaultValue: 'Unknown' }),
     initial: (member.name || member.username || 'U').charAt(0).toUpperCase(),
     color: ['#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63'][index % 5],
   }));
@@ -249,6 +257,11 @@ const HomeScreen = () => {
   const primaryColor =
     overviewData.categoryData.length > 0 ? overviewData.categoryData[0].color : '#2979FF';
 
+  // Get currency based on current language
+  const getCurrency = () => {
+    return t('common.currency');
+  };
+
   return (
     <ScrollView className="container flex flex-1 gap-6 bg-white pb-6 pt-2 ">
       {/* Header */}
@@ -258,7 +271,7 @@ const HomeScreen = () => {
             <Text className="font-dmsans-bold text-lg text-white">M</Text>
           </View>
           <View>
-            <Text className="text-sm text-gray-500">Good morning 👋</Text>
+            <Text className="text-sm text-gray-500">{t('home.goodMorning')}</Text>
             {isLoadingUser ? (
               <>
                 <View className="mb-2 h-6 w-48 rounded bg-gray-100" />
@@ -280,15 +293,15 @@ const HomeScreen = () => {
       <View className="flex gap-8 pb-4">
         <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
           <View className="mr-2 flex-1">
-            <Text className="mb-1 text-lg font-medium text-gray-500">Owe You</Text>
+            <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.oweYou')}</Text>
             <Text className="font-dmsans-bold text-2xl text-error">
-              {oweYou.toFixed(2)} <Text className="text-sm">MAD</Text>
+              {oweYou.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
             </Text>
           </View>
           <View className="ml-2 flex-1">
-            <Text className="mb-1 text-lg font-medium text-gray-500">You Owe</Text>
+            <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.youOwe')}</Text>
             <Text className="font-dmsans-bold text-2xl text-green-500">
-              {youOwe.toFixed(2)} <Text className="text-sm">MAD</Text>
+              {youOwe.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
             </Text>
           </View>
         </View>
@@ -296,7 +309,10 @@ const HomeScreen = () => {
         {/* Overview Section */}
         <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
           <Text className="mb-4 text-lg font-medium text-black">
-            {overviewData.monthName} {overviewData.year} Overview
+            {t('home.monthlyOverview', {
+              month: overviewData.monthName,
+              year: overviewData.year,
+            })}
           </Text>
 
           {isLoadingOverview ? (
@@ -313,7 +329,7 @@ const HomeScreen = () => {
           ) : overviewData.categoryData.length === 0 ? (
             <View className="items-center py-8">
               <Feather name="pie-chart" size={48} color="#ccc" />
-              <Text className="mt-2 text-gray-500">No expenses for this month</Text>
+              <Text className="mt-2 text-gray-500">{t('home.noExpensesThisMonth')}</Text>
             </View>
           ) : (
             <View className="flex-row items-center">
@@ -329,14 +345,18 @@ const HomeScreen = () => {
                         className="mr-2 h-3 w-3 rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
-                      <Text className="text-lg font-normal text-gray-500">{item.category}</Text>
+                      <Text className="text-lg font-normal text-gray-500">
+                        {t(`categories.${item.category.toLowerCase()}`, {
+                          defaultValue: item.category,
+                        })}
+                      </Text>
                     </View>
                     <Text className="text-lg font-medium text-black">{item.percentage}%</Text>
                   </View>
                 ))}
                 {overviewData.categoryData.length > 4 && (
                   <Text className="text-sm text-gray-400">
-                    +{overviewData.categoryData.length - 4} more categories
+                    {t('home.moreCategoriesCount', { count: overviewData.categoryData.length - 4 })}
                   </Text>
                 )}
               </View>
@@ -347,13 +367,13 @@ const HomeScreen = () => {
           {!isLoadingOverview && overviewData.totalAmount > 0 && (
             <View className="mt-4 border-t border-gray-100 pt-4">
               <View className="flex-row justify-between">
-                <Text className="text-gray-500">Total Expenses</Text>
+                <Text className="text-gray-500">{t('home.totalExpenses')}</Text>
                 <Text className="font-dmsans-bold text-black">
-                  {overviewData.totalAmount.toFixed(2)} MAD
+                  {overviewData.totalAmount.toFixed(2)} {getCurrency()}
                 </Text>
               </View>
               <View className="mt-1 flex-row justify-between">
-                <Text className="text-gray-500">Total Transactions</Text>
+                <Text className="text-gray-500">{t('home.totalTransactions')}</Text>
                 <Text className="text-black">{overviewData.expenseCount}</Text>
               </View>
             </View>
@@ -363,9 +383,9 @@ const HomeScreen = () => {
         {/* Recent Activity */}
         <View className="mx-4 ">
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">Recently Activity</Text>
+            <Text className="text-lg font-medium text-black">{t('home.recentActivity')}</Text>
             <TouchableOpacity onPress={() => navigation.navigate('AllExpenses')}>
-              <Text className="font-medium text-primary">See All</Text>
+              <Text className="font-medium text-primary">{t('common.seeAll')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -373,7 +393,7 @@ const HomeScreen = () => {
             {transformedRecentActivity.length === 0 ? (
               <View className="items-center py-8">
                 <Feather name="activity" size={48} color="#ccc" />
-                <Text className="mt-2 text-gray-500">No recent activity</Text>
+                <Text className="mt-2 text-gray-500">{t('home.noRecentActivity')}</Text>
               </View>
             ) : (
               transformedRecentActivity.map((item) => (
@@ -382,7 +402,7 @@ const HomeScreen = () => {
                   {...item}
                   onPress={handleExpensePress}
                   showBorder={false}
-                  currency="MAD"
+                  currency={getCurrency()}
                 />
               ))
             )}
@@ -394,7 +414,7 @@ const HomeScreen = () => {
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">{groupName}</Text>
             <TouchableOpacity onPress={() => setShowGroupModal(true)}>
-              <Text className="font-medium text-primary">Switch Group</Text>
+              <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -405,7 +425,7 @@ const HomeScreen = () => {
             groups={groups}
             selectedGroupId={selectedGroup}
             onGroupSelect={handleGroupSelection}
-            title="Switch Group"
+            title={t('group.switchGroup')}
             showCreateNewOption={true}
             onCreateNew={() => {
               // Handle navigation to create new group screen
@@ -417,7 +437,7 @@ const HomeScreen = () => {
             {friends.length === 0 ? (
               <View className="w-full items-center py-8">
                 <Feather name="users" size={48} color="#ccc" />
-                <Text className="mt-2 text-gray-500">No group members</Text>
+                <Text className="mt-2 text-gray-500">{t('home.noGroupMembers')}</Text>
               </View>
             ) : (
               friends.map((friend, index) => (

@@ -7,14 +7,17 @@ import User from 'models/auth/user';
 import LogoutModal from 'components/LogoutModal';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
+import { useTranslation } from 'react-i18next';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+  const { t, i18n } = useTranslation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  console.log('User', user);
 
   // Add custom alert hook
   const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
@@ -41,17 +44,32 @@ const ProfileScreen = () => {
     color: '#2979FF',
   };
 
+  // Get current language display name
+  const getCurrentLanguageDisplayName = () => {
+    const currentLang = i18n.language;
+    switch (currentLang) {
+      case 'en':
+        return t('languages.english');
+      case 'ar':
+        return t('languages.arabic');
+      case 'fr':
+        return t('languages.french');
+      default:
+        return t('languages.english');
+    }
+  };
+
   const menuItems = [
     {
       id: 'profile',
-      title: 'Profile',
+      title: t('profile.profile'),
       icon: 'user',
       hasArrow: true,
       action: () => navigation.navigate('ProfileDetails'),
     },
     {
       id: 'settings',
-      title: 'Settings',
+      title: t('profile.settings'),
       icon: 'settings',
       hasArrow: true,
       hasNotification: true,
@@ -59,15 +77,15 @@ const ProfileScreen = () => {
     },
     {
       id: 'language',
-      title: 'Language',
+      title: t('profile.language'),
       icon: 'globe',
       hasArrow: true,
-      rightText: 'English',
+      //rightText: getCurrentLanguageDisplayName(),
       action: () => navigation.navigate('Languages'),
     },
     {
       id: 'darkmode',
-      title: 'Dark Mode',
+      title: t('profile.darkMode'),
       icon: 'moon',
       hasSwitch: true,
       switchValue: isDarkMode,
@@ -86,10 +104,10 @@ const ProfileScreen = () => {
       await logoutInstance.logout();
       setShowLogoutModal(false);
       // Use custom success alert instead of native Alert
-      showSuccess('Success', 'You have been logged out successfully.');
+      showSuccess(t('alerts.success'), t('logout.success'));
     } catch (error) {
       // Use custom error alert instead of native Alert
-      showError('Error', 'Failed to log out. Please try again.');
+      showError(t('alerts.error'), t('logout.error'));
     } finally {
       setIsLoggingOut(false);
     }
@@ -106,27 +124,27 @@ const ProfileScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header - Profile Info */}
-        <View className="items-center px-4 pt-12 pb-8">
+        <View className="items-center px-4 pb-8 pt-12">
           {/* Profile Avatar */}
           <View
-            className="items-center justify-center w-20 h-20 mb-4 rounded-full"
+            className="mb-4 h-20 w-20 items-center justify-center rounded-full"
             style={{ backgroundColor: isLoadingUser ? '#E5E5E5' : userProfile.color }}>
             {isLoadingUser ? (
-              <View className="w-8 h-8 bg-gray-300 rounded-full" />
+              <View className="h-8 w-8 rounded-full bg-gray-300" />
             ) : (
-              <Text className="text-2xl text-white font-dmsans-bold">{userProfile.initial}</Text>
+              <Text className="font-dmsans-bold text-2xl text-white">{userProfile.initial}</Text>
             )}
           </View>
 
           {/* Profile Name and Email */}
           {isLoadingUser ? (
             <>
-              <View className="w-48 h-6 mb-2 bg-gray-200 rounded" />
-              <View className="w-64 h-4 bg-gray-200 rounded" />
+              <View className="mb-2 h-6 w-48 rounded bg-gray-200" />
+              <View className="h-4 w-64 rounded bg-gray-200" />
             </>
           ) : (
             <>
-              <Text className="mb-2 text-xl text-black font-dmsans-bold">
+              <Text className="mb-2 font-dmsans-bold text-xl text-black">
                 {userProfile.username}
               </Text>
               <Text className="text-base text-gray-500">{userProfile.email}</Text>
@@ -139,12 +157,12 @@ const ProfileScreen = () => {
           {menuItems.map((item) => (
             <TouchableOpacity
               key={item.id}
-              className="flex-row items-center justify-between py-4 mb-1 border-b border-gray-250"
+              className="mb-1 flex-row items-center justify-between border-b border-gray-250 py-4"
               onPress={item.action}
               disabled={item.hasSwitch}>
               <View className="flex-row items-center">
                 {/* Icon */}
-                <View className="items-center justify-center w-10 h-10 mr-4">
+                <View className="mr-4 h-10 w-10 items-center justify-center">
                   <Feather name={item.icon} size={20} color="#666" />
                 </View>
 
@@ -155,7 +173,7 @@ const ProfileScreen = () => {
               {/* Right Side Content */}
               <View className="flex-row items-center">
                 {/* Notification Dot */}
-                {item.hasNotification && <View className="w-2 h-2 mr-2 bg-red-500 rounded-full" />}
+                {item.hasNotification && <View className="mr-2 h-2 w-2 rounded-full bg-red-500" />}
 
                 {/* Right Text */}
                 {item.rightText && (
@@ -180,11 +198,11 @@ const ProfileScreen = () => {
           ))}
 
           {/* Logout Button */}
-          <TouchableOpacity className="flex-row items-center py-4 mb-1" onPress={handleLogoutPress}>
-            <View className="items-center justify-center w-10 h-10 mr-4">
+          <TouchableOpacity className="mb-1 flex-row items-center py-4" onPress={handleLogoutPress}>
+            <View className="mr-4 h-10 w-10 items-center justify-center">
               <Feather name="log-out" size={20} color="#FF3B30" />
             </View>
-            <Text className="text-lg font-normal text-error">Logout</Text>
+            <Text className="text-lg font-normal text-error">{t('profile.logout')}</Text>
           </TouchableOpacity>
 
           {/* Bottom Spacing */}
