@@ -342,77 +342,192 @@ class Expense {
     return balances.filter((b) => b < 0).reduce((sum, b) => sum + Math.abs(b), 0);
   }
 
-  // Add to Expense class
-  static async getExpenseOverview(groupId = null, startDate = null, endDate = null) {
-    const auth = getAuth(app);
-    const currentUser = auth.currentUser;
+  /**
+   * Get expense overview by category for a specific month/year
+   * @param {string} groupId - Group ID (optional, if null gets user's personal expenses)
+   * @param {number} month - Month (1-12)
+   * @param {number} year - Year
+   * @returns {Promise<Object>} - Object containing category breakdown and total
+   */
+  static async getExpenseOverview(groupId = null, month = null, year = null) {
+    try {
+      const auth = getAuth(app);
+      const currentUser = auth.currentUser;
 
-    if (!currentUser) {
-      throw new Error('No authenticated user found');
-    }
-
-    // Set default to current month if dates not provided
-    if (!startDate || !endDate) {
-      const now = new Date();
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-    }
-
-    const expensesCol = collection(db, 'expenses');
-    let q;
-    
-    if (groupId) {
-      q = query(
-        expensesCol,
-        where('group_id', '==', groupId),
-        where('incurred_at', '>=', Timestamp.fromDate(startDate)),
-        where('incurred_at', '<=', Timestamp.fromDate(endDate))
-      );
-    } else {
-      q = query(
-        expensesCol,
-        where('user_id', '==', currentUser.uid),
-        where('incurred_at', '>=', Timestamp.fromDate(startDate)),
-        where('incurred_at', '<=', Timestamp.fromDate(endDate))
-      );
-    }
-
-    const snapshot = await getDocs(q);
-    const expenses = snapshot.docs.map(doc => doc.data());
-
-    // Calculate total amount
-    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
-    // Group by category
-    const categoriesMap = {};
-    expenses.forEach(expense => {
-      const category = expense.category;
-      if (!categoriesMap[category]) {
-        categoriesMap[category] = 0;
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
       }
-      categoriesMap[category] += expense.amount;
-    });
 
-    // Convert to array of objects
-    const categories = Object.keys(categoriesMap).map(category => {
-      const amount = categoriesMap[category];
-      const percentage = totalAmount > 0 ? (amount / totalAmount) * 100 : 0;
+      // If no month/year provided, use current month/year
+      const now = new Date();
+      const targetMonth = month || now.getMonth() + 1; // getMonth() returns 0-11
+      const targetYear = year || now.getFullYear();
+
+      // Create start and end dates for the month
+      const startOfMonth = new Date(targetYear, targetMonth - 1, 1);
+      const endOfMonth = new Date(targetYear, targetMonth, 0, 23, 59, 59);
+
+      const expensesCollection = collection(db, 'expenses');
+      let q;
+
+      if (groupId) {
+        // Get expenses for specific group
+        q = query(
+          expensesCollection,
+          where('group_id', '==', groupId),
+          where('incurred_at', '>=', Timestamp.fromDate(startOfMonth)),
+          where('incurred_at', '<=', Timestamp.fromDate(endOfMonth))
+        );
+      } else {
+        // Get user's personal expenses
+        q = query(
+          expensesCollection,
+          where('user_id', '==', currentUser.uid),
+          where('incurred_at', '>=', Timestamp.fromDate(startOfMonth)),
+          where('incurred_at', '<=', Timestamp.fromDate(endOfMonth))
+        );
+      }
+
+      const snapshot = await getDocs(q);
+      const expenses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Calculate totals by category
+      const categoryTotals = {};
+      let totalAmount = 0;
+
+      expenses.forEach((expense) => {
+        const category = expense.category || 'Others';
+        const amount = expense.amount || 0;
+
+        if (!categoryTotals[category]) {
+          categoryTotals[category] = 0;
+        }
+        categoryTotals[category] += amount;
+        totalAmount += amount;
+      });
+
+      // Convert to array with percentages and sort by amount (descending)
+      const categoryData = Object.keys(categoryTotals)
+        .map((category) => ({
+          category,
+          amount: categoryTotals[category],
+          percentage: totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
+        }))
+        .sort((a, b) => b.amount - a.amount);
+
+      // Assign colors to categories
+      const colors = [
+        '#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63',
+        '#4CAF50', '#FF5722', '#795548', '#607D8B', '#FFC107'
+      ];
+
+      const categoryDataWithColors = categoryData.map((item, index) => ({
+        ...item,
+        color: colors[index % colors.length],
+      }));
+
       return {
-        category,
-        amount,
-        percentage: Math.round(percentage * 10) / 10, // Round to 1 decimal place
+        categoryData: categoryDataWithColors,
+        totalAmount,
+        month: targetMonth,
+        year: targetYear,
+        monthName: new Date(targetYear, targetMonth - 1).toLocaleDateString('en-US', { month: 'long' }),
+        expenseCount: expenses.length,
       };
-    });
+    } catch (error) {
+      console.error('Error getting expense overview:', error);
+      throw error;
+    }
+  }
 
-    // Sort by amount descending
-    categories.sort((a, b) => b.amount - a.amount);
+  /**
+   * Get expense overview for current user across all groups for a specific month
+   * @param {number} month - Month (1-12)
+   * @param {number} year - Year
+   * @returns {Promise<Object>} - Combined overview data
+   */
+  static async getExpenseOverviewAllGroups(month = null, year = null) {
+    try {
+      const auth = getAuth(app);
+      const currentUser = auth.currentUser;
 
-    return {
-      total: totalAmount,
-      categories,
-      startDate,
-      endDate
-    };
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
+      }
+
+      // If no month/year provided, use current month/year
+      const now = new Date();
+      const targetMonth = month || now.getMonth() + 1;
+      const targetYear = year || now.getFullYear();
+
+      // Create start and end dates for the month
+      const startOfMonth = new Date(targetYear, targetMonth - 1, 1);
+      const endOfMonth = new Date(targetYear, targetMonth, 0, 23, 59, 59);
+
+      const expensesCollection = collection(db, 'expenses');
+      const q = query(
+        expensesCollection,
+        where('user_id', '==', currentUser.uid),
+        where('incurred_at', '>=', Timestamp.fromDate(startOfMonth)),
+        where('incurred_at', '<=', Timestamp.fromDate(endOfMonth))
+      );
+
+      const snapshot = await getDocs(q);
+      const expenses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Calculate totals by category
+      const categoryTotals = {};
+      let totalAmount = 0;
+
+      expenses.forEach((expense) => {
+        const category = expense.category || 'Others';
+        const amount = expense.amount || 0;
+
+        if (!categoryTotals[category]) {
+          categoryTotals[category] = 0;
+        }
+        categoryTotals[category] += amount;
+        totalAmount += amount;
+      });
+
+      // Convert to array with percentages and sort by amount (descending)
+      const categoryData = Object.keys(categoryTotals)
+        .map((category) => ({
+          category,
+          amount: categoryTotals[category],
+          percentage: totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
+        }))
+        .sort((a, b) => b.amount - a.amount);
+
+      // Assign colors to categories
+      const colors = [
+        '#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63',
+        '#4CAF50', '#FF5722', '#795548', '#607D8B', '#FFC107'
+      ];
+
+      const categoryDataWithColors = categoryData.map((item, index) => ({
+        ...item,
+        color: colors[index % colors.length],
+      }));
+
+      return {
+        categoryData: categoryDataWithColors,
+        totalAmount,
+        month: targetMonth,
+        year: targetYear,
+        monthName: new Date(targetYear, targetMonth - 1).toLocaleDateString('en-US', { month: 'long' }),
+        expenseCount: expenses.length,
+      };
+    } catch (error) {
+      console.error('Error getting expense overview for all groups:', error);
+      throw error;
+    }
   }
 }
 

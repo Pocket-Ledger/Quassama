@@ -41,6 +41,56 @@ const HomeScreen = () => {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [groupMembers, setGroupMembers] = useState([]);
+  
+  // New state for overview data
+  const [overviewData, setOverviewData] = useState({
+    categoryData: [],
+    totalAmount: 0,
+    monthName: '',
+    year: new Date().getFullYear(),
+    expenseCount: 0,
+  });
+  const [isLoadingOverview, setIsLoadingOverview] = useState(true);
+
+  // Function to fetch expense overview
+  const fetchExpenseOverview = useCallback(async () => {
+    setIsLoadingOverview(true);
+    try {
+      let overview;
+      if (selectedGroup) {
+        // Get overview for selected group
+        overview = await Expense.getExpenseOverview(selectedGroup);
+      } else {
+        // Get overview for all user's expenses
+        overview = await Expense.getExpenseOverviewAllGroups();
+      }
+      setOverviewData(overview);
+    } catch (error) {
+      console.error('Error fetching expense overview:', error);
+      // Set default empty data on error
+      setOverviewData({
+        categoryData: [],
+        totalAmount: 0,
+        monthName: new Date().toLocaleDateString('en-US', { month: 'long' }),
+        year: new Date().getFullYear(),
+        expenseCount: 0,
+      });
+    } finally {
+      setIsLoadingOverview(false);
+    }
+  }, [selectedGroup]);
+
+  // Function to fetch balances
+  const fetchBalances = useCallback(async () => {
+    try {
+      const owedToUser = await Expense.getTotalOwedToUser();
+      const youOweAmount = await Expense.getTotalYouOwe();
+      setOweYou(owedToUser);
+      setYouOwe(youOweAmount);
+    } catch (error) {
+      console.error('Error fetching balances:', error);
+    }
+  }, []);
 
   // Function to fetch recent activity for selected group
   const fetchRecentlyActivity = useCallback(async () => {
@@ -74,7 +124,9 @@ const HomeScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchRecentlyActivity();
-    }, [fetchRecentlyActivity])
+      fetchExpenseOverview();
+      fetchBalances();
+    }, [fetchRecentlyActivity, fetchExpenseOverview, fetchBalances])
   );
 
   useEffect(() => {
@@ -141,6 +193,9 @@ const HomeScreen = () => {
       );
       setTransformedRecentActivity(transformedData);
       
+      // Fetch updated overview for the selected group
+      fetchExpenseOverview();
+      
       console.log('Selected Group ID:', groupId);
       console.log('Selected Group Name:', groupName);
       console.log('Group Members:', members);
@@ -149,50 +204,6 @@ const HomeScreen = () => {
       console.error('Error fetching group data:', error);
     }
   };
-
-  const [overviewData, setOverviewData] = useState({
-    total: 0,
-    categories: [],
-  });
-  const [overviewPeriod, setOverviewPeriod] = useState('');
-
-  // Function to fetch overview data
-  const fetchOverviewData = useCallback(async () => {
-    try {
-      const now = new Date();
-      const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-      
-      const data = await Expense.getExpenseOverview(
-        selectedGroup, 
-        startDate, 
-        endDate
-      );
-      
-      setOverviewData(data);
-      setOverviewPeriod(
-        startDate.toLocaleString('default', { month: 'long', year: 'numeric' })
-      );
-    } catch (error) {
-      console.error('Error fetching overview data:', error);
-    }
-  }, [selectedGroup]);
-
-  // Fetch overview data when selected group changes
-  useEffect(() => {
-    fetchOverviewData();
-  }, [fetchOverviewData, selectedGroup]);
-
-  // Transform data for UI with category colors
-  const expenseData = overviewData.categories.map(item => {
-    const categoryConfig = DEFAULT_CATEGORIES.find(c => c.name === item.category);
-    return {
-      category: item.category,
-      percentage: item.percentage,
-      color: categoryConfig ? categoryConfig.color : '#E6F0FF',
-      amount: item.amount
-    };
-  });
 
   const transformExpenseData = async (activity) => {
     try {
@@ -231,6 +242,10 @@ const HomeScreen = () => {
     color: ['#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63'][index % 5],
   }));
 
+  // Calculate the primary percentage for the circular progress
+  const primaryPercentage = overviewData.categoryData.length > 0 ? overviewData.categoryData[0].percentage : 0;
+  const primaryColor = overviewData.categoryData.length > 0 ? overviewData.categoryData[0].color : '#2979FF';
+
   return (
     <ScrollView className="container flex flex-1 gap-6 bg-white pb-6 pt-2 ">
       {/* Header */}
@@ -264,47 +279,82 @@ const HomeScreen = () => {
           <View className="mr-2 flex-1">
             <Text className="mb-1 text-lg font-medium text-gray-500">Owe You</Text>
             <Text className="font-dmsans-bold text-2xl text-error">
-              {oweYou} <Text className="text-sm">MAD</Text>
+              {oweYou.toFixed(2)} <Text className="text-sm">MAD</Text>
             </Text>
           </View>
           <View className="ml-2 flex-1">
             <Text className="mb-1 text-lg font-medium text-gray-500">You Owe</Text>
             <Text className="font-dmsans-bold text-2xl text-green-500">
-              {youOwe} <Text className="text-sm">MAD</Text>
+              {youOwe.toFixed(2)} <Text className="text-sm">MAD</Text>
             </Text>
           </View>
         </View>
 
         {/* Overview Section */}
-        {/* Overview Section */}
         <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
           <Text className="mb-4 text-lg font-medium text-black">
-            {overviewPeriod} Overview
+            {overviewData.monthName} {overviewData.year} Overview
           </Text>
 
-          <View className="flex-row items-center">
-            <View className="relative mr-6">
-              <CircularProgress 
-                percentage={expenseData[0]?.percentage || 0} 
-                color={expenseData[0]?.color || '#2979FF'} 
-              />
+          {isLoadingOverview ? (
+            <View className="flex-row items-center">
+              <View className="relative mr-6">
+                <View className="h-20 w-20 rounded-full bg-gray-200" />
+              </View>
+              <View className="flex-1">
+                <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
+                <View className="mb-2 h-4 w-24 rounded bg-gray-200" />
+                <View className="mb-2 h-4 w-28 rounded bg-gray-200" />
+              </View>
             </View>
+          ) : overviewData.categoryData.length === 0 ? (
+            <View className="items-center py-8">
+              <Feather name="pie-chart" size={48} color="#ccc" />
+              <Text className="mt-2 text-gray-500">No expenses for this month</Text>
+            </View>
+          ) : (
+            <View className="flex-row items-center">
+              <View className="relative mr-6">
+                <CircularProgress percentage={primaryPercentage} color={primaryColor} />
+              </View>
 
-            <View className="flex-1">
-              {expenseData.map((item, index) => (
-                <View key={index} className="mb-2 flex-row items-center justify-between">
-                  <View className="flex-row items-center">
-                    <View
-                      className="mr-2 h-3 w-3 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <Text className="text-lg font-normal text-gray-500">{item.category}</Text>
+              <View className="flex-1">
+                {overviewData.categoryData.slice(0, 4).map((item, index) => (
+                  <View key={index} className="mb-2 flex-row items-center justify-between">
+                    <View className="flex-row items-center">
+                      <View
+                        className="mr-2 h-3 w-3 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <Text className="text-lg font-normal text-gray-500">{item.category}</Text>
+                    </View>
+                    <Text className="text-lg font-medium text-black">{item.percentage}%</Text>
                   </View>
-                  <Text className="text-lg font-medium text-black">{item.percentage}%</Text>
-                </View>
-              ))}
+                ))}
+                {overviewData.categoryData.length > 4 && (
+                  <Text className="text-sm text-gray-400">
+                    +{overviewData.categoryData.length - 4} more categories
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
+          )}
+
+          {/* Total amount display */}
+          {!isLoadingOverview && overviewData.totalAmount > 0 && (
+            <View className="mt-4 pt-4 border-t border-gray-100">
+              <View className="flex-row justify-between">
+                <Text className="text-gray-500">Total Expenses</Text>
+                <Text className="font-dmsans-bold text-black">
+                  {overviewData.totalAmount.toFixed(2)} MAD
+                </Text>
+              </View>
+              <View className="flex-row justify-between mt-1">
+                <Text className="text-gray-500">Total Transactions</Text>
+                <Text className="text-black">{overviewData.expenseCount}</Text>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Recent Activity */}
@@ -317,15 +367,22 @@ const HomeScreen = () => {
           </View>
 
           <View>
-            {transformedRecentActivity.map((item) => (
-              <ExpenseListItem
-                key={item.id}
-                {...item}
-                onPress={handleExpensePress}
-                showBorder={false}
-                currency="MAD"
-              />
-            ))}
+            {transformedRecentActivity.length === 0 ? (
+              <View className="items-center py-8">
+                <Feather name="activity" size={48} color="#ccc" />
+                <Text className="mt-2 text-gray-500">No recent activity</Text>
+              </View>
+            ) : (
+              transformedRecentActivity.map((item) => (
+                <ExpenseListItem
+                  key={item.id}
+                  {...item}
+                  onPress={handleExpensePress}
+                  showBorder={false}
+                  currency="MAD"
+                />
+              ))
+            )}
           </View>
         </View>
 
@@ -375,17 +432,24 @@ const HomeScreen = () => {
           </Modal>
 
           <View className="flex-row justify-between">
-            {friends.map((friend, index) => (
-              <View key={index}>
-                <Avatar
-                  initial={friend.initial}
-                  name={friend.name}
-                  color={friend.color}
-                  size="medium"
-                  showName={true}
-                />
+            {friends.length === 0 ? (
+              <View className="items-center py-8 w-full">
+                <Feather name="users" size={48} color="#ccc" />
+                <Text className="mt-2 text-gray-500">No group members</Text>
               </View>
-            ))}
+            ) : (
+              friends.map((friend, index) => (
+                <View key={index}>
+                  <Avatar
+                    initial={friend.initial}
+                    name={friend.name}
+                    color={friend.color}
+                    size="medium"
+                    showName={true}
+                  />
+                </View>
+              ))
+            )}
           </View>
         </View>
       </View>
