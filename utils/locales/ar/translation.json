@@ -46,5 +46,30 @@
     "currency": "العملة",
     "update_info": "تحديث المعلومات",
     "updating": "جارٍ التحديث..."
+  },
+  "addGroup": {
+    "title": "إنشاء مجموعة جديدة",
+    "group_name": "اسم المجموعة",
+    "group_name_placeholder": "مثل: 'رفقاء السكن'، 'رحلة أغادير'",
+    "add_members": "إضافة الأعضاء",
+    "search_placeholder": "ابحث باسم المستخدم: 'user02718'",
+    "searching": "جارٍ البحث...",
+    "search_results": "نتائج البحث",
+    "no_users_found": "لم يتم العثور على مستخدمين",
+    "selected_members": "الأعضاء المحددون ({{count}})",
+    "allow_invite_others": "السماح للأعضاء بدعوة الآخرين",
+    "notify_new_expenses": "إشعار بالنفقات الجديدة",
+    "creating": "جارٍ الإنشاء...",
+    "add_group": "إضافة مجموعة",
+    "success_title": "نجاح",
+    "success_message": "تم إنشاء المجموعة بنجاح!",
+    "error_title": "خطأ في الإنشاء",
+    "error_message": "فشل إنشاء المجموعة. حاول مرة أخرى.",
+    "search_error_title": "خطأ في البحث",
+    "search_error_message": "فشل البحث عن المستخدمين. حاول مرة أخرى.",
+    "errors": {
+      "group_name_required": "اسم المجموعة مطلوب",
+      "members_required": "يرجى إضافة عضو واحد على الأقل"
+    }
   }
 }
