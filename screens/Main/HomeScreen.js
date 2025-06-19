@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
 import Expense from 'models/expense/Expense';
@@ -8,6 +8,8 @@ import User from 'models/auth/user';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import ExpenseListItem from 'components/ExpenseListItem';
 import Avatar from 'components/Avatar';
+import Group from 'models/group/group';
+import { auth } from 'firebase';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -31,48 +33,122 @@ const HomeScreen = () => {
   }, []);
 
   const [RecentlyActivity, setRecentlyActivity] = useState([]);
+  const [transformedRecentActivity, setTransformedRecentActivity] = useState([]);
   const [oweYou, setOweYou] = useState(0);
   const [youOwe, setYouOwe] = useState(0);
+  const [groupName, setGroupName] = useState('No group set yet');
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [groupMembers, setGroupMembers] = useState([]);
+
+  // Function to fetch recent activity for selected group
+  const fetchRecentlyActivity = useCallback(async () => {
+    try {
+      if (selectedGroup) {
+        // Fetch recent activity for the selected group (limit to 3)
+        const recentActivity = await Expense.getExpensesByGroupWithLimit(selectedGroup, 3);
+        setRecentlyActivity(recentActivity);
+        
+        // Transform the data to include usernames
+        const transformedData = await Promise.all(
+          recentActivity.map(item => transformExpenseData(item))
+        );
+        setTransformedRecentActivity(transformedData);
+      } else {
+        // Fallback to user's recent activity if no group is selected
+        const recentActivity = await Expense.RecentlyActivityByUser();
+        setRecentlyActivity(recentActivity);
+        
+        // Transform the data to include usernames
+        const transformedData = await Promise.all(
+          recentActivity.map(item => transformExpenseData(item))
+        );
+        setTransformedRecentActivity(transformedData);
+      }
+    } catch (error) {
+      console.error('Error fetching recent activity:', error);
+    }
+  }, [selectedGroup]);
 
   useFocusEffect(
     useCallback(() => {
-      const fetchRecentlyActivity = async () => {
-        try {
-          const recentActivity = await Expense.RecentlyActivityByUser();
-          setRecentlyActivity(recentActivity);
-        } catch (error) {
-          console.error('Error fetching recent activity:', error);
-        }
-      };
-
       fetchRecentlyActivity();
-    }, [])
+    }, [fetchRecentlyActivity])
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      let mounted = true;
-      const fetchBalances = async () => {
-        try {
-          const owed = await Expense.getTotalOwedToUser();
-          const owe = await Expense.getTotalYouOwe();
-          if (mounted) {
-            setOweYou(owed);
-            setYouOwe(owe);
-          }
-        } catch (error) {
-          console.error('Error fetching balances:', error);
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoadingUser(true);
+      try {
+        const userDetails = auth.currentUser.uid;
+        setUser(userDetails);
+        console.log('User ID:', userDetails);
+        const userGroups = await Group.getGroupsByUser(userDetails);
+        setGroups(userGroups);
+        console.log('User Groups:', userGroups);
+
+        // Set initial group if groups exist
+        if (userGroups.length > 0) {
+          const firstGroup = userGroups[0];
+          setSelectedGroup(firstGroup.id);
+          setGroupName(firstGroup.name);
+          
+          // Fetch members for the first group
+          const members = await Group.getMembersByGroup(firstGroup.id);
+          setGroupMembers(members);
+          
+          // Fetch recent activity for the first group
+          const recentActivity = await Expense.getExpensesByGroupWithLimit(firstGroup.id, 3);
+          setRecentlyActivity(recentActivity);
+          
+          // Transform the data to include usernames
+          const transformedData = await Promise.all(
+            recentActivity.map(item => transformExpenseData(item))
+          );
+          setTransformedRecentActivity(transformedData);
+          
+          console.log('Group Members:', members);
+          console.log('Initial Group Activity:', recentActivity);
         }
-      };
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+    fetchUser();
+  }, []);
 
-      fetchBalances();
-      return () => {
-        mounted = false;
-      };
-    }, [])
-  );
-
-  console.log('Recently Activity:', RecentlyActivity);
+  // Function to handle group selection
+  const handleGroupSelection = async (groupId, groupName) => {
+    try {
+      setSelectedGroup(groupId);
+      setGroupName(groupName);
+      setShowGroupModal(false);
+      
+      // Fetch members for the selected group
+      const members = await Group.getMembersByGroup(groupId);
+      setGroupMembers(members);
+      
+      // Fetch recent activity for the selected group
+      const recentActivity = await Expense.getExpensesByGroupWithLimit(groupId, 3);
+      setRecentlyActivity(recentActivity);
+      
+      // Transform the data to include usernames
+      const transformedData = await Promise.all(
+        recentActivity.map(item => transformExpenseData(item))
+      );
+      setTransformedRecentActivity(transformedData);
+      
+      console.log('Selected Group ID:', groupId);
+      console.log('Selected Group Name:', groupName);
+      console.log('Group Members:', members);
+      console.log('Group Recent Activity:', recentActivity);
+    } catch (error) {
+      console.error('Error fetching group data:', error);
+    }
+  };
 
   const expenseData = [
     { category: 'Groceries', percentage: 50, color: '#2979FF' },
@@ -81,48 +157,29 @@ const HomeScreen = () => {
     { category: 'Others', percentage: 5, color: '#E6F0FF' },
   ];
 
-  const recentActivity = [
-    {
-      id: 1,
-      title: 'Groceries',
-      time: '2h ago',
-      amount: '180',
-      paidBy: 'Sara',
-      icon: 'shopping-basket',
-      iconBg: '#E6F0FF',
-      iconColor: '#2979FF',
-    },
-    {
-      id: 2,
-      title: 'Internet Bill',
-      time: 'Yesterday',
-      amount: '180',
-      paidBy: 'Morad',
-      icon: 'wifi',
-      iconBg: '#E6F0FF',
-      iconColor: '#2979FF',
-    },
-    {
-      id: 3,
-      title: 'Cleaning',
-      time: '2d ago',
-      amount: '60',
-      paidBy: 'You',
-      icon: 'check-circle',
-      iconBg: '#E6F0FF',
-      iconColor: '#2979FF',
-    },
-  ];
-
-  const transformExpenseData = (activity) => {
-    return {
-      id: activity.id,
-      name: activity.title,
-      amount: activity.amount,
-      category: activity.category,
-      time: activity.time,
-      paidBy: activity.user_id,
-    };
+  const transformExpenseData = async (activity) => {
+    try {
+      // Get username from user_id
+      const username = await User.getUsernameById(activity.user_id);
+      return {
+        id: activity.id,
+        name: activity.title,
+        amount: activity.amount,
+        category: activity.category,
+        time: activity.time,
+        paidBy: username,
+      };
+    } catch (error) {
+      console.error('Error fetching username:', error);
+      return {
+        id: activity.id,
+        name: activity.title,
+        amount: activity.amount,
+        category: activity.category,
+        time: activity.time,
+        paidBy: 'Unknown User',
+      };
+    }
   };
 
   const handleExpensePress = (expenseData) => {
@@ -130,30 +187,12 @@ const HomeScreen = () => {
     // Navigate to expense details or perform other actions
   };
 
-  const getIconByCategory = (category) => {
-    switch (category.toLowerCase()) {
-      case 'internet':
-        return 'wifi';
-      case 'shopping':
-        return 'shopping-bag';
-      case 'groceries':
-        return 'shopping-cart';
-      case 'rent':
-        return 'home';
-      case 'cleaning':
-        return 'check-circle';
-      default:
-        return 'credit-card';
-    }
-  };
-
-  const friends = [
-    { name: 'Mehdi', initial: 'M', color: '#2979FF' },
-    { name: 'Sara', initial: 'S', color: '#FF9800' },
-    { name: 'Leila', initial: 'L', color: '#00BCD4' },
-    { name: 'Morad', initial: 'M', color: '#673AB7' },
-    { name: 'Salma', initial: 'S', color: '#E91E63' },
-  ];
+  // Convert group members to friends format for display
+  const friends = groupMembers.map((member, index) => ({
+    name: member.name || member.username || 'Unknown',
+    initial: (member.name || member.username || 'U').charAt(0).toUpperCase(),
+    color: ['#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63'][index % 5],
+  }));
 
   return (
     <ScrollView className="container flex flex-1 gap-6 bg-white pb-6 pt-2 ">
@@ -165,7 +204,6 @@ const HomeScreen = () => {
           </View>
           <View>
             <Text className="text-sm text-gray-500">Good morning 👋</Text>
-            {/* <Text className="text-lg text-black font-dmsans-bold">{user.username}</Text> */}
             {isLoadingUser ? (
               <>
                 <View className="mb-2 h-6 w-48 rounded bg-gray-100" />
@@ -236,52 +274,62 @@ const HomeScreen = () => {
           </View>
 
           <View>
-            {recentActivity.map((item) => (
+            {transformedRecentActivity.map((item) => (
               <ExpenseListItem
                 key={item.id}
-                {...transformExpenseData(item)}
-                //categories={DEFAULT_CATEGORIES}
+                {...item}
                 onPress={handleExpensePress}
                 showBorder={false}
                 currency="MAD"
               />
             ))}
           </View>
-          {/* {RecentlyActivity.map((item) => (
-            <View
-              key={item.id}
-              className="flex-row items-center justify-between py-2 border-gray-100">
-              <View className="flex-row items-center flex-1">
-                <View
-                  className="mr-3 h-[55px] w-[55px] items-center justify-center rounded-full"
-                  style={{ backgroundColor: '#E6F0FF' }}>
-                  <Feather name={getIconByCategory(item.category)} size={20} color="#2979FF" />
-                </View>
-                <View>
-                  <Text className="font-medium text-black">{item.title}</Text>
-                  <Text className="text-sm text-gray-500">
-                    {item.incurred_at?.toDate
-                      ? new Date(item.incurred_at.toDate()).toLocaleDateString()
-                      : 'Unknown'}
-                  </Text>
-                </View>
-              </View>
-              <View className="items-end">
-                <Text className="font-medium text-black">{item.amount} MAD</Text>
-                <Text className="text-sm text-gray-500">Paid by {item.user_id}</Text>
-              </View>
-            </View>
-          ))} */}
         </View>
 
-        {/* Faculty Friends */}
+        {/* Group Members */}
         <View className="mx-4 ">
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">Faculty Friends</Text>
-            <TouchableOpacity>
+            <Text className="text-lg font-medium text-black">{groupName}</Text>
+            <TouchableOpacity onPress={() => setShowGroupModal(true)}>
               <Text className="font-medium text-primary">Switch Group</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Group selection modal */}
+          <Modal
+            visible={showGroupModal}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setShowGroupModal(false)}
+          >
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000088' }}>
+              <View style={{ backgroundColor: 'white', borderRadius: 10, padding: 20, minWidth: 250 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 10 }}>Select Group</Text>
+                {groups.map((group) => (
+                  <Pressable
+                    key={group.id}
+                    onPress={() => handleGroupSelection(group.id, group.name)}
+                    style={{ 
+                      paddingVertical: 10,
+                      backgroundColor: selectedGroup === group.id ? '#f0f0f0' : 'transparent',
+                      borderRadius: 5,
+                      paddingHorizontal: 10
+                    }}
+                  >
+                    <Text style={{ 
+                      fontSize: 16,
+                      fontWeight: selectedGroup === group.id ? 'bold' : 'normal'
+                    }}>
+                      {group.name}
+                    </Text>
+                  </Pressable>
+                ))}
+                <Pressable onPress={() => setShowGroupModal(false)} style={{ marginTop: 10 }}>
+                  <Text style={{ color: 'red', textAlign: 'center' }}>Cancel</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
 
           <View className="flex-row justify-between">
             {friends.map((friend, index) => (

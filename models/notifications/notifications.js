@@ -1,5 +1,5 @@
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, addDoc, query, where, getDocs, orderBy } from "firebase/firestore";
+import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, updateDoc, doc } from "firebase/firestore";
 import { app, db } from '../../firebase';
 
 class Notification{
@@ -96,6 +96,18 @@ class Notification{
         notification.groupId = groupId;
         notification.expenseId = expenseId;
         return await notification.save();
+    }
+
+    //  function to mark a notification as read
+    static async markAsRead(notificationId) {
+        const notificationRef = doc(db, 'notifications', notificationId);
+        try {
+            await updateDoc(notificationRef, { read: true });
+            console.log('Notification marked as read:', notificationId);
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+            throw new Error('Failed to mark notification as read');
+        }
     }
 }
 

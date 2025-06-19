@@ -32,6 +32,21 @@ const NotificationsScreen = () => {
     console.log('Start Now pressed');
   };
 
+  // function to update the read status of a notification
+  const handleNotificationPress = async (notificationId) => {
+    try {
+      await Notification.markAsRead(notificationId);
+      // Update local state to reflect the change
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notificationId ? { ...n, read: true } : n
+        )
+      );
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
   const EmptyNotificationsState = () => (
     <View className="flex-1 px-6 mt-20 ">
       <View className="items-center mb-8 ">
@@ -69,7 +84,10 @@ const NotificationsScreen = () => {
         ) : notifications.length === 0 ? (
           <EmptyNotificationsState />
         ) : (
-          <NotificationsList notifications={notifications} />
+          <NotificationsList 
+            notifications={notifications} 
+            onNotificationPress={handleNotificationPress}
+          />
         )}
       </View>
     </SafeAreaView>

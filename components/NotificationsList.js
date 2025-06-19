@@ -1,7 +1,7 @@
 import { ScrollView } from 'react-native';
 import NotificationItem from './NotificationItem';
 
-export const NotificationsList = ({ notifications }) => {
+export const NotificationsList = ({ notifications, onNotificationPress }) => {
   console.log(notifications);
 
   return (
@@ -10,7 +10,11 @@ export const NotificationsList = ({ notifications }) => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 20 }}>
       {notifications.map((notification) => (
-        <NotificationItem key={notification.id} notification={notification} />
+        <NotificationItem 
+          key={notification.id} 
+          notification={notification} 
+          onPress={() => onNotificationPress(notification.id)}
+        />
       ))}
     </ScrollView>
   );

@@ -86,6 +86,15 @@ class Group{
         return { id: snap.id, ...snap.data() };
     }
 
+    /**
+   * Return an array of members for a given group.
+   * If members were stored as strings, treat them as IDs/names.
+   */
+    static async getMembersByGroup(groupId) {
+        const { members = [] } = await this.getGroupById(groupId);
+        return members;
+    }
+
     
 }
 
