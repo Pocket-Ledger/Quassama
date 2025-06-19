@@ -1,5 +1,7 @@
 import { AuthProvider } from 'utils/AuthContext';
 import './global.css';
+import i18n from 'utils/i18n';
+import { I18nextProvider } from 'react-i18next';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from 'utils/AppNavigator';
 import {
@@ -40,9 +42,11 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <I18nextProvider i18n={i18n}>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </I18nextProvider>
     </AuthProvider>
   );
 }

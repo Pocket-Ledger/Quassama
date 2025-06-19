@@ -13,9 +13,12 @@ import { Logo } from 'components/Logo';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Login from 'models/auth/Login';
+import { useTranslation } from 'react-i18next';
+import i18n from 'utils/i18n';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -85,16 +88,14 @@ const LoginScreen = () => {
           </View>
           {/* Title and Subtitle */}
           <View>
-            <Text className="title">Login</Text>
-            <Text className="subtitle">
-              Please enter your email and password to enjoy the experience
-            </Text>
+            <Text className="title">{t('login.title')}</Text>
+            <Text className="subtitle">{t('login.subtitle')}</Text>
           </View>
           {/* Form */}
           <View className="form-container">
             <View className="gap-4">
               <View className="input-group">
-                <Text className="input-label">Email</Text>
+                <Text className="input-label">{t('login.email')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="mail-outline"
@@ -128,7 +129,7 @@ const LoginScreen = () => {
               </View>
 
               <View className="input-group">
-                <Text className="input-label">Password</Text>
+                <Text className="input-label">{t('login.password')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="lock-closed-outline"
@@ -172,16 +173,16 @@ const LoginScreen = () => {
             </View>
 
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-              <Text className="forgot-password-link">Forget Password?</Text>
+              <Text className="forgot-password-link">{t('login.forgot_password')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="btn-primary" onPress={handleLogin} disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? 'Logging in...' : 'Login'}</Text>
+              <Text className="btn-primary-text">{isLoading ? t('login.logging_in') : t('login.login_button')}</Text>
             </TouchableOpacity>
           </View>
           <View className="divider-container">
             <View className="divider-line" />
-            <Text className="divider-text">Or Continue with</Text>
+            <Text className="divider-text">{t('login.or_continue_with')}</Text>
             <View className="divider-line" />
           </View>
           <View className="flex w-full flex-row gap-4">
@@ -191,19 +192,19 @@ const LoginScreen = () => {
                 className="h-5 w-5"
                 resizeMode="contain"
               />
-              <Text className="text-label">Google</Text>
+              <Text className="text-label">{t('login.google')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Apple')}>
               <Ionicons name="logo-apple" size={20} color="#000000" />
-              <Text className="text-label">Apple</Text>
+              <Text className="text-label">{t('login.apple')}</Text>
             </TouchableOpacity>
           </View>
           {/* Sign Up Link - UNCOMMENTED */}
           <View className="signup-container">
-            <Text className="signup-text">Didn&apos;t have an account? </Text>
+            <Text className="signup-text">{t('login.no_account')}</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text className="signup-link">Sign Up</Text>
+              <Text className="signup-link">{t('login.sign_up')}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -12,9 +12,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
+import { useTranslation } from 'react-i18next';
+import i18n from 'utils/i18n';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState('MAD');
   const [isLoading, setIsLoading] = useState(false);
@@ -52,8 +55,8 @@ const SettingsScreen = () => {
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
-        <Header title="Settings" />
-        <Text className="text-sm font-normal">Customize app preferences.</Text>
+        <Header title={t('settings.title')} />
+        <Text className="text-sm font-normal">{t('settings.subtitle')}</Text>
         <View className="relative pt-4">
           <View className="form-container">
             {/* Notifications Setting */}
@@ -62,7 +65,7 @@ const SettingsScreen = () => {
                 <View className="items-center justify-center w-10 h-10 ">
                   <Ionicons name="notifications-outline" size={20} color="#666" />
                 </View>
-                <Text className="text-lg font-normal text-black">Notifications</Text>
+                <Text className="text-lg font-normal text-black">{t('settings.notifications')}</Text>
               </View>
               <Switch
                 value={notificationsEnabled}
@@ -75,7 +78,7 @@ const SettingsScreen = () => {
 
             {/* Currency Setting */}
             <View className="mb-6">
-              <Text className="mb-2 input-label">Currency</Text>
+              <Text className="mb-2 input-label">{t('settings.currency')}</Text>
               <TouchableOpacity
                 className="input-container"
                 onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
@@ -118,7 +121,7 @@ const SettingsScreen = () => {
               className="btn-primary"
               onPress={handleUpdateSettings}
               disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? 'Updating...' : 'Update Info'}</Text>
+              <Text className="btn-primary-text">{isLoading ? t('settings.updating') : t('settings.update_info')}</Text>
             </TouchableOpacity>
           </View>
         </View>

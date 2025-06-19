@@ -1,0 +1,50 @@
+{
+  "languages": {
+    "title": "Languages",
+    "subtitle": "Change the app language.",
+    "change": "Change language",
+    "changing": "Changing...",
+    "success_title": "Success",
+    "success_message": "Language changed successfully",
+    "error_title": "Error",
+    "error_message": "Failed to change language. Please try again."
+  },
+  "login": {
+    "title": "Login",
+    "subtitle": "Please enter your email and password to enjoy the experience",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forget Password?",
+    "login_button": "Login",
+    "logging_in": "Logging in...",
+    "or_continue_with": "Or Continue with",
+    "google": "Google",
+    "apple": "Apple",
+    "no_account": "Didn't have an account? ",
+    "sign_up": "Sign Up"
+  },
+  "register": {
+    "title": "Create an Account",
+    "subtitle": "Please enter your details to enjoy the experience",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "remember_me": "Remember me",
+    "create_account": "Create an Account",
+    "creating_account": "Creating Account...",
+    "or_use": "OR use",
+    "google": "Google",
+    "apple": "Apple",
+    "already_have_account": "Already have an account? ",
+    "login": "Log In"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize app preferences.",
+    "notifications": "Notifications",
+    "currency": "Currency",
+    "update_info": "Update Info",
+    "updating": "Updating..."
+  }
+}

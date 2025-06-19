@@ -1,0 +1,50 @@
+{
+  "languages": {
+    "title": "Langues",
+    "subtitle": "Changer la langue de l'application.",
+    "change": "Changer la langue",
+    "changing": "Changement...",
+    "success_title": "Succès",
+    "success_message": "Langue changée avec succès",
+    "error_title": "Erreur",
+    "error_message": "Échec du changement de langue. Veuillez réessayer."
+  },
+  "login": {
+    "title": "Connexion",
+    "subtitle": "Veuillez entrer votre email et mot de passe pour profiter de l'application",
+    "email": "Email",
+    "password": "Mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "login_button": "Se connecter",
+    "logging_in": "Connexion...",
+    "or_continue_with": "Ou continuer avec",
+    "google": "Google",
+    "apple": "Apple",
+    "no_account": "Vous n'avez pas de compte ? ",
+    "sign_up": "S'inscrire"
+  },
+  "register": {
+    "title": "Créer un compte",
+    "subtitle": "Veuillez entrer vos informations pour profiter de l'application",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "remember_me": "Se souvenir de moi",
+    "create_account": "Créer un compte",
+    "creating_account": "Création du compte...",
+    "or_use": "Ou utiliser",
+    "google": "Google",
+    "apple": "Apple",
+    "already_have_account": "Vous avez déjà un compte ? ",
+    "login": "Se connecter"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Personnaliser les préférences de l'application.",
+    "notifications": "Notifications",
+    "currency": "Devise",
+    "update_info": "Mettre à jour",
+    "updating": "Mise à jour..."
+  }
+}

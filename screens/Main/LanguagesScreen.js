@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
+import { useTranslation } from 'react-i18next';
+import i18n from 'utils/i18n';
 
 const LanguagesScreen = () => {
   const navigation = useNavigation();
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const { t } = useTranslation();
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
   const [isLoading, setIsLoading] = useState(false);
 
   const languages = [
@@ -43,20 +45,19 @@ const LanguagesScreen = () => {
     }, */
   ];
 
-  const handleLanguageSelect = (language) => {
-    setSelectedLanguage(language.name);
+  const handleLanguageSelect = language => {
+    setSelectedLanguage(language.code);
   };
 
   const handleChangeLanguage = async () => {
     setIsLoading(true);
     try {
-      // Add your language change logic here
-      // await Language.changeLanguage(selectedLanguage);
-      Alert.alert('Success', `Language changed to ${selectedLanguage}`);
+      await i18n.changeLanguage(selectedLanguage);
+      Alert.alert(t('languages.success_title'), t('languages.success_message'));
       navigation.goBack();
     } catch (error) {
       console.error('Language change failed:', error.message);
-      Alert.alert('Error', 'Failed to change language. Please try again.');
+      Alert.alert(t('languages.error_title'), t('languages.error_message'));
     } finally {
       setIsLoading(false);
     }
@@ -68,8 +69,8 @@ const LanguagesScreen = () => {
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
-        <Header title="Languages" />
-        <Text className="text-sm font-normal">Change the app language.</Text>
+        <Header title={t('languages.title')} />
+        <Text className="text-sm font-normal">{t('languages.subtitle')}</Text>
         <View className="relative pt-4">
           <View className="form-container">
             {/* Language Options */}
@@ -78,7 +79,7 @@ const LanguagesScreen = () => {
                 <TouchableOpacity
                   key={language.code}
                   className={`mb-2 flex-row items-center justify-between rounded-lg border p-4 ${
-                    selectedLanguage === language.name
+                    selectedLanguage === language.code
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 bg-white'
                   }`}
@@ -88,7 +89,7 @@ const LanguagesScreen = () => {
                     <View>
                       <Text
                         className={`text-lg font-medium ${
-                          selectedLanguage === language.name ? 'text-blue-600' : 'text-black'
+                          selectedLanguage === language.code ? 'text-blue-600' : 'text-black'
                         }`}>
                         {language.name}
                       </Text>
@@ -98,11 +99,11 @@ const LanguagesScreen = () => {
 
                   <View
                     className={`h-6 w-6 items-center justify-center rounded-full border-2 ${
-                      selectedLanguage === language.name
+                      selectedLanguage === language.code
                         ? 'border-blue-500 bg-blue-500'
                         : 'border-gray-300'
                     }`}>
-                    {selectedLanguage === language.name && (
+                    {selectedLanguage === language.code && (
                       <Ionicons name="checkmark" size={16} color="white" />
                     )}
                   </View>
@@ -115,7 +116,7 @@ const LanguagesScreen = () => {
               onPress={handleChangeLanguage}
               disabled={isLoading}>
               <Text className="btn-primary-text">
-                {isLoading ? 'Changing...' : 'Change language'}
+                {isLoading ? t('languages.changing') : t('languages.change')}
               </Text>
             </TouchableOpacity>
           </View>

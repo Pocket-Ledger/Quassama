@@ -1,0 +1,50 @@
+{
+  "languages": {
+    "title": "اللغات",
+    "subtitle": "تغيير لغة التطبيق.",
+    "change": "تغيير اللغة",
+    "changing": "جارٍ التغيير...",
+    "success_title": "نجاح",
+    "success_message": "تم تغيير اللغة بنجاح",
+    "error_title": "خطأ",
+    "error_message": "فشل تغيير اللغة. حاول مرة أخرى."
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "subtitle": "يرجى إدخال البريد الإلكتروني وكلمة المرور للاستمتاع بالتطبيق",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgot_password": "هل نسيت كلمة المرور؟",
+    "login_button": "تسجيل الدخول",
+    "logging_in": "جارٍ تسجيل الدخول...",
+    "or_continue_with": "أو المتابعة بواسطة",
+    "google": "جوجل",
+    "apple": "أبل",
+    "no_account": "ليس لديك حساب؟ ",
+    "sign_up": "إنشاء حساب"
+  },
+  "register": {
+    "title": "إنشاء حساب",
+    "subtitle": "يرجى إدخال بياناتك للاستمتاع بالتطبيق",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirm_password": "تأكيد كلمة المرور",
+    "remember_me": "تذكرني",
+    "create_account": "إنشاء حساب",
+    "creating_account": "جارٍ إنشاء الحساب...",
+    "or_use": "أو استخدم",
+    "google": "جوجل",
+    "apple": "أبل",
+    "already_have_account": "لديك حساب بالفعل؟ ",
+    "login": "تسجيل الدخول"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "تخصيص تفضيلات التطبيق.",
+    "notifications": "الإشعارات",
+    "currency": "العملة",
+    "update_info": "تحديث المعلومات",
+    "updating": "جارٍ التحديث..."
+  }
+}

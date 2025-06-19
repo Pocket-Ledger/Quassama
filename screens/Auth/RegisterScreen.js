@@ -18,9 +18,12 @@ import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Register from 'models/auth/Register';
 import User from 'models/auth/user';
+import { useTranslation } from 'react-i18next';
+import i18n from 'utils/i18n';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -168,8 +171,8 @@ const RegisterScreen = () => {
 
             {/* Title and Subtitle */}
             <View className="">
-              <Text className="title">Create an Account</Text>
-              <Text className="subtitle">Please enter your details to enjoy the experience</Text>
+              <Text className="title">{t('register.title')}</Text>
+              <Text className="subtitle">{t('register.subtitle')}</Text>
             </View>
 
             {/* Form */}
@@ -177,7 +180,7 @@ const RegisterScreen = () => {
               <View className="gap-4">
                 {/* Username Input */}
                 <View className="input-group">
-                  <Text className="input-label">Username</Text>
+                  <Text className="input-label">{t('register.username')}</Text>
                   <View className="input-container">
                     <Ionicons
                       name="person-outline"
@@ -211,7 +214,7 @@ const RegisterScreen = () => {
 
                 {/* Email Input */}
                 <View className="input-group">
-                  <Text className="input-label">Email</Text>
+                  <Text className="input-label">{t('register.email')}</Text>
                   <View className="input-container">
                     <Ionicons
                       name="mail-outline"
@@ -246,7 +249,7 @@ const RegisterScreen = () => {
 
                 {/* Password Input */}
                 <View className="input-group">
-                  <Text className="input-label">Password</Text>
+                  <Text className="input-label">{t('register.password')}</Text>
                   <View className="input-container">
                     <Ionicons
                       name="lock-closed-outline"
@@ -362,7 +365,7 @@ const RegisterScreen = () => {
 
                 {/* Confirm Password Input */}
                 <View className="input-group">
-                  <Text className="input-label">Confirm Password</Text>
+                  <Text className="input-label">{t('register.confirm_password')}</Text>
                   <View className="input-container">
                     <Ionicons
                       name="lock-closed-outline"
@@ -434,7 +437,7 @@ const RegisterScreen = () => {
                   }`}>
                   {rememberMe && <Ionicons name="checkmark" size={14} color="white" />}
                 </View>
-                <Text className="font-medium text-body text-primary">Remember me</Text>
+                <Text className="font-medium text-body text-primary">{t('register.remember_me')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -442,14 +445,14 @@ const RegisterScreen = () => {
                 onPress={handleRegister}
                 disabled={isLoading}>
                 <Text className="btn-primary-text">
-                  {isLoading ? 'Creating Account...' : 'Create an Account'}
+                  {isLoading ? t('register.creating_account') : t('register.create_account')}
                 </Text>
               </TouchableOpacity>
             </View>
 
             <View className="divider-container">
               <View className="divider-line" />
-              <Text className="divider-text">OR use</Text>
+              <Text className="divider-text">{t('register.or_use')}</Text>
               <View className="divider-line" />
             </View>
 
@@ -463,22 +466,22 @@ const RegisterScreen = () => {
                   className="w-5 h-5"
                   resizeMode="contain"
                 />
-                <Text className="text-label">Google</Text>
+                <Text className="text-label">{t('register.google')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 className="social-button"
                 onPress={() => handleSocialLogin('Apple')}>
                 <Ionicons name="logo-apple" size={20} color="#000000" />
-                <Text className="text-label">Apple</Text>
+                <Text className="text-label">{t('register.apple')}</Text>
               </TouchableOpacity>
             </View>
 
             {/* Login Link */}
             <View className="mt-6 signup-container">
-              <Text className="signup-text">Already have an account? </Text>
+              <Text className="signup-text">{t('register.already_have_account')}</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text className="signup-link">Log In</Text>
+                <Text className="signup-link">{t('register.login')}</Text>
               </TouchableOpacity>
             </View>
           </View>
