@@ -31,6 +31,7 @@ const GroupDetailsScreen = () => {
   const [youPaid, setYouPaid] = useState(0);
   const [youOwe, setYouOwe] = useState(0);
   const [recentExpenses, setRecentExpenses] = useState([]);
+  const [balanceByAllUsers, setBalanceByAllUsers] = useState({});
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
@@ -106,6 +107,7 @@ const GroupDetailsScreen = () => {
             setYouPaid(userPaidAmount);
             setYouOwe(totalAmount - userPaidAmount);
             setRecentExpenses(expensesWithUsernames);
+            setBalanceByAllUsers(balanceByAllUsersInGroup); // Store the balance data
           }
         } catch (err) {
           console.error('Error fetching group details or expenses', err);
@@ -123,7 +125,7 @@ const GroupDetailsScreen = () => {
 
   if (loading || !groupData) {
     return (
-      <SafeAreaView className="items-center justify-center flex-1 bg-white">
+      <SafeAreaView className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#2979FF" />
         <Text className="mt-4">Loading…</Text>
       </SafeAreaView>
@@ -132,6 +134,21 @@ const GroupDetailsScreen = () => {
 
   // Destructure real data
   const { name, members } = groupData;
+
+  // Helper function to get balance for a member
+  const getMemberBalance = (memberId) => {
+    return balanceByAllUsers[memberId] || 0;
+  };
+
+  // Helper function to format balance with appropriate sign and color
+  const formatBalance = (balance) => {
+    if (balance > 0) {
+      return `+${balance}`;
+    } else if (balance < 0) {
+      return `${balance}`;
+    }
+    return '0';
+  };
 
   const handleSettleUp = () => {
     console.log('Settle up pressed');
@@ -155,16 +172,16 @@ const GroupDetailsScreen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Group Summary Card */}
-          <View className="p-6 mb-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-            <Text className="text-base text-center text-black/75">Total Group Expenses</Text>
-            <Text className="text-2xl font-medium text-center text-black">$ {TotalExpenses}</Text>
+          <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+            <Text className="text-center text-base text-black/75">Total Group Expenses</Text>
+            <Text className="text-center text-2xl font-medium text-black">$ {TotalExpenses}</Text>
 
-            <View className="flex-row justify-between mt-6">
+            <View className="mt-6 flex-row justify-between">
               <View className="flex-1">
                 <Text className="text-sm text-black/75">You Paid</Text>
                 <Text className="text-xl text-black">$ {youPaid}</Text>
               </View>
-              <View className="items-end flex-1">
+              <View className="flex-1 items-end">
                 <Text className="text-sm text-black/75">You Owe</Text>
                 <Text className="text-xl text-red-500">-${youOwe}</Text>
               </View>
@@ -172,37 +189,42 @@ const GroupDetailsScreen = () => {
           </View>
 
           {/* Settle Up Button */}
-          <TouchableOpacity className="py-4 mb-6 rounded-lg bg-primary" onPress={handleSettleUp}>
-            <Text className="text-base font-semibold text-center text-white">Settle Up</Text>
+          <TouchableOpacity className="mb-6 rounded-lg bg-primary py-4" onPress={handleSettleUp}>
+            <Text className="text-center text-base font-semibold text-white">Settle Up</Text>
           </TouchableOpacity>
 
           {/* Members List */}
-          <View className="flex-row mb-6">
-            {members.map((member, idx) => (
-              <View key={member.id ?? `member-${idx}`} className="items-center mr-4">
-                <Avatar
-                  initial={member.initial}
-                  name={member.name}
-                  color={member.color}
-                  size="medium"
-                  showName={true}
-                />
-                <Text
-                  className={`text-sm ${
-                    typeof member.amount === 'string' && member.amount.startsWith('+')
-                      ? 'text-green-500'
-                      : 'text-red-500'
-                  }`}>
-                  {member.amount ?? '—'}
-                </Text>
-              </View>
-            ))}
+          <View className="mb-6 flex-row">
+            {members.map((member, idx) => {
+              const memberBalance = getMemberBalance(member.id);
+              const formattedBalance = formatBalance(memberBalance);
+
+              return (
+                <View key={member.id ?? `member-${idx}`} className="mr-4 items-center">
+                  <Avatar
+                    initial={member.initial}
+                    name={member.name}
+                    color={member.color}
+                    size="medium"
+                    showName={true}
+                  />
+                  <Text
+                    className={`text-xs font-medium ${
+                      memberBalance > 0
+                        ? 'text-green-500'
+                        : memberBalance < 0
+                          ? 'text-red-500'
+                          : 'text-gray-500'
+                    }`}>
+                    {formattedBalance} MAD
+                  </Text>
+                </View>
+              );
+            })}
           </View>
 
-
-
           {/* Recently Expenses Header */}
-          <View className="flex-row items-center justify-between mb-4">
+          <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">Recently Expenses</Text>
             <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId })}>
               <Text className="text-base font-medium text-primary">See All</Text>

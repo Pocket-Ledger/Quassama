@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Group from 'models/group/group';
 import { getAuth } from 'firebase/auth';
 import Header from 'components/Header';
@@ -34,7 +34,23 @@ const AddNewGroupScreen = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [shouldReset, setShouldReset] = useState(false);
 
+  /* useFocusEffect(
+    React.useCallback(() => {
+      if (shouldReset) {
+        setGroupName('');
+        setMemberInput('');
+        setSelectedMembers([]);
+        setSearchResults([]);
+        setErrors({});
+        setHasSearched(false);
+        setAllowInviteOthers(true);
+        setNotifyForExpenses(true);
+        setShouldReset(false);
+      }
+    }, [shouldReset])
+  ); */
   // Now holds { docId, id, username, email }
   const [selectedMembers, setSelectedMembers] = useState([]);
   const avatarColors = [
@@ -134,6 +150,7 @@ const AddNewGroupScreen = () => {
           }
         }
       }
+      //setShouldReset(true);
 
       showSuccess(t('addGroup.success_title'), t('addGroup.success_message'), () => {
         hideAlert();
@@ -188,7 +205,9 @@ const AddNewGroupScreen = () => {
         <View className="flex-1 gap-6">
           {/* Group Name */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">{t('addGroup.group_name')}</Text>
+            <Text className="input-label text-base font-medium text-black">
+              {t('addGroup.group_name')}
+            </Text>
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4 py-4 text-black ${
@@ -213,7 +232,9 @@ const AddNewGroupScreen = () => {
 
           {/* Member Search */}
           <View>
-            <Text className="mb-2 text-base font-medium text-black">{t('addGroup.add_members')}</Text>
+            <Text className="mb-2 text-base font-medium text-black">
+              {t('addGroup.add_members')}
+            </Text>
             <View className="input-container flex-row">
               <TextInput
                 className="input-field flex-1 rounded-lg border border-gray-200 px-4 py-4 text-black"
@@ -299,7 +320,9 @@ const AddNewGroupScreen = () => {
               memberInput.trim() !== '' &&
               searchResults.length === 0 && (
                 <View className="mt-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
-                  <Text className="text-center text-sm text-gray-500">{t('addGroup.no_users_found')}</Text>
+                  <Text className="text-center text-sm text-gray-500">
+                    {t('addGroup.no_users_found')}
+                  </Text>
                 </View>
               )}
           </View>
@@ -308,7 +331,7 @@ const AddNewGroupScreen = () => {
           {selectedMembers.length > 0 && (
             <View className="mb-4">
               <Text className="mb-3 text-base font-medium text-black">
-                {t('addGroup.selected_members', {count: selectedMembers.length})}
+                {t('addGroup.selected_members', { count: selectedMembers.length })}
               </Text>
               {renderMembers()}
             </View>

@@ -6,30 +6,30 @@ const { width } = Dimensions.get('window');
 const LogoutModal = ({ visible, onClose, onConfirm, isLoading = false }) => {
   return (
     <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
-      <Pressable className="items-center justify-center flex-1 px-4 bg-black/50" onPress={onClose}>
+      <Pressable className="flex-1 items-center justify-center bg-black/50 px-4" onPress={onClose}>
         <Pressable
-          className="w-full max-w-sm p-6 bg-white rounded-2xl"
+          className="w-full max-w-sm rounded-2xl bg-white p-6"
           onPress={(e) => e.stopPropagation()}
           style={{ width: width * 0.85, maxWidth: 340 }}>
           {/* Modal Header */}
-          <View className="items-center mb-4">
+          <View className="mb-4 items-center">
             <Text className="mb-2 text-xl font-bold text-black">Logout</Text>
-            <Text className="text-base leading-5 text-center text-gray-600">
+            <Text className="text-center text-base font-normal leading-5 text-gray-600">
               Are you sure you want to log out?
             </Text>
           </View>
 
           {/* Modal Actions */}
-          <View className="flex-row gap-3 mt-6">
+          <View className="mt-6 flex-row gap-3">
             <TouchableOpacity
-              className="items-center justify-center flex-1 px-4 py-3 bg-gray-100 rounded-lg"
+              className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-4 py-3"
               onPress={onClose}
               disabled={isLoading}>
               <Text className="text-base font-medium text-gray-700">Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="items-center justify-center flex-1 px-4 py-3 bg-red-500 rounded-lg"
+              className="flex-1 items-center justify-center rounded-lg bg-red-500 px-4 py-3"
               onPress={onConfirm}
               disabled={isLoading}>
               <Text className="text-base font-medium text-white">

@@ -177,12 +177,14 @@ const LoginScreen = () => {
             </TouchableOpacity>
 
             <TouchableOpacity className="btn-primary" onPress={handleLogin} disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? t('login.logging_in') : t('login.login_button')}</Text>
+              <Text className="btn-primary-text">
+                {isLoading ? t('login.logging_in') : t('login.login_button')}
+              </Text>
             </TouchableOpacity>
           </View>
           <View className="divider-container">
             <View className="divider-line" />
-            <Text className="divider-text">{t('login.or_continue_with')}</Text>
+            <Text className="divider-text font-normal">{t('login.or_continue_with')}</Text>
             <View className="divider-line" />
           </View>
           <View className="flex w-full flex-row gap-4">
@@ -202,7 +204,7 @@ const LoginScreen = () => {
           </View>
           {/* Sign Up Link - UNCOMMENTED */}
           <View className="signup-container">
-            <Text className="signup-text">{t('login.no_account')}</Text>
+            <Text className="signup-text font-normal">{t('login.no_account')}</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text className="signup-link">{t('login.sign_up')}</Text>
             </TouchableOpacity>

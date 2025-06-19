@@ -162,7 +162,7 @@ const RegisterScreen = () => {
           className="container "
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={true}>
-          <View className="relative login-content">
+          <View className="login-content relative">
             {/* Header with Back Button and Logo */}
             <BackButton />
             <View className="logo-container">
@@ -296,7 +296,7 @@ const RegisterScreen = () => {
                     <View className="mt-3">
                       {/* Password Strength Bar */}
                       <View className="mb-2">
-                        <View className="flex-row items-center justify-between mb-1">
+                        <View className="mb-1 flex-row items-center justify-between">
                           <Text className="text-sm text-gray-600">Password Strength</Text>
                           <Text
                             className="text-sm font-medium"
@@ -304,9 +304,9 @@ const RegisterScreen = () => {
                             {getPasswordStrengthText()}
                           </Text>
                         </View>
-                        <View className="h-2 overflow-hidden bg-gray-200 rounded-full">
+                        <View className="h-2 overflow-hidden rounded-full bg-gray-200">
                           <View
-                            className="h-full transition-all duration-300 rounded-full"
+                            className="h-full rounded-full transition-all duration-300"
                             style={{
                               width: `${passwordStrength}%`,
                               backgroundColor: getPasswordStrengthColor(),
@@ -349,7 +349,7 @@ const RegisterScreen = () => {
 
                       {/* Helpful Tips */}
                       {passwordStrength < 70 && (
-                        <View className="p-2 mt-2 rounded-lg bg-blue-50">
+                        <View className="mt-2 rounded-lg bg-blue-50 p-2">
                           <Text className="text-xs text-blue-700">
                             💡 Tip: Try adding {password.length < 8 ? 'more characters, ' : ''}
                             {!/[A-Z]/.test(password) ? 'uppercase letters, ' : ''}
@@ -410,7 +410,7 @@ const RegisterScreen = () => {
 
                   {/* Password Match Indicator */}
                   {confirmPassword.length > 0 && (
-                    <View className="flex-row items-center mt-1">
+                    <View className="mt-1 flex-row items-center">
                       <Ionicons
                         name={password === confirmPassword ? 'checkmark-circle' : 'close-circle'}
                         size={16}
@@ -429,7 +429,7 @@ const RegisterScreen = () => {
 
               {/* Remember Me Checkbox */}
               <TouchableOpacity
-                className="flex-row items-center mt-4 mb-6"
+                className="mb-6 mt-4 flex-row items-center"
                 onPress={() => setRememberMe(!rememberMe)}>
                 <View
                   className={`mr-3 h-5 w-5 items-center justify-center rounded border-2 ${
@@ -437,14 +437,16 @@ const RegisterScreen = () => {
                   }`}>
                   {rememberMe && <Ionicons name="checkmark" size={14} color="white" />}
                 </View>
-                <Text className="font-medium text-body text-primary">{t('register.remember_me')}</Text>
+                <Text className="text-body font-medium text-primary">
+                  {t('register.remember_me')}
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 className="btn-primary btn-primary-text"
                 onPress={handleRegister}
                 disabled={isLoading}>
-                <Text className="btn-primary-text">
+                <Text className="btn-primary-text font-dmsans-bold">
                   {isLoading ? t('register.creating_account') : t('register.create_account')}
                 </Text>
               </TouchableOpacity>
@@ -452,18 +454,18 @@ const RegisterScreen = () => {
 
             <View className="divider-container">
               <View className="divider-line" />
-              <Text className="divider-text">{t('register.or_use')}</Text>
+              <Text className="divider-text font-normal">{t('register.or_use')}</Text>
               <View className="divider-line" />
             </View>
 
             {/* Social Login Buttons */}
-            <View className="flex flex-row w-full gap-4">
+            <View className="flex w-full flex-row gap-4">
               <TouchableOpacity
                 className="social-button"
                 onPress={() => handleSocialLogin('Google')}>
                 <Image
                   source={require('../../assets/google.png')}
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   resizeMode="contain"
                 />
                 <Text className="text-label">{t('register.google')}</Text>
@@ -478,8 +480,8 @@ const RegisterScreen = () => {
             </View>
 
             {/* Login Link */}
-            <View className="mt-6 signup-container">
-              <Text className="signup-text">{t('register.already_have_account')}</Text>
+            <View className="signup-container mt-6">
+              <Text className="signup-text font-normal">{t('register.already_have_account')}</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <Text className="signup-link">{t('register.login')}</Text>
               </TouchableOpacity>
