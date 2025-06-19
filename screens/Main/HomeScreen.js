@@ -10,6 +10,7 @@ import ExpenseListItem from 'components/ExpenseListItem';
 import Avatar from 'components/Avatar';
 import Group from 'models/group/group';
 import { auth } from 'firebase';
+import SwitchGroupModal from 'components/SwitchGroupModal';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -41,7 +42,7 @@ const HomeScreen = () => {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [groupMembers, setGroupMembers] = useState([]);
-  
+
   // New state for overview data
   const [overviewData, setOverviewData] = useState({
     categoryData: [],
@@ -99,20 +100,20 @@ const HomeScreen = () => {
         // Fetch recent activity for the selected group (limit to 3)
         const recentActivity = await Expense.getExpensesByGroupWithLimit(selectedGroup, 3);
         setRecentlyActivity(recentActivity);
-        
+
         // Transform the data to include usernames
         const transformedData = await Promise.all(
-          recentActivity.map(item => transformExpenseData(item))
+          recentActivity.map((item) => transformExpenseData(item))
         );
         setTransformedRecentActivity(transformedData);
       } else {
         // Fallback to user's recent activity if no group is selected
         const recentActivity = await Expense.RecentlyActivityByUser();
         setRecentlyActivity(recentActivity);
-        
+
         // Transform the data to include usernames
         const transformedData = await Promise.all(
-          recentActivity.map(item => transformExpenseData(item))
+          recentActivity.map((item) => transformExpenseData(item))
         );
         setTransformedRecentActivity(transformedData);
       }
@@ -145,21 +146,21 @@ const HomeScreen = () => {
           const firstGroup = userGroups[0];
           setSelectedGroup(firstGroup.id);
           setGroupName(firstGroup.name);
-          
+
           // Fetch members for the first group
           const members = await Group.getMembersByGroup(firstGroup.id);
           setGroupMembers(members);
-          
+
           // Fetch recent activity for the first group
           const recentActivity = await Expense.getExpensesByGroupWithLimit(firstGroup.id, 3);
           setRecentlyActivity(recentActivity);
-          
+
           // Transform the data to include usernames
           const transformedData = await Promise.all(
-            recentActivity.map(item => transformExpenseData(item))
+            recentActivity.map((item) => transformExpenseData(item))
           );
           setTransformedRecentActivity(transformedData);
-          
+
           console.log('Group Members:', members);
           console.log('Initial Group Activity:', recentActivity);
         }
@@ -178,24 +179,24 @@ const HomeScreen = () => {
       setSelectedGroup(groupId);
       setGroupName(groupName);
       setShowGroupModal(false);
-      
+
       // Fetch members for the selected group
       const members = await Group.getMembersByGroup(groupId);
       setGroupMembers(members);
-      
+
       // Fetch recent activity for the selected group
       const recentActivity = await Expense.getExpensesByGroupWithLimit(groupId, 3);
       setRecentlyActivity(recentActivity);
-      
+
       // Transform the data to include usernames
       const transformedData = await Promise.all(
-        recentActivity.map(item => transformExpenseData(item))
+        recentActivity.map((item) => transformExpenseData(item))
       );
       setTransformedRecentActivity(transformedData);
-      
+
       // Fetch updated overview for the selected group
       fetchExpenseOverview();
-      
+
       console.log('Selected Group ID:', groupId);
       console.log('Selected Group Name:', groupName);
       console.log('Group Members:', members);
@@ -243,8 +244,10 @@ const HomeScreen = () => {
   }));
 
   // Calculate the primary percentage for the circular progress
-  const primaryPercentage = overviewData.categoryData.length > 0 ? overviewData.categoryData[0].percentage : 0;
-  const primaryColor = overviewData.categoryData.length > 0 ? overviewData.categoryData[0].color : '#2979FF';
+  const primaryPercentage =
+    overviewData.categoryData.length > 0 ? overviewData.categoryData[0].percentage : 0;
+  const primaryColor =
+    overviewData.categoryData.length > 0 ? overviewData.categoryData[0].color : '#2979FF';
 
   return (
     <ScrollView className="container flex flex-1 gap-6 bg-white pb-6 pt-2 ">
@@ -342,14 +345,14 @@ const HomeScreen = () => {
 
           {/* Total amount display */}
           {!isLoadingOverview && overviewData.totalAmount > 0 && (
-            <View className="mt-4 pt-4 border-t border-gray-100">
+            <View className="mt-4 border-t border-gray-100 pt-4">
               <View className="flex-row justify-between">
                 <Text className="text-gray-500">Total Expenses</Text>
                 <Text className="font-dmsans-bold text-black">
                   {overviewData.totalAmount.toFixed(2)} MAD
                 </Text>
               </View>
-              <View className="flex-row justify-between mt-1">
+              <View className="mt-1 flex-row justify-between">
                 <Text className="text-gray-500">Total Transactions</Text>
                 <Text className="text-black">{overviewData.expenseCount}</Text>
               </View>
@@ -396,44 +399,23 @@ const HomeScreen = () => {
           </View>
 
           {/* Group selection modal */}
-          <Modal
+          <SwitchGroupModal
             visible={showGroupModal}
-            transparent
-            animationType="slide"
-            onRequestClose={() => setShowGroupModal(false)}
-          >
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000088' }}>
-              <View style={{ backgroundColor: 'white', borderRadius: 10, padding: 20, minWidth: 250 }}>
-                <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 10 }}>Select Group</Text>
-                {groups.map((group) => (
-                  <Pressable
-                    key={group.id}
-                    onPress={() => handleGroupSelection(group.id, group.name)}
-                    style={{ 
-                      paddingVertical: 10,
-                      backgroundColor: selectedGroup === group.id ? '#f0f0f0' : 'transparent',
-                      borderRadius: 5,
-                      paddingHorizontal: 10
-                    }}
-                  >
-                    <Text style={{ 
-                      fontSize: 16,
-                      fontWeight: selectedGroup === group.id ? 'bold' : 'normal'
-                    }}>
-                      {group.name}
-                    </Text>
-                  </Pressable>
-                ))}
-                <Pressable onPress={() => setShowGroupModal(false)} style={{ marginTop: 10 }}>
-                  <Text style={{ color: 'red', textAlign: 'center' }}>Cancel</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Modal>
+            onClose={() => setShowGroupModal(false)}
+            groups={groups}
+            selectedGroupId={selectedGroup}
+            onGroupSelect={handleGroupSelection}
+            title="Switch Group"
+            showCreateNewOption={true}
+            onCreateNew={() => {
+              // Handle navigation to create new group screen
+              navigation.navigate('AddNewGroup');
+            }}
+          />
 
           <View className="flex-row justify-between">
             {friends.length === 0 ? (
-              <View className="items-center py-8 w-full">
+              <View className="w-full items-center py-8">
                 <Feather name="users" size={48} color="#ccc" />
                 <Text className="mt-2 text-gray-500">No group members</Text>
               </View>
