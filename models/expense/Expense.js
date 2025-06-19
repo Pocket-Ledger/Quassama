@@ -341,6 +341,79 @@ class Expense {
 
     return balances.filter((b) => b < 0).reduce((sum, b) => sum + Math.abs(b), 0);
   }
+
+  // Add to Expense class
+  static async getExpenseOverview(groupId = null, startDate = null, endDate = null) {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    // Set default to current month if dates not provided
+    if (!startDate || !endDate) {
+      const now = new Date();
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    }
+
+    const expensesCol = collection(db, 'expenses');
+    let q;
+    
+    if (groupId) {
+      q = query(
+        expensesCol,
+        where('group_id', '==', groupId),
+        where('incurred_at', '>=', Timestamp.fromDate(startDate)),
+        where('incurred_at', '<=', Timestamp.fromDate(endDate))
+      );
+    } else {
+      q = query(
+        expensesCol,
+        where('user_id', '==', currentUser.uid),
+        where('incurred_at', '>=', Timestamp.fromDate(startDate)),
+        where('incurred_at', '<=', Timestamp.fromDate(endDate))
+      );
+    }
+
+    const snapshot = await getDocs(q);
+    const expenses = snapshot.docs.map(doc => doc.data());
+
+    // Calculate total amount
+    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+    // Group by category
+    const categoriesMap = {};
+    expenses.forEach(expense => {
+      const category = expense.category;
+      if (!categoriesMap[category]) {
+        categoriesMap[category] = 0;
+      }
+      categoriesMap[category] += expense.amount;
+    });
+
+    // Convert to array of objects
+    const categories = Object.keys(categoriesMap).map(category => {
+      const amount = categoriesMap[category];
+      const percentage = totalAmount > 0 ? (amount / totalAmount) * 100 : 0;
+      return {
+        category,
+        amount,
+        percentage: Math.round(percentage * 10) / 10, // Round to 1 decimal place
+      };
+    });
+
+    // Sort by amount descending
+    categories.sort((a, b) => b.amount - a.amount);
+
+    return {
+      total: totalAmount,
+      categories,
+      startDate,
+      endDate
+    };
+  }
 }
 
 export default Expense;

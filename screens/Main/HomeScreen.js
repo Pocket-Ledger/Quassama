@@ -150,12 +150,49 @@ const HomeScreen = () => {
     }
   };
 
-  const expenseData = [
-    { category: 'Groceries', percentage: 50, color: '#2979FF' },
-    { category: 'Rent', percentage: 30, color: '#2A67BF' },
-    { category: 'Cleaning', percentage: 15, color: '#83B1FF' },
-    { category: 'Others', percentage: 5, color: '#E6F0FF' },
-  ];
+  const [overviewData, setOverviewData] = useState({
+    total: 0,
+    categories: [],
+  });
+  const [overviewPeriod, setOverviewPeriod] = useState('');
+
+  // Function to fetch overview data
+  const fetchOverviewData = useCallback(async () => {
+    try {
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      
+      const data = await Expense.getExpenseOverview(
+        selectedGroup, 
+        startDate, 
+        endDate
+      );
+      
+      setOverviewData(data);
+      setOverviewPeriod(
+        startDate.toLocaleString('default', { month: 'long', year: 'numeric' })
+      );
+    } catch (error) {
+      console.error('Error fetching overview data:', error);
+    }
+  }, [selectedGroup]);
+
+  // Fetch overview data when selected group changes
+  useEffect(() => {
+    fetchOverviewData();
+  }, [fetchOverviewData, selectedGroup]);
+
+  // Transform data for UI with category colors
+  const expenseData = overviewData.categories.map(item => {
+    const categoryConfig = DEFAULT_CATEGORIES.find(c => c.name === item.category);
+    return {
+      category: item.category,
+      percentage: item.percentage,
+      color: categoryConfig ? categoryConfig.color : '#E6F0FF',
+      amount: item.amount
+    };
+  });
 
   const transformExpenseData = async (activity) => {
     try {
@@ -239,12 +276,18 @@ const HomeScreen = () => {
         </View>
 
         {/* Overview Section */}
+        {/* Overview Section */}
         <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <Text className="mb-4 text-lg font-medium text-black">April 2025 Overview</Text>
+          <Text className="mb-4 text-lg font-medium text-black">
+            {overviewPeriod} Overview
+          </Text>
 
           <View className="flex-row items-center">
             <View className="relative mr-6">
-              <CircularProgress percentage={50} color="#2979FF" />
+              <CircularProgress 
+                percentage={expenseData[0]?.percentage || 0} 
+                color={expenseData[0]?.color || '#2979FF'} 
+              />
             </View>
 
             <View className="flex-1">
