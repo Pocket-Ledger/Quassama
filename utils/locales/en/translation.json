@@ -46,5 +46,30 @@
     "currency": "Currency",
     "update_info": "Update Info",
     "updating": "Updating..."
+  },
+  "addGroup": {
+    "title": "Add New Group",
+    "group_name": "Group Name",
+    "group_name_placeholder": "Eg: 'Roommates', 'Vacation Agadir'",
+    "add_members": "Add Members",
+    "search_placeholder": "Search by username: 'user02718'",
+    "searching": "Searching...",
+    "search_results": "Search Results",
+    "no_users_found": "No users found",
+    "selected_members": "Selected Members ({{count}})",
+    "allow_invite_others": "Allow members to invite others",
+    "notify_new_expenses": "Notify for new expenses",
+    "creating": "Creating...",
+    "add_group": "Add Group",
+    "success_title": "Success",
+    "success_message": "Group created successfully!",
+    "error_title": "Creation Error",
+    "error_message": "Failed to create group. Please try again.",
+    "search_error_title": "Search Error",
+    "search_error_message": "Failed to search for users. Please try again.",
+    "errors": {
+      "group_name_required": "Group name is required",
+      "members_required": "Please add at least one member"
+    }
   }
 }

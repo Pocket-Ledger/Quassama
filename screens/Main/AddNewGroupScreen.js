@@ -18,9 +18,11 @@ import User from 'models/auth/user';
 import Invitation from 'models/invitation/invitation';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
+import { useTranslation } from 'react-i18next';
 
 const AddNewGroupScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const { alertConfig, hideAlert, showSuccess, showError } = useAlert();
 
   const [groupName, setGroupName] = useState('');
@@ -63,7 +65,7 @@ const AddNewGroupScreen = () => {
       );
     } catch (error) {
       console.error('Error searching for users:', error);
-      showError('Search Error', 'Failed to search for users. Please try again.');
+      showError(t('addGroup.search_error_title'), t('addGroup.search_error_message'));
     } finally {
       setIsSearching(false);
     }
@@ -72,10 +74,10 @@ const AddNewGroupScreen = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!groupName.trim()) {
-      newErrors.groupName = 'Group name is required';
+      newErrors.groupName = t('addGroup.errors.group_name_required');
     }
     if (selectedMembers.length === 0) {
-      newErrors.members = 'Please add at least one member';
+      newErrors.members = t('addGroup.errors.members_required');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -133,13 +135,13 @@ const AddNewGroupScreen = () => {
         }
       }
 
-      showSuccess('Success', 'Group created successfully!', () => {
+      showSuccess(t('addGroup.success_title'), t('addGroup.success_message'), () => {
         hideAlert();
         navigation.goBack();
       });
     } catch (error) {
       console.error('Error creating group:', error);
-      showError('Creation Error', 'Failed to create group. Please try again.');
+      showError(t('addGroup.error_title'), t('addGroup.error_message'));
     } finally {
       setIsCreating(false);
     }
@@ -182,17 +184,17 @@ const AddNewGroupScreen = () => {
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
-        <Header title="Add New Group" />
+        <Header title={t('addGroup.title')} />
         <View className="flex-1 gap-6">
           {/* Group Name */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">Group Name</Text>
+            <Text className="input-label text-base font-medium text-black">{t('addGroup.group_name')}</Text>
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4 py-4 text-black ${
                   errors.groupName ? 'border-red-500' : 'border-gray-200'
                 }`}
-                placeholder='Eg: "Roommates", "Vacation Agadir"'
+                placeholder={t('addGroup.group_name_placeholder')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={groupName}
                 onChangeText={(text) => {
@@ -211,11 +213,11 @@ const AddNewGroupScreen = () => {
 
           {/* Member Search */}
           <View>
-            <Text className="mb-2 text-base font-medium text-black">Add Members</Text>
+            <Text className="mb-2 text-base font-medium text-black">{t('addGroup.add_members')}</Text>
             <View className="input-container flex-row">
               <TextInput
                 className="input-field flex-1 rounded-lg border border-gray-200 px-4 py-4 text-black"
-                placeholder='Search by username: "user02718"'
+                placeholder={t('addGroup.search_placeholder')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={memberInput}
                 onChangeText={(text) => {
@@ -241,7 +243,7 @@ const AddNewGroupScreen = () => {
             {isSearching && (
               <View className="mt-3 flex-row items-center justify-center px-2">
                 <ActivityIndicator size="small" color="#2979FF" />
-                <Text className="ml-2 text-sm text-gray-600">Searching...</Text>
+                <Text className="ml-2 text-sm text-gray-600">{t('addGroup.searching')}</Text>
               </View>
             )}
 
@@ -249,7 +251,7 @@ const AddNewGroupScreen = () => {
             {searchResults.length > 0 && (
               <View className="mt-3 rounded-lg border border-gray-100 bg-gray-50">
                 <Text className="border-b border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
-                  Search Results
+                  {t('addGroup.search_results')}
                 </Text>
                 {searchResults.map((user, index) => (
                   <TouchableOpacity
@@ -297,7 +299,7 @@ const AddNewGroupScreen = () => {
               memberInput.trim() !== '' &&
               searchResults.length === 0 && (
                 <View className="mt-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
-                  <Text className="text-center text-sm text-gray-500">No users found</Text>
+                  <Text className="text-center text-sm text-gray-500">{t('addGroup.no_users_found')}</Text>
                 </View>
               )}
           </View>
@@ -306,7 +308,7 @@ const AddNewGroupScreen = () => {
           {selectedMembers.length > 0 && (
             <View className="mb-4">
               <Text className="mb-3 text-base font-medium text-black">
-                Selected Members ({selectedMembers.length})
+                {t('addGroup.selected_members', {count: selectedMembers.length})}
               </Text>
               {renderMembers()}
             </View>
@@ -320,7 +322,7 @@ const AddNewGroupScreen = () => {
           {/* Settings */}
           <View className="gap-2">
             <View className="flex-row items-center justify-between py-2">
-              <Text className="text-base text-black">Allow members to invite others</Text>
+              <Text className="text-base text-black">{t('addGroup.allow_invite_others')}</Text>
               <TouchableOpacity
                 className={`h-8 w-14 rounded-full ${
                   allowInviteOthers ? 'bg-primary' : 'bg-gray-300'
@@ -334,7 +336,7 @@ const AddNewGroupScreen = () => {
               </TouchableOpacity>
             </View>
             <View className="flex-row items-center justify-between border-b-[0.5px] border-gray-250 py-2">
-              <Text className="text-base text-black">Notify for new expenses</Text>
+              <Text className="text-base text-black">{t('addGroup.notify_new_expenses')}</Text>
               <TouchableOpacity
                 className={`h-8 w-14 rounded-full ${
                   notifyForExpenses ? 'bg-primary' : 'bg-gray-300'
@@ -357,7 +359,7 @@ const AddNewGroupScreen = () => {
             onPress={handleAddGroup}
             disabled={isCreating}>
             <Text className="btn-primary-text text-center text-base font-semibold text-white">
-              {isCreating ? 'Creating...' : 'Add Group'}
+              {isCreating ? t('addGroup.creating') : t('addGroup.add_group')}
             </Text>
           </TouchableOpacity>
         </View>

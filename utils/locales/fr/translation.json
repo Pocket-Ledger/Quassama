@@ -46,5 +46,30 @@
     "currency": "Devise",
     "update_info": "Mettre à jour",
     "updating": "Mise à jour..."
+  },
+  "addGroup": {
+    "title": "Créer un nouveau groupe",
+    "group_name": "Nom du groupe",
+    "group_name_placeholder": "Ex: 'Colocataires', 'Vacances Agadir'",
+    "add_members": "Ajouter des membres",
+    "search_placeholder": "Rechercher par nom d'utilisateur : 'user02718'",
+    "searching": "Recherche...",
+    "search_results": "Résultats de recherche",
+    "no_users_found": "Aucun utilisateur trouvé",
+    "selected_members": "Membres sélectionnés ({{count}})",
+    "allow_invite_others": "Permettre aux membres d'inviter d'autres",
+    "notify_new_expenses": "Notifier pour les nouvelles dépenses",
+    "creating": "Création...",
+    "add_group": "Ajouter le groupe",
+    "success_title": "Succès",
+    "success_message": "Groupe créé avec succès !",
+    "error_title": "Erreur de création",
+    "error_message": "Échec de la création du groupe. Veuillez réessayer.",
+    "search_error_title": "Erreur de recherche",
+    "search_error_message": "Échec de la recherche d'utilisateurs. Veuillez réessayer.",
+    "errors": {
+      "group_name_required": "Le nom du groupe est obligatoire",
+      "members_required": "Veuillez ajouter au moins un membre"
+    }
   }
 }
