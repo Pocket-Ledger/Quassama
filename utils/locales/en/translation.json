@@ -167,7 +167,19 @@
     "noGroupsAvailable": "No groups available",
     "memberCount": "{{count}} members",
     "groupSettings": "Group Settings",
-    "inviteMembers": "Invite Members"
+    "inviteMembers": "Invite Members",
+    "title": "Groups",
+    "tabs": {
+      "all": "All",
+      "youOwed": "You Owed",
+      "youOw": "You Ow",
+      "settled": "Settled"
+    },
+    "noGroupsYet": "No Groups Yet",
+    "startByCreating": "Start by creating a group for your trip, event, or shared expenses. It only takes a few seconds!",
+    "createFirstGroup": "Create Your First Group",
+    "noExpensesYet": "No expenses yet",
+    "personal": "Personal"
   },
   "notifications": {
     "notifications": "Notifications",
@@ -264,5 +276,12 @@
     "back": "Back",
     "next": "Next",
     "done": "Done"
+  },
+  "invitations": {
+    "join": "Join \"{{groupName}}\"?",
+    "invitedBy": "Invited By {{name}}",
+    "accept": "Accept",
+    "decline": "Decline",
+    "unknown": "Unknown"
   }
 }

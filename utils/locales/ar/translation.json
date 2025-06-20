@@ -166,7 +166,19 @@
     "noGroupsAvailable": "لا توجد مجموعات متاحة",
     "memberCount": "{{count}} أعضاء",
     "groupSettings": "إعدادات المجموعة",
-    "inviteMembers": "دعوة أعضاء"
+    "inviteMembers": "دعوة أعضاء",
+    "title": "المجموعات",
+    "tabs": {
+      "all": "الكل",
+      "youOwed": "مستحقاتك",
+      "youOw": "ديونك",
+      "settled": "مسددة"
+    },
+    "noGroupsYet": "لا توجد مجموعات بعد",
+    "startByCreating": "ابدأ بإنشاء مجموعة لرحلتك أو مناسبتك أو نفقاتك المشتركة. يستغرق الأمر بضع ثوانٍ فقط!",
+    "createFirstGroup": "إنشاء مجموعتك الأولى",
+    "noExpensesYet": "لا توجد نفقات بعد",
+    "personal": "شخصي"
   },
   "notifications": {
     "notifications": "الإشعارات",
@@ -263,5 +275,12 @@
     "back": "رجوع",
     "next": "التالي",
     "done": "تم"
+  },
+  "invitations": {
+    "join": "الانضمام إلى \"{{groupName}}\"؟",
+    "invitedBy": "بدعوة من {{name}}",
+    "accept": "قبول",
+    "decline": "رفض",
+    "unknown": "غير معروف"
   }
 }

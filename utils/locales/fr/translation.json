@@ -153,6 +153,7 @@
     "note": "Note"
   },
   "group": {
+    "title": "Groupes",
     "selectGroup": "Sélectionner le Groupe",
     "switchGroup": "Changer de Groupe",
     "createNewGroup": "Créer un Nouveau Groupe",
@@ -166,7 +167,18 @@
     "noGroupsAvailable": "Aucun groupe disponible",
     "memberCount": "{{count}} membres",
     "groupSettings": "Paramètres du Groupe",
-    "inviteMembers": "Inviter des Membres"
+    "inviteMembers": "Inviter des Membres",
+    "tabs": {
+      "all": "Tous",
+      "youOwed": "On vous doit",
+      "youOw": "Vous devez",
+      "settled": "Réglé"
+    },
+    "noGroupsYet": "Pas encore de groupes",
+    "startByCreating": "Commencez par créer un groupe pour votre voyage, événement ou dépenses partagées. Cela ne prend que quelques secondes!",
+    "createFirstGroup": "Créer votre premier groupe",
+    "noExpensesYet": "Pas encore de dépenses",
+    "personal": "Personnel"
   },
   "notifications": {
     "notifications": "Notifications",
@@ -262,5 +274,12 @@
     "back": "Retour",
     "next": "Suivant",
     "done": "Terminé"
+  },
+  "invitations": {
+    "join": "Rejoindre \"{{groupName}}\"?",
+    "invitedBy": "Invité par {{name}}",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "unknown": "Inconnu"
   }
 }
