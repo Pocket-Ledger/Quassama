@@ -273,7 +273,7 @@ const HomeScreen = () => {
             <Text className="font-dmsans-bold text-lg text-white">M</Text>
           </View>
           <View>
-            <Text className="text-sm text-gray-500">{t('home.goodMorning')}</Text>
+            <Text className="text-sm font-normal text-gray-500">{t('home.goodMorning')}</Text>
             {isLoadingUser ? (
               <>
                 <View className="mb-2 h-6 w-48 rounded bg-gray-100" />
@@ -386,7 +386,8 @@ const HomeScreen = () => {
         <View className="mx-4 ">
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">{t('home.recentActivity')}</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId: selectedGroup })}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('AllExpenses', { groupId: selectedGroup })}>
               <Text className="font-medium text-primary">{t('common.seeAll')}</Text>
             </TouchableOpacity>
           </View>
