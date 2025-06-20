@@ -345,7 +345,9 @@ const AddNewGroupScreen = () => {
           {/* Settings */}
           <View className="gap-2">
             <View className="flex-row items-center justify-between py-2">
-              <Text className="text-base text-black">{t('addGroup.allow_invite_others')}</Text>
+              <Text className="text-base font-normal text-black">
+                {t('addGroup.allow_invite_others')}
+              </Text>
               <TouchableOpacity
                 className={`h-8 w-14 rounded-full ${
                   allowInviteOthers ? 'bg-primary' : 'bg-gray-300'
@@ -359,7 +361,9 @@ const AddNewGroupScreen = () => {
               </TouchableOpacity>
             </View>
             <View className="flex-row items-center justify-between border-b-[0.5px] border-gray-250 py-2">
-              <Text className="text-base text-black">{t('addGroup.notify_new_expenses')}</Text>
+              <Text className="text-base font-normal text-black">
+                {t('addGroup.notify_new_expenses')}
+              </Text>
               <TouchableOpacity
                 className={`h-8 w-14 rounded-full ${
                   notifyForExpenses ? 'bg-primary' : 'bg-gray-300'
