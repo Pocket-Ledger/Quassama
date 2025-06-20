@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, FlatList, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import CategoryItem from './CategoryItem';
 
 const CategoryList = ({
@@ -9,12 +10,14 @@ const CategoryList = ({
   layout = 'grid',
   size = 'medium',
   numColumns = 5,
-  title = 'Category',
+  title = '',
   showTitle = true,
   multiSelect = false,
   customStyle = {},
   itemCustomStyle = {},
 }) => {
+  const { t } = useTranslation();
+
   // Normalize selected categories to array for consistent handling
   const selectedArray = Array.isArray(selectedCategories)
     ? selectedCategories
@@ -54,7 +57,7 @@ const CategoryList = ({
       style={layout === 'grid' ? { width: `${100 / numColumns}%` } : {}}>
       <CategoryItem
         id={item.id}
-        name={item.name}
+        name={t(`categories.${item.name.toLowerCase()}`, { defaultValue: item.name })}
         icon={item.icon}
         color={item.color}
         isSelected={isCategorySelected(item.id)}
@@ -79,6 +82,11 @@ const CategoryList = ({
     }
   };
 
+  // Get the display title
+  const getDisplayTitle = () => {
+    return title || t('categories.category');
+  };
+
   // Render based on layout type
   const renderContent = () => {
     if (layout === 'horizontal') {
@@ -93,7 +101,7 @@ const CategoryList = ({
               <CategoryItem
                 key={item.id}
                 id={item.id}
-                name={item.name}
+                name={t(`categories.${item.name.toLowerCase()}`, { defaultValue: item.name })}
                 icon={item.icon}
                 color={item.color}
                 isSelected={isCategorySelected(item.id)}
@@ -125,9 +133,9 @@ const CategoryList = ({
 
   return (
     <View className={customStyle.container || ''}>
-      {showTitle && title && (
+      {showTitle && (
         <Text className={`mb-3 text-base font-medium text-black ${customStyle.title || ''}`}>
-          {title}
+          {getDisplayTitle()}
         </Text>
       )}
 
@@ -136,7 +144,7 @@ const CategoryList = ({
       {/* Optional helper text for multi-select */}
       {multiSelect && selectedArray.length > 0 && (
         <Text className={`mt-2 text-sm text-gray-500 ${customStyle.helperText || ''}`}>
-          {selectedArray.length} categor{selectedArray.length === 1 ? 'y' : 'ies'} selected
+          {t('categories.categoriesSelected', { count: selectedArray.length })}
         </Text>
       )}
     </View>

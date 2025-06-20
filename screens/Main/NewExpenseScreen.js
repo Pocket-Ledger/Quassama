@@ -14,6 +14,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
+import { useTranslation } from 'react-i18next';
 
 import Expense from 'models/expense/Expense';
 import Group from 'models/group/group';
@@ -25,6 +26,7 @@ import Header from 'components/Header';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
+  const { t, i18n } = useTranslation();
   const { alertConfig, hideAlert, showSuccess, showError } = useAlert();
 
   const auth = getAuth();
@@ -51,18 +53,20 @@ const NewExpenseScreen = () => {
           let list = [];
 
           if (fetched && fetched.length > 0) {
-            list = fetched.map(g => ({
+            list = fetched.map((g) => ({
               id: g.id,
               name: g.name,
               memberCount: g.members?.length ?? 1,
             }));
           } else {
             // default personal group
-            list = [{
-              id: `personal_${userId}`,
-              name: 'Personal',
-              memberCount: 1,
-            }];
+            list = [
+              {
+                id: `personal_${userId}`,
+                name: t('group.personal', { defaultValue: 'Personal' }),
+                memberCount: 1,
+              },
+            ];
           }
 
           if (mounted) {
@@ -78,69 +82,72 @@ const NewExpenseScreen = () => {
       }
 
       fetchGroups();
-      return () => { mounted = false; };
-    }, [userId])
+      return () => {
+        mounted = false;
+      };
+    }, [userId, t])
   );
 
   const validateForm = () => {
     const newErrors = {};
-    if (!expenseName.trim()) newErrors.expenseName = 'Expense name is required';
-    if (!amount.trim()) newErrors.amount = 'Amount is required';
-    else if (isNaN(amount) || parseFloat(amount) <= 0) newErrors.amount = 'Please enter a valid amount';
-    if (!selectedCategory) newErrors.category = 'Please select a category';
-    if (!selectedGroup) newErrors.group = 'Please select a group';
+    if (!expenseName.trim()) newErrors.expenseName = t('expense.validation.expenseNameRequired');
+    if (!amount.trim()) newErrors.amount = t('expense.validation.amountRequired');
+    else if (isNaN(amount) || parseFloat(amount) <= 0)
+      newErrors.amount = t('expense.validation.validAmount');
+    if (!selectedCategory) newErrors.category = t('expense.validation.selectCategory');
+    if (!selectedGroup) newErrors.group = t('expense.validation.selectGroup');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleAddExpense = async () => {
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  setIsSaving(true);
+    setIsSaving(true);
     try {
       const expense = new Expense(
-        expenseName.trim(),   // title
-        amount.trim(),        // amount
-        selectedCategory,     // category
-        note.trim(),          // note/description
-        selectedGroup         // group_id
+        expenseName.trim(), // title
+        amount.trim(), // amount
+        selectedCategory, // category
+        note.trim(), // note/description
+        selectedGroup // group_id
       );
       await expense.save();
 
       console.log('Expense saved successfully:', expense);
 
-      showSuccess('Success', 'Your expense was added successfully!', () => {
+      showSuccess(t('alerts.success'), t('expense.success.added'), () => {
         hideAlert();
         navigation.goBack();
       });
     } catch (error) {
       console.error('Error saving expense:', error);
-      showError('Error', error.message || 'Failed to save expense. Please try again.');
+      showError(t('alerts.error'), error.message || t('expense.error.saveFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
-
   const handleGroupSelect = (groupId) => {
     setSelectedGroup(groupId);
     setIsGroupModalVisible(false);
     if (errors.group) {
-      setErrors(prev => ({ ...prev, group: null }));
+      setErrors((prev) => ({ ...prev, group: null }));
     }
   };
 
-  const selectedGroupData = groups.find(g => g.id === selectedGroup);
+  const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const renderGroupItem = ({ item }) => (
     <TouchableOpacity
       className="flex-row items-center justify-between border-b border-gray-100 px-4 py-4"
-      onPress={() => handleGroupSelect(item.id)}
-    >
+      onPress={() => handleGroupSelect(item.id)}>
       <View>
         <Text className="text-base font-medium text-black">{item.name}</Text>
-        <Text className="text-sm text-gray-500">{item.memberCount} members</Text>
+        <Text className="text-sm text-gray-500">
+          {t('group.memberCount', { count: item.memberCount })}
+        </Text>
       </View>
       <View className="h-5 w-5 items-center justify-center rounded-full border-2 border-gray-300">
         {selectedGroup === item.id && <View className="h-3 w-3 rounded-full bg-primary" />}
@@ -148,30 +155,36 @@ const NewExpenseScreen = () => {
     </TouchableOpacity>
   );
 
+  // Get currency based on current language
+  const getCurrency = () => {
+    return t('common.currency');
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
         className="container"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <Header title="Add New Expense" />
+        contentContainerStyle={{ flexGrow: 1 }}>
+        <Header title={t('expense.addExpense')} />
 
         <View className="flex-1 gap-6 px-4">
           {/* Expense Name */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">Expense Name</Text>
+            <Text className="input-label text-base font-medium text-black">
+              {t('expense.expenseTitle')}
+            </Text>
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4 py-4 text-black ${
                   errors.expenseName ? 'border-red-500' : 'border-gray-200'
                 }`}
-                placeholder="T9edia"
+                placeholder={t('expense.expenseTitle')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={expenseName}
-                onChangeText={text => {
+                onChangeText={(text) => {
                   setExpenseName(text);
-                  if (errors.expenseName) setErrors(prev => ({ ...prev, expenseName: null }));
+                  if (errors.expenseName) setErrors((prev) => ({ ...prev, expenseName: null }));
                 }}
                 autoCapitalize="words"
               />
@@ -183,22 +196,24 @@ const NewExpenseScreen = () => {
 
           {/* Amount */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">Amount</Text>
+            <Text className="input-label text-base font-medium text-black">
+              {t('expense.expenseAmount')}
+            </Text>
             <View className="input-container relative">
               <TextInput
                 className={`input-field rounded-lg border px-4 py-4 pr-16 text-black ${
                   errors.amount ? 'border-red-500' : 'border-gray-200'
                 }`}
-                placeholder="250"
+                placeholder="100"
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={amount}
-                onChangeText={text => {
+                onChangeText={(text) => {
                   setAmount(text);
-                  if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
+                  if (errors.amount) setErrors((prev) => ({ ...prev, amount: null }));
                 }}
                 keyboardType="numeric"
               />
-              <Text className="absolute right-4 top-4 text-base text-black">MAD</Text>
+              <Text className="absolute right-4 top-4 text-base text-black">{getCurrency()}</Text>
             </View>
             {errors.amount && (
               <Text className="error-text mt-1 text-sm text-red-500">{errors.amount}</Text>
@@ -207,24 +222,25 @@ const NewExpenseScreen = () => {
 
           {/* Group Selection */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">Group</Text>
+            <Text className="input-label text-base font-medium text-black">
+              {t('group.selectGroup')}
+            </Text>
             <TouchableOpacity
               className={`input-container rounded-lg border px-4 py-4 ${
                 errors.group ? 'border-red-500' : 'border-gray-200'
               }`}
-              onPress={() => setIsGroupModalVisible(true)}
-            >
+              onPress={() => setIsGroupModalVisible(true)}>
               <View className="flex-row items-center justify-between">
                 <View className="flex-1">
                   {selectedGroupData ? (
                     <View className="flex flex-row justify-between pr-2">
                       <Text className="text-base text-black">{selectedGroupData.name}</Text>
                       <Text className="text-sm text-gray-500">
-                        {selectedGroupData.memberCount} members
+                        {t('group.memberCount', { count: selectedGroupData.memberCount })}
                       </Text>
                     </View>
                   ) : (
-                    <Text className="text-base text-gray-400">Select a group</Text>
+                    <Text className="text-base text-gray-400">{t('expense.selectGroup')}</Text>
                   )}
                 </View>
                 <Feather name="chevron-down" size={20} color="#666" />
@@ -242,18 +258,20 @@ const NewExpenseScreen = () => {
             onCategorySelect={setSelectedCategory}
             layout="grid"
             numColumns={5}
-            title="Category"
+            title={t('expense.selectCategory')}
           />
           {errors.category && (
-            <Text className="mt-2 text-sm text-red-500 error-text">{errors.category}</Text>
+            <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
           )}
 
           {/* Note */}
           <View>
-            <Text className="input-label text-base font-medium text-black">Note</Text>
+            <Text className="input-label text-base font-medium text-black">
+              {t('expense.note')}
+            </Text>
             <TextInput
               className="input-field h-24 rounded-lg border border-gray-200 px-4 py-4 text-black"
-              placeholder="Add description here"
+              placeholder={t('expense.addNote')}
               placeholderTextColor="rgba(0, 0, 0, 0.4)"
               value={note}
               onChangeText={setNote}
@@ -267,10 +285,9 @@ const NewExpenseScreen = () => {
           <TouchableOpacity
             className="btn-primary mb-8 rounded-lg bg-primary py-4"
             onPress={handleAddExpense}
-            disabled={isSaving}
-          >
+            disabled={isSaving}>
             <Text className="btn-primary-text text-center text-base font-semibold text-white">
-              {isSaving ? 'Adding...' : 'Add Expense'}
+              {isSaving ? t('expense.adding') : t('expense.addExpense')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -281,12 +298,11 @@ const NewExpenseScreen = () => {
         visible={isGroupModalVisible}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={() => setIsGroupModalVisible(false)}
-      >
+        onRequestClose={() => setIsGroupModalVisible(false)}>
         <SafeAreaView className="flex-1 bg-white">
           <View className="flex-1">
             <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
-              <Text className="text-lg font-semibold text-black">Select Group</Text>
+              <Text className="text-lg font-semibold text-black">{t('group.selectGroup')}</Text>
               <TouchableOpacity onPress={() => setIsGroupModalVisible(false)}>
                 <Feather name="x" size={24} color="#666" />
               </TouchableOpacity>
@@ -294,7 +310,7 @@ const NewExpenseScreen = () => {
             <FlatList
               data={groups}
               renderItem={renderGroupItem}
-              keyExtractor={item => item.id}
+              keyExtractor={(item) => item.id}
               showsVerticalScrollIndicator={false}
             />
           </View>

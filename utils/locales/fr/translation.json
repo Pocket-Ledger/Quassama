@@ -149,7 +149,8 @@
     "selectCategory": "Sélectionner la Catégorie",
     "selectDate": "Sélectionner la Date",
     "addNote": "Ajouter une Note",
-    "splitBetween": "Diviser Entre"
+    "splitBetween": "Diviser Entre",
+    "note": "Note"
   },
   "group": {
     "selectGroup": "Sélectionner le Groupe",
@@ -183,7 +184,7 @@
     "food": "Nourriture",
     "transport": "Transport",
     "entertainment": "Divertissement",
-    "shopping": "Shopping",
+    "shopping": "Achats",
     "bills": "Factures",
     "health": "Santé",
     "education": "Éducation",
@@ -191,15 +192,17 @@
     "other": "Autre",
     "groceries": "Épicerie",
     "restaurant": "Restaurant",
-    "gas": "Essence",
+    "gas": "Carburant",
     "taxi": "Taxi",
-    "movies": "Films",
+    "movies": "Cinéma",
     "clothing": "Vêtements",
     "electricity": "Électricité",
     "internet": "Internet",
-    "medicine": "Médicament",
+    "medicine": "Médicaments",
     "books": "Livres",
-    "hotel": "Hôtel"
+    "hotel": "Hôtel",
+    "cleaning": "Ménage",
+    "rent": "Loyer"
   },
   "validation": {
     "required": "Ce champ est requis",

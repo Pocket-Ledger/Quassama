@@ -150,7 +150,8 @@
     "selectCategory": "Select Category",
     "selectDate": "Select Date",
     "addNote": "Add Note",
-    "splitBetween": "Split Between"
+    "splitBetween": "Split Between",
+    "note": "Note"
   },
   "group": {
     "selectGroup": "Select Group",
@@ -200,7 +201,9 @@
     "internet": "Internet",
     "medicine": "Medicine",
     "books": "Books",
-    "hotel": "Hotel"
+    "hotel": "Hotel",
+    "cleaning": "Cleaning",
+    "rent": "Rent"
   },
   "validation": {
     "required": "This field is required",

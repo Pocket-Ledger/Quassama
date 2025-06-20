@@ -149,7 +149,8 @@
     "selectCategory": "اختر الفئة",
     "selectDate": "اختر التاريخ",
     "addNote": "إضافة ملاحظة",
-    "splitBetween": "تقسيم بين"
+    "splitBetween": "تقسيم بين",
+    "note": "ملاحظة"
   },
   "group": {
     "selectGroup": "اختر المجموعة",
@@ -199,7 +200,9 @@
     "internet": "إنترنت",
     "medicine": "دواء",
     "books": "كتب",
-    "hotel": "فندق"
+    "hotel": "فندق",
+    "cleaning": "تنظيف",
+    "rent": "إيجار"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
