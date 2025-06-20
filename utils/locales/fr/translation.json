@@ -258,6 +258,23 @@
     "version": "Version",
     "buildNumber": "Numéro de Build"
   },
+  "profileDetails": {
+    "subtitle": "Consultez et mettez à jour vos informations personnelles.",
+    "name": "Nom",
+    "email": "Email",
+    "namePlaceholder": "Entrez votre nom",
+    "emailPlaceholder": "Entrez votre email",
+    "updateButton": "Mettre à jour",
+    "updating": "Mise à jour...",
+    "updateSuccess": "Profil mis à jour avec succès",
+    "updateError": "Échec de la mise à jour du profil. Veuillez réessayer.",
+    "fetchError": "Échec de la récupération des détails de l'utilisateur. Veuillez réessayer.",
+    "validation": {
+      "nameRequired": "Le nom est requis",
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Veuillez entrer une adresse email valide"
+    }
+  },
   "logout": {
     "title": "Déconnexion",
     "message": "Êtes-vous sûr de vouloir vous déconnecter ?",

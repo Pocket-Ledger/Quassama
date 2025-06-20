@@ -258,6 +258,23 @@
     "version": "الإصدار",
     "buildNumber": "رقم البناء"
   },
+  "profileDetails": {
+    "subtitle": "عرض وتحديث معلوماتك الشخصية.",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "namePlaceholder": "أدخل اسمك",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "updateButton": "تحديث المعلومات",
+    "updating": "جاري التحديث...",
+    "updateSuccess": "تم تحديث الملف الشخصي بنجاح",
+    "updateError": "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
+    "fetchError": "فشل جلب تفاصيل المستخدم. يرجى المحاولة مرة أخرى.",
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح"
+    }
+  },
 
   "logout": {
     "title": "تسجيل الخروج",

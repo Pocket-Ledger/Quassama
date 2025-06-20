@@ -15,6 +15,7 @@ import User from 'models/auth/user';
 import Header from 'components/Header';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
+import { useTranslation } from 'react-i18next';
 
 const SkeletonPlaceholder = ({ width, height, style = {} }) => {
   const shimmerValue = new Animated.Value(0);
@@ -69,32 +70,38 @@ const InputFieldSkeleton = () => (
 );
 
 // Loading Screen Component
-const LoadingScreen = () => (
-  <SafeAreaView className="flex-1 bg-white">
-    <ScrollView
-      className="container"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ flexGrow: 1 }}>
-      <Header title="Profile" />
-      <SkeletonPlaceholder width="80%" height={16} style={{ marginBottom: 16 }} />
-      <View className="relative pt-4">
-        <View className="gap-4 form-container">
-          <View className="gap-4">
-            <InputFieldSkeleton />
-            <InputFieldSkeleton />
-            <SkeletonPlaceholder
-              width="100%"
-              height={56}
-              style={{ borderRadius: 12, marginTop: 8 }}
-            />
+const LoadingScreen = () => {
+  const { t } = useTranslation();
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView
+        className="container"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}>
+        <Header title={t('profile.title')} />
+        <SkeletonPlaceholder width="80%" height={16} style={{ marginBottom: 16 }} />
+        <View className="relative pt-4">
+          <View className="form-container gap-4">
+            <View className="gap-4">
+              <InputFieldSkeleton />
+              <InputFieldSkeleton />
+              <SkeletonPlaceholder
+                width="100%"
+                height={56}
+                style={{ borderRadius: 12, marginTop: 8 }}
+              />
+            </View>
           </View>
         </View>
-      </View>
-    </ScrollView>
-  </SafeAreaView>
-);
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
 const ProfileDetailsScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -111,25 +118,25 @@ const ProfileDetailsScreen = () => {
         setEmail(userDetails?.email || '');
       } catch (error) {
         console.error('Error fetching user details:', error);
-        showError('Error', 'Failed to fetch user details. Please try again.');
+        showError(t('customAlert.titles.error'), t('profileDetails.fetchError'));
       } finally {
         setIsLoadingUser(false);
       }
     };
     fetchUser();
-  }, []);
+  }, [t]);
 
   const validateForm = () => {
     const newErrors = {};
 
     if (!name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('profileDetails.validation.nameRequired');
     }
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('profileDetails.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('profileDetails.validation.emailInvalid');
     }
 
     setErrors(newErrors);
@@ -143,11 +150,11 @@ const ProfileDetailsScreen = () => {
     try {
       // Add your update profile logic here
       // await User.updateProfile({ name, email });
-      showSuccess('Success', 'Profile updated successfully');
+      showSuccess(t('customAlert.titles.success'), t('profileDetails.updateSuccess'));
       navigation.goBack();
     } catch (error) {
       console.error('Update failed:', error.message);
-      showError('Error', 'Failed to update profile. Please try again.');
+      showError(t('customAlert.titles.error'), t('profileDetails.updateError'));
     } finally {
       setIsLoading(false);
     }
@@ -164,13 +171,13 @@ const ProfileDetailsScreen = () => {
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
-        <Header title="Profile" />
-        <Text className="text-sm font-normal">View and update your personal information.</Text>
+        <Header title={t('profile.title')} />
+        <Text className="text-sm font-normal">{t('profileDetails.subtitle')}</Text>
         <View className="relative pt-4">
-          <View className="gap-4 form-container">
+          <View className="form-container gap-4">
             <View className="gap-4">
               <View className="input-group">
-                <Text className="input-label">Name</Text>
+                <Text className="input-label">{t('profileDetails.name')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="person-outline"
@@ -186,7 +193,7 @@ const ProfileDetailsScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.name ? 'input-field-error' : ''}`}
-                    placeholder="Enter your name"
+                    placeholder={t('profileDetails.namePlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={name}
                     onChangeText={(text) => {
@@ -203,7 +210,7 @@ const ProfileDetailsScreen = () => {
               </View>
 
               <View className="input-group">
-                <Text className="input-label">Email</Text>
+                <Text className="input-label">{t('profileDetails.email')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="mail-outline"
@@ -219,7 +226,7 @@ const ProfileDetailsScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.email ? 'input-field-error' : ''}`}
-                    placeholder="Enter your email"
+                    placeholder={t('profileDetails.emailPlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={email}
                     onChangeText={(text) => {
@@ -247,10 +254,10 @@ const ProfileDetailsScreen = () => {
                       height={20}
                       style={{ borderRadius: 10, marginRight: 8 }}
                     />
-                    <Text className="btn-primary-text">Updating...</Text>
+                    <Text className="btn-primary-text">{t('profileDetails.updating')}</Text>
                   </View>
                 ) : (
-                  <Text className="btn-primary-text">Update Info</Text>
+                  <Text className="btn-primary-text">{t('profileDetails.updateButton')}</Text>
                 )}
               </TouchableOpacity>
             </View>

@@ -259,6 +259,23 @@
     "version": "Version",
     "buildNumber": "Build Number"
   },
+  "profileDetails": {
+    "subtitle": "View and update your personal information.",
+    "name": "Name",
+    "email": "Email",
+    "namePlaceholder": "Enter your name",
+    "emailPlaceholder": "Enter your email",
+    "updateButton": "Update Info",
+    "updating": "Updating...",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Failed to update profile. Please try again.",
+    "fetchError": "Failed to fetch user details. Please try again.",
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address"
+    }
+  },
 
   "logout": {
     "title": "Logout",
