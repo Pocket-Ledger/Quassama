@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next';
 
 import NewExpenseScreen from '../screens/Main/NewExpenseScreen';
 import GroupsScreen from '../screens/Main/GroupsScreen';
@@ -13,20 +14,34 @@ import GroupDetailsScreen from 'screens/Main/GroupDetailsScreen';
 const Tab = createBottomTabNavigator();
 
 export function TabNavigator() {
+  const { t } = useTranslation();
+
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
       }}>
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Home' }} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ tabBarLabel: t('navigation.home') }}
+      />
       <Tab.Screen
         name="NewExpense"
         component={NewExpenseScreen}
-        options={{ tabBarLabel: 'New Expense' }}
+        options={{ tabBarLabel: t('navigation.newExpense') }}
       />
-      <Tab.Screen name="Groups" component={GroupsScreen} options={{ tabBarLabel: 'Groups' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
+      <Tab.Screen
+        name="Groups"
+        component={GroupsScreen}
+        options={{ tabBarLabel: t('navigation.groups') }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ tabBarLabel: t('navigation.profile') }}
+      />
     </Tab.Navigator>
   );
 }

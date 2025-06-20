@@ -250,5 +250,14 @@
     "cancel": "Annuler",
     "success": "Vous avez été déconnecté avec succès",
     "error": "Échec de la déconnexion. Veuillez réessayer"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "newExpense": "Nouvelle Dépense",
+    "groups": "Groupes",
+    "profile": "Profil",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé"
   }
 }

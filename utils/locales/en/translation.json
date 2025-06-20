@@ -252,5 +252,14 @@
     "cancel": "Cancel",
     "success": "You have been logged out successfully",
     "error": "Failed to log out. Please try again"
+  },
+  "navigation": {
+    "home": "Home",
+    "newExpense": "New Expense",
+    "groups": "Groups",
+    "profile": "Profile",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done"
   }
 }
