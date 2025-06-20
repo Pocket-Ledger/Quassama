@@ -300,5 +300,45 @@
     "accept": "Accept",
     "decline": "Decline",
     "unknown": "Unknown"
+  },
+  "passwordRecovery": {
+    "forgetPassword": {
+      "title": "Forget Password",
+      "subtitle": "Please enter your email to receive a code",
+      "email": "Email",
+      "emailPlaceholder": "John.doe@gmail.com",
+      "sendButton": "Send",
+      "sending": "Sending..."
+    },
+    "otpVerification": {
+      "title": "Enter Code",
+      "subtitle": "We've sent an email with an activation code to your email {{email}}",
+      "wrongCode": "Wrong Code, Please try again",
+      "didntReceive": "Didn't receive the code?",
+      "resend": "Resend",
+      "confirmButton": "Confirm",
+      "confirming": "Confirming..."
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Create a new secure password for your account",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Re-enter new password",
+      "saveButton": "Save",
+      "saving": "Saving...",
+      "successMessage": "Your password has been reset successfully",
+      "validation": {
+        "newPasswordRequired": "New password is required",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "confirmPasswordRequired": "Please confirm your password",
+        "passwordsDoNotMatch": "Passwords do not match"
+      }
+    },
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address"
+    }
   }
 }

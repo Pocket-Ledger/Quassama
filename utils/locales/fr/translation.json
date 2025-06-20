@@ -298,5 +298,45 @@
     "accept": "Accepter",
     "decline": "Refuser",
     "unknown": "Inconnu"
+  },
+  "passwordRecovery": {
+    "forgetPassword": {
+      "title": "Mot de Passe Oublié",
+      "subtitle": "Veuillez entrer votre email pour recevoir un code",
+      "email": "Email",
+      "emailPlaceholder": "John.doe@gmail.com",
+      "sendButton": "Envoyer",
+      "sending": "Envoi en cours..."
+    },
+    "otpVerification": {
+      "title": "Entrez le Code",
+      "subtitle": "Nous avons envoyé un email avec un code d'activation à votre email {{email}}",
+      "wrongCode": "Code erroné, veuillez réessayer",
+      "didntReceive": "Vous n'avez pas reçu le code ?",
+      "resend": "Renvoyer",
+      "confirmButton": "Confirmer",
+      "confirming": "Confirmation..."
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le Mot de Passe",
+      "subtitle": "Créez un nouveau mot de passe sécurisé pour votre compte",
+      "newPassword": "Nouveau Mot de Passe",
+      "newPasswordPlaceholder": "Entrez le nouveau mot de passe",
+      "confirmPassword": "Confirmer le Nouveau Mot de Passe",
+      "confirmPasswordPlaceholder": "Entrez à nouveau le mot de passe",
+      "saveButton": "Enregistrer",
+      "saving": "Enregistrement...",
+      "successMessage": "Votre mot de passe a été réinitialisé avec succès",
+      "validation": {
+        "newPasswordRequired": "Le nouveau mot de passe est requis",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+        "passwordsDoNotMatch": "Les mots de passe ne correspondent pas"
+      }
+    },
+    "validation": {
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Veuillez entrer une adresse email valide"
+    }
   }
 }

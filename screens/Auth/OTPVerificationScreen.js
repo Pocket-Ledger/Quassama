@@ -11,8 +11,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo, SmallLogo } from 'components/Logo';
+import { useTranslation } from 'react-i18next';
 
 const OTPVerificationScreen = () => {
+  const { t } = useTranslation();
   const [code, setCode] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -116,9 +118,9 @@ const OTPVerificationScreen = () => {
           <View className="mt-16">
             {/* Title and Subtitle */}
             <View className="">
-              <Text className="title">Enter Code</Text>
+              <Text className="title">{t('passwordRecovery.otpVerification.title')}</Text>
               <Text className="subtitle">
-                We&apos;ve sent an email with an activation code to your phone john.doe@gmail.com
+                {t('passwordRecovery.otpVerification.subtitle', { email: 'john.doe@gmail.com' })}
               </Text>
             </View>
 
@@ -147,7 +149,9 @@ const OTPVerificationScreen = () => {
               </View>
 
               {hasError && (
-                <Text className="mt-4 text-center text-error">Wrong Code, Please try again</Text>
+                <Text className="mt-4 text-center text-error">
+                  {t('passwordRecovery.otpVerification.wrongCode')}
+                </Text>
               )}
             </View>
 
@@ -155,12 +159,12 @@ const OTPVerificationScreen = () => {
             <View className="mb-8 ">
               <View className="flex-row items-center justify-center p-0 text-label">
                 <Text className="text-center text-text-secondary">
-                  Didn&apos;t receive the code?{' '}
+                  {t('passwordRecovery.otpVerification.didntReceive')}{' '}
                 </Text>
                 <TouchableOpacity onPress={handleResendCode} disabled={!canResend}>
                   <Text
                     className={`${canResend ? 'font-medium text-primary' : 'font-medium text-gray-300'}`}>
-                    Resend
+                    {t('passwordRecovery.otpVerification.resend')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -168,7 +172,11 @@ const OTPVerificationScreen = () => {
 
             {/* Confirm Button */}
             <TouchableOpacity className="btn-primary" onPress={handleConfirm} disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? 'Confirming...' : 'Confirm'}</Text>
+              <Text className="btn-primary-text">
+                {isLoading
+                  ? t('passwordRecovery.otpVerification.confirming')
+                  : t('passwordRecovery.otpVerification.confirmButton')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

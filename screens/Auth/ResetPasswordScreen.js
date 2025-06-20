@@ -11,7 +11,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
+import { useTranslation } from 'react-i18next';
+
 const ResetPasswordScreen = () => {
+  const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -23,15 +26,19 @@ const ResetPasswordScreen = () => {
     const newErrors = {};
 
     if (!newPassword) {
-      newErrors.newPassword = 'New password is required';
+      newErrors.newPassword = t('passwordRecovery.resetPassword.validation.newPasswordRequired');
     } else if (newPassword.length < 6) {
-      newErrors.newPassword = 'Password must be at least 6 characters';
+      newErrors.newPassword = t('passwordRecovery.resetPassword.validation.passwordTooShort');
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = t(
+        'passwordRecovery.resetPassword.validation.confirmPasswordRequired'
+      );
     } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t(
+        'passwordRecovery.resetPassword.validation.passwordsDoNotMatch'
+      );
     }
 
     setErrors(newErrors);
@@ -46,9 +53,16 @@ const ResetPasswordScreen = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
       console.log('Password reset successfully');
-      Alert.alert('Success', 'Your password has been reset successfully', [
-        { text: 'OK', onPress: () => console.log('Navigate to login') },
-      ]);
+      Alert.alert(
+        t('customAlert.titles.success'),
+        t('passwordRecovery.resetPassword.successMessage'),
+        [
+          {
+            text: t('customAlert.buttons.ok'),
+            onPress: () => console.log('Navigate to login'),
+          },
+        ]
+      );
     } catch (error) {
       console.error('Failed to reset password:', error);
     } finally {
@@ -79,8 +93,8 @@ const ResetPasswordScreen = () => {
 
           {/* Title and Subtitle */}
           <View className="mt-16">
-            <Text className="title">Reset Password</Text>
-            <Text className="subtitle">Please enter your email to receive a code</Text>
+            <Text className="title">{t('passwordRecovery.resetPassword.title')}</Text>
+            <Text className="subtitle">{t('passwordRecovery.resetPassword.subtitle')}</Text>
           </View>
 
           {/* Form */}
@@ -88,7 +102,9 @@ const ResetPasswordScreen = () => {
             <View className="gap-6">
               {/* New Password Input */}
               <View className="input-group">
-                <Text className="input-label">New Password</Text>
+                <Text className="input-label">
+                  {t('passwordRecovery.resetPassword.newPassword')}
+                </Text>
                 <View className="input-container">
                   <Ionicons
                     name="lock-closed-outline"
@@ -104,7 +120,7 @@ const ResetPasswordScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.newPassword ? 'input-field-error' : ''}`}
-                    placeholder="John.doe@gmail"
+                    placeholder={t('passwordRecovery.resetPassword.newPasswordPlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={newPassword}
                     onChangeText={(text) => {
@@ -132,7 +148,9 @@ const ResetPasswordScreen = () => {
 
               {/* Confirm Password Input */}
               <View className="input-group">
-                <Text className="input-label">Confirm New Password</Text>
+                <Text className="input-label">
+                  {t('passwordRecovery.resetPassword.confirmPassword')}
+                </Text>
                 <View className="input-container">
                   <Ionicons
                     name="lock-closed-outline"
@@ -148,7 +166,7 @@ const ResetPasswordScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.confirmPassword ? 'input-field-error' : ''}`}
-                    placeholder="John.doe@gmail"
+                    placeholder={t('passwordRecovery.resetPassword.confirmPasswordPlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={confirmPassword}
                     onChangeText={(text) => {
@@ -179,7 +197,11 @@ const ResetPasswordScreen = () => {
                 className="btn-primary "
                 onPress={handleSavePassword}
                 disabled={isLoading}>
-                <Text className="btn-primary-text">{isLoading ? 'Saving...' : 'Save'}</Text>
+                <Text className="btn-primary-text">
+                  {isLoading
+                    ? t('passwordRecovery.resetPassword.saving')
+                    : t('passwordRecovery.resetPassword.saveButton')}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

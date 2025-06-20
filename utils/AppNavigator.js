@@ -14,6 +14,8 @@ import NotificationsScreen from 'screens/Main/NotificationsScreen';
 import LanguagesScreen from 'screens/Main/LanguagesScreen';
 import ProfileDetailsScreen from 'screens/Main/ProfileDetails';
 import SettingsScreen from 'screens/Main/SettingsScreen';
+import ForgetPasswordScreen from 'screens/Auth/ForgetPasswordScreen ';
+import ResetPasswordScreen from 'screens/Auth/ResetPasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,9 +46,9 @@ function AppNavigator() {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-          {/* <Stack.Screen name="ForgotPassword" component={ForgetPasswordScreen} /> */}
+          <Stack.Screen name="ForgotPassword" component={ForgetPasswordScreen} />
           <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
-          {/* <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} /> */}
+          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         </>
       )}
     </Stack.Navigator>

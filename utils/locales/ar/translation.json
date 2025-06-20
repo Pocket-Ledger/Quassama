@@ -299,5 +299,45 @@
     "accept": "قبول",
     "decline": "رفض",
     "unknown": "غير معروف"
+  },
+  "passwordRecovery": {
+    "forgetPassword": {
+      "title": "نسيت كلمة المرور",
+      "subtitle": "الرجاء إدخال بريدك الإلكتروني لتلقي رمز التحقق",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "John.doe@gmail.com",
+      "sendButton": "إرسال",
+      "sending": "جاري الإرسال..."
+    },
+    "otpVerification": {
+      "title": "أدخل الرمز",
+      "subtitle": "لقد أرسلنا بريدًا إلكترونيًا يحتوي على رمز التفعيل إلى بريدك الإلكتروني {{email}}",
+      "wrongCode": "رمز خاطئ، يرجى المحاولة مرة أخرى",
+      "didntReceive": "لم تستلم الرمز؟",
+      "resend": "إعادة إرسال",
+      "confirmButton": "تأكيد",
+      "confirming": "جاري التأكيد..."
+    },
+    "resetPassword": {
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "إنشاء كلمة مرور جديدة آمنة لحسابك",
+      "newPassword": "كلمة المرور الجديدة",
+      "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور الجديدة",
+      "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور الجديدة",
+      "saveButton": "حفظ",
+      "saving": "جاري الحفظ...",
+      "successMessage": "تم إعادة تعيين كلمة المرور بنجاح",
+      "validation": {
+        "newPasswordRequired": "كلمة المرور الجديدة مطلوبة",
+        "passwordTooShort": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+        "confirmPasswordRequired": "يرجى تأكيد كلمة المرور الخاصة بك",
+        "passwordsDoNotMatch": "كلمات المرور غير متطابقة"
+      }
+    },
+    "validation": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صحيح"
+    }
   }
 }
