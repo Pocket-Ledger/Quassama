@@ -45,6 +45,7 @@ const HomeScreen = () => {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [groupMembers, setGroupMembers] = useState([]);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
 
   // New state for overview data
   const [overviewData, setOverviewData] = useState({
@@ -204,6 +205,7 @@ const HomeScreen = () => {
 
       // Fetch updated overview for the selected group
       fetchExpenseOverview();
+      setSelectedGroupId(groupId);
 
       console.log('Selected Group ID:', groupId);
       console.log('Selected Group Name:', groupName);
@@ -384,7 +386,7 @@ const HomeScreen = () => {
         <View className="mx-4 ">
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">{t('home.recentActivity')}</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AllExpenses')}>
+            <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId: selectedGroup })}>
               <Text className="font-medium text-primary">{t('common.seeAll')}</Text>
             </TouchableOpacity>
           </View>

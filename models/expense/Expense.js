@@ -529,6 +529,156 @@ class Expense {
       throw error;
     }
   }
+
+  
+  /**
+   * Returns paginated expenses for a given group.
+   * @param {string} groupId - The group ID
+   * @param {number} page - Page number (starts from 1)
+   * @param {number} pageSize - Number of items per page
+   * @returns {Promise<Object>} - Object containing expenses array, pagination info, and totals
+   */
+  static async getExpensesByGroup(groupId, page = 1, pageSize = 10) {
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+    
+    if (typeof page !== 'number' || !Number.isInteger(page) || page <= 0) {
+      throw new Error('Page must be a positive integer starting from 1');
+    }
+    
+    if (typeof pageSize !== 'number' || !Number.isInteger(pageSize) || pageSize <= 0) {
+      throw new Error('PageSize must be a positive integer');
+    }
+
+    try {
+      const expensesCol = collection(db, 'expenses');
+      
+      // First, get total count for pagination info
+      const countQuery = query(expensesCol, where('group_id', '==', groupId));
+      const countSnapshot = await getDocs(countQuery);
+      const totalItems = countSnapshot.size;
+      
+      // Calculate pagination values
+      const totalPages = Math.ceil(totalItems / pageSize);
+      const hasNextPage = page < totalPages;
+      const hasPreviousPage = page > 1;
+      
+      // Get paginated data
+      const paginatedQuery = query(
+        expensesCol,
+        where('group_id', '==', groupId),
+        orderBy('incurred_at', 'desc'),
+        limit(pageSize * page) // Get all items up to current page
+      );
+      
+      const snapshot = await getDocs(paginatedQuery);
+      const allExpenses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      
+      // Extract only the current page items
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const expenses = allExpenses.slice(startIndex, endIndex);
+      
+      // Calculate total amount for current page
+      const currentPageTotal = expenses.reduce((total, expense) => total + (expense.amount || 0), 0);
+      
+      return {
+        expenses,
+        pagination: {
+          currentPage: page,
+          pageSize,
+          totalItems,
+          totalPages,
+          hasNextPage,
+          hasPreviousPage,
+          startIndex: startIndex + 1,
+          endIndex: Math.min(endIndex, totalItems),
+        },
+        totals: {
+          currentPageTotal,
+          itemCount: expenses.length,
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching paginated expenses:', error);
+      throw new Error(`Failed to fetch expenses: ${error.message}`);
+    }
+  }
+
+  /**
+   * Alternative implementation using startAfter for better performance with large datasets
+   * @param {string} groupId - The group ID
+   * @param {number} pageSize - Number of items per page
+   * @param {Object} lastDoc - Last document from previous page (for cursor-based pagination)
+   * @returns {Promise<Object>} - Object containing expenses array and pagination info
+   */
+  static async getExpensesByGroupCursor(groupId, pageSize = 10, lastDoc = null) {
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+    
+    if (typeof pageSize !== 'number' || !Number.isInteger(pageSize) || pageSize <= 0) {
+      throw new Error('PageSize must be a positive integer');
+    }
+
+    try {
+      const expensesCol = collection(db, 'expenses');
+      
+      let q = query(
+        expensesCol,
+        where('group_id', '==', groupId),
+        orderBy('incurred_at', 'desc'),
+        limit(pageSize + 1) // Get one extra to check if there's a next page
+      );
+      
+      // If we have a lastDoc, start after it
+      if (lastDoc) {
+        q = query(
+          expensesCol,
+          where('group_id', '==', groupId),
+          orderBy('incurred_at', 'desc'),
+          startAfter(lastDoc),
+          limit(pageSize + 1)
+        );
+      }
+      
+      const snapshot = await getDocs(q);
+      const docs = snapshot.docs;
+      
+      // Check if there's a next page
+      const hasNextPage = docs.length > pageSize;
+      
+      // Remove the extra document if it exists
+      const expenses = docs.slice(0, pageSize).map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        _doc: doc, // Keep reference for next page cursor
+      }));
+      
+      const currentPageTotal = expenses.reduce((total, expense) => total + (expense.amount || 0), 0);
+      
+      return {
+        expenses,
+        pagination: {
+          pageSize,
+          hasNextPage,
+          itemCount: expenses.length,
+          lastDoc: expenses.length > 0 ? expenses[expenses.length - 1]._doc : null,
+        },
+        totals: {
+          currentPageTotal,
+          itemCount: expenses.length,
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching cursor-based paginated expenses:', error);
+      throw new Error(`Failed to fetch expenses: ${error.message}`);
+    }
+  }
 }
 
 export default Expense;
