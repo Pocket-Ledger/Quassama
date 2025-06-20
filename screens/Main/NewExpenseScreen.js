@@ -23,6 +23,7 @@ import { useAlert } from 'hooks/useAlert';
 import CategoryList from 'components/CategoryList';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
+import FloatingPlusButton from 'components/FloatingPlusButton';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();

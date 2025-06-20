@@ -18,6 +18,7 @@ import { db } from '../../firebase';
 import Expense from 'models/expense/Expense';
 import User from 'models/auth/user';
 import { extractHourAndMinute, extractHourMinutePeriod } from 'utils/time';
+import FloatingPlusButton from 'components/FloatingPlusButton';
 
 const LIMIT = 5; // Limit for recent expenses
 
@@ -251,6 +252,7 @@ const GroupDetailsScreen = () => {
           </View>
         </ScrollView>
       </View>
+      <FloatingPlusButton navigateTo="NewExpense" size={48} bottom={10} right={10} />
     </SafeAreaView>
   );
 };
