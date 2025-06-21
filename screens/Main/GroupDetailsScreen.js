@@ -145,12 +145,13 @@ const GroupDetailsScreen = () => {
 
   // Helper function to format balance with appropriate sign and color
   const formatBalance = (balance) => {
+    const formattedNumber = parseFloat(balance).toFixed(1);
     if (balance > 0) {
-      return `+${balance}`;
+      return `+${formattedNumber}`;
     } else if (balance < 0) {
-      return `${balance}`;
+      return `${formattedNumber}`;
     }
-    return '0';
+    return '0.0';
   };
 
   const handleSettleUp = () => {

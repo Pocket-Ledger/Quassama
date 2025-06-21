@@ -150,7 +150,14 @@
     "selectDate": "اختر التاريخ",
     "addNote": "إضافة ملاحظة",
     "splitBetween": "تقسيم بين",
-    "note": "ملاحظة"
+    "note": "ملاحظة",
+    "validation": {
+      "expenseNameRequired": "اسم المصروف مطلوب",
+      "amountRequired": "المبلغ مطلوب",
+      "validAmount": "يرجى إدخال مبلغ صحيح أكبر من 0",
+      "selectCategory": "يرجى اختيار فئة",
+      "selectGroup": "يرجى اختيار مجموعة"
+    }
   },
   "group": {
     "selectGroup": "اختر المجموعة",

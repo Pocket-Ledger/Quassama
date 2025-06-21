@@ -151,7 +151,14 @@
     "selectDate": "Select Date",
     "addNote": "Add Note",
     "splitBetween": "Split Between",
-    "note": "Note"
+    "note": "Note",
+    "validation": {
+      "expenseNameRequired": "Expense name is required",
+      "amountRequired": "Amount is required",
+      "validAmount": "Please enter a valid amount greater than 0",
+      "selectCategory": "Please select a category",
+      "selectGroup": "Please select a group"
+    }
   },
   "group": {
     "selectGroup": "Select Group",

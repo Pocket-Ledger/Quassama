@@ -150,7 +150,14 @@
     "selectDate": "Sélectionner la Date",
     "addNote": "Ajouter une Note",
     "splitBetween": "Diviser Entre",
-    "note": "Note"
+    "note": "Note",
+    "validation": {
+      "expenseNameRequired": "Le nom de la dépense est requis",
+      "amountRequired": "Le montant est requis",
+      "validAmount": "Veuillez saisir un montant valide supérieur à 0",
+      "selectCategory": "Veuillez sélectionner une catégorie",
+      "selectGroup": "Veuillez sélectionner un groupe"
+    }
   },
   "group": {
     "title": "Groupes",
