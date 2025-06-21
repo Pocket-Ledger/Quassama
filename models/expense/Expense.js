@@ -538,7 +538,7 @@ class Expense {
    * @param {number} pageSize - Number of items per page
    * @returns {Promise<Object>} - Object containing expenses array, pagination info, and totals
    */
-  static async getExpensesByGroup(groupId, page = 1, pageSize = 10) {
+  static async getExpensesByGroupPaginated(groupId, page = 1, pageSize = 10) {
     if (!groupId || typeof groupId !== 'string') {
       throw new Error('A valid groupId (string) is required');
     }
@@ -546,7 +546,7 @@ class Expense {
     if (typeof page !== 'number' || !Number.isInteger(page) || page <= 0) {
       throw new Error('Page must be a positive integer starting from 1');
     }
-    
+    //getExpensesByGroup
     if (typeof pageSize !== 'number' || !Number.isInteger(pageSize) || pageSize <= 0) {
       throw new Error('PageSize must be a positive integer');
     }

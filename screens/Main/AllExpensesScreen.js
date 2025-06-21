@@ -62,7 +62,7 @@ const AllExpensesScreen = () => {
         setLoadingMore(true);
       }
 
-      const result = await Expense.getExpensesByGroup(groupId, page, pagination.pageSize);
+      const result = await Expense.getExpensesByGroupPaginated(groupId, page, pagination.pageSize);
       
       if (isRefresh || page === 1) {
         setExpenses(result.expenses);
