@@ -180,6 +180,14 @@
     "noExpensesYet": "Pas encore de dépenses",
     "personal": "Personnel"
   },
+  "groupDetails": {
+    "totalGroupExpenses": "Dépenses Totales du Groupe",
+    "youPaid": "Vous Avez Payé",
+    "youOwe": "Vous Devez",
+    "settleUp": "Régler les Comptes",
+    "recentExpenses": "Dépenses Récentes",
+    "noExpenses": "Pas encore de dépenses"
+  },
   "notifications": {
     "notifications": "Notifications",
     "noNotifications": "Aucune notification",

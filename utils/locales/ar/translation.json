@@ -180,6 +180,14 @@
     "noExpensesYet": "لا توجد نفقات بعد",
     "personal": "شخصي"
   },
+  "groupDetails": {
+    "totalGroupExpenses": "إجمالي نفقات المجموعة",
+    "youPaid": "دفعت",
+    "youOwe": "عليك",
+    "settleUp": "تسوية الحسابات",
+    "recentExpenses": "النفقات الأخيرة",
+    "noExpenses": "لا توجد نفقات بعد"
+  },
   "notifications": {
     "notifications": "الإشعارات",
     "noNotifications": "لا توجد إشعارات",

@@ -34,10 +34,7 @@ const ExpenseListItem = ({
 
   // Get translated currency
   const getDisplayCurrency = () => {
-    if (currency === 'MAD') {
-      return t('common.currency');
-    }
-    return currency;
+    return t('common.currency');
   };
 
   // Format the "Paid by" text with translation
@@ -47,7 +44,7 @@ const ExpenseListItem = ({
 
   return (
     <TouchableOpacity
-      className={`flex-row items-center justify-between   py-2 ${
+      className={`flex-row items-center justify-between py-2 ${
         showBorder ? 'border-b border-gray-100' : ''
       } ${customStyle.container || ''}`}
       onPress={handlePress}

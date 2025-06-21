@@ -19,6 +19,7 @@ import Expense from 'models/expense/Expense';
 import User from 'models/auth/user';
 import { extractHourAndMinute, extractHourMinutePeriod } from 'utils/time';
 import FloatingPlusButton from 'components/FloatingPlusButton';
+import { useTranslation } from 'react-i18next';
 
 const LIMIT = 5; // Limit for recent expenses
 
@@ -26,6 +27,7 @@ const GroupDetailsScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { groupId } = route.params;
+  const { t } = useTranslation();
 
   const [groupData, setGroupData] = useState(null);
   const [TotalExpenses, setTotalExpenses] = useState(0);
@@ -128,7 +130,7 @@ const GroupDetailsScreen = () => {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#2979FF" />
-        <Text className="mt-4">Loading…</Text>
+        <Text className="mt-4">{t('common.loading')}</Text>
       </SafeAreaView>
     );
   }
@@ -174,16 +176,18 @@ const GroupDetailsScreen = () => {
           contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Group Summary Card */}
           <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-            <Text className="text-center text-base text-black/75">Total Group Expenses</Text>
+            <Text className="text-center text-base text-black/75">
+              {t('groupDetails.totalGroupExpenses')}
+            </Text>
             <Text className="text-center text-2xl font-medium text-black">$ {TotalExpenses}</Text>
 
             <View className="mt-6 flex-row justify-between">
               <View className="flex-1">
-                <Text className="text-sm text-black/75">You Paid</Text>
+                <Text className="text-sm text-black/75">{t('groupDetails.youPaid')}</Text>
                 <Text className="text-xl text-black">$ {youPaid}</Text>
               </View>
               <View className="flex-1 items-end">
-                <Text className="text-sm text-black/75">You Owe</Text>
+                <Text className="text-sm text-black/75">{t('groupDetails.youOwe')}</Text>
                 <Text className="text-xl text-red-500">-${youOwe}</Text>
               </View>
             </View>
@@ -191,7 +195,9 @@ const GroupDetailsScreen = () => {
 
           {/* Settle Up Button */}
           <TouchableOpacity className="mb-6 rounded-lg bg-primary py-4" onPress={handleSettleUp}>
-            <Text className="text-center text-base font-semibold text-white">Settle Up</Text>
+            <Text className="text-center text-base font-semibold text-white">
+              {t('groupDetails.settleUp')}
+            </Text>
           </TouchableOpacity>
 
           {/* Members List */}
@@ -217,7 +223,7 @@ const GroupDetailsScreen = () => {
                           ? 'text-red-500'
                           : 'text-gray-500'
                     }`}>
-                    {formattedBalance} MAD
+                    {formattedBalance} {t('common.currency')}
                   </Text>
                 </View>
               );
@@ -226,9 +232,11 @@ const GroupDetailsScreen = () => {
 
           {/* Recently Expenses Header */}
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">Recently Expenses</Text>
+            <Text className="text-lg font-medium text-black">
+              {t('groupDetails.recentExpenses')}
+            </Text>
             <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId })}>
-              <Text className="text-base font-medium text-primary">See All</Text>
+              <Text className="text-base font-medium text-primary">{t('common.seeAll')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -246,7 +254,7 @@ const GroupDetailsScreen = () => {
                 categories={DEFAULT_CATEGORIES}
                 onPress={() => console.log('Expense pressed:', expense)}
                 showBorder={true}
-                currency="MAD"
+                currency={t('common.currency')}
               />
             ))}
           </View>

@@ -181,6 +181,14 @@
     "noExpensesYet": "No expenses yet",
     "personal": "Personal"
   },
+  "groupDetails": {
+    "totalGroupExpenses": "Total Group Expenses",
+    "youPaid": "You Paid",
+    "youOwe": "You Owe",
+    "settleUp": "Settle Up",
+    "recentExpenses": "Recently Expenses",
+    "noExpenses": "No expenses yet"
+  },
   "notifications": {
     "notifications": "Notifications",
     "noNotifications": "No notifications",
