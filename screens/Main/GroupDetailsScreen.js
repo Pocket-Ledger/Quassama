@@ -200,34 +200,41 @@ const GroupDetailsScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          {/* Members List */}
-          <View className="mb-6 flex-row">
-            {members.map((member, idx) => {
-              const memberBalance = getMemberBalance(member.id);
-              const formattedBalance = formatBalance(memberBalance);
+          {/* Members List with Horizontal Scroll */}
+          <View className="mb-6">
+            <Text className="mb-3 text-lg font-medium text-black">Members</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 4 }}
+              className="flex-row">
+              {members.map((member, idx) => {
+                const memberBalance = getMemberBalance(member.id);
+                const formattedBalance = formatBalance(memberBalance);
 
-              return (
-                <View key={member.id ?? `member-${idx}`} className="mr-4 items-center">
-                  <Avatar
-                    initial={member.initial}
-                    name={member.name}
-                    color={member.color}
-                    size="medium"
-                    showName={true}
-                  />
-                  <Text
-                    className={`text-xs font-medium ${
-                      memberBalance > 0
-                        ? 'text-green-500'
-                        : memberBalance < 0
-                          ? 'text-red-500'
-                          : 'text-gray-500'
-                    }`}>
-                    {formattedBalance} {t('common.currency')}
-                  </Text>
-                </View>
-              );
-            })}
+                return (
+                  <View key={member.id ?? `member-${idx}`} className="mr-4 items-center">
+                    <Avatar
+                      initial={member.initial}
+                      name={member.name}
+                      color={member.color}
+                      size="medium"
+                      showName={true}
+                    />
+                    <Text
+                      className={`mt-1 text-xs font-medium ${
+                        memberBalance > 0
+                          ? 'text-green-500'
+                          : memberBalance < 0
+                            ? 'text-red-500'
+                            : 'text-gray-500'
+                      }`}>
+                      {formattedBalance} {t('common.currency')}
+                    </Text>
+                  </View>
+                );
+              })}
+            </ScrollView>
           </View>
 
           {/* Recently Expenses Header */}
