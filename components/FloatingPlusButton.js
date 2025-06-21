@@ -38,7 +38,8 @@ const FloatingPlusButton = ({
       if (onPress) {
         onPress();
       } else if (navigateTo) {
-        navigation.navigate(navigateTo);
+        // navigation.navigate(navigateTo);
+        navigation.navigate('MainTabs', { screen: navigateTo });
       }
     }, 150);
   };

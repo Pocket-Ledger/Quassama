@@ -11,9 +11,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
+import { useTranslation } from 'react-i18next';
 
 // Forget Password Screen
 const ForgetPasswordScreen = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +24,9 @@ const ForgetPasswordScreen = () => {
     const newErrors = {};
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('passwordRecovery.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('passwordRecovery.validation.emailInvalid');
     }
 
     setErrors(newErrors);
@@ -70,14 +72,14 @@ const ForgetPasswordScreen = () => {
 
           {/* Title and Subtitle */}
           <View className="mt-16">
-            <Text className="title">Forget Password</Text>
-            <Text className="subtitle">Please enter your email to receive a code</Text>
+            <Text className="title">{t('passwordRecovery.forgetPassword.title')}</Text>
+            <Text className="subtitle">{t('passwordRecovery.forgetPassword.subtitle')}</Text>
           </View>
 
           {/* Form */}
           <View className="form-container gap-6 ">
             <View className="input-group ">
-              <Text className="input-label">Email</Text>
+              <Text className="input-label">{t('passwordRecovery.forgetPassword.email')}</Text>
               <View className="input-container">
                 <Ionicons
                   name="mail-outline"
@@ -93,7 +95,7 @@ const ForgetPasswordScreen = () => {
                 />
                 <TextInput
                   className={`input-field ${errors.email ? 'input-field-error' : ''}`}
-                  placeholder="John.doe@gmail"
+                  placeholder={t('passwordRecovery.forgetPassword.emailPlaceholder')}
                   placeholderTextColor="rgba(0, 0, 0, 0.2)"
                   value={email}
                   onChangeText={(text) => {
@@ -114,7 +116,11 @@ const ForgetPasswordScreen = () => {
               className="btn-primary "
               onPress={handleSendCode}
               disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? 'Sending...' : 'Send'}</Text>
+              <Text className="btn-primary-text">
+                {isLoading
+                  ? t('passwordRecovery.forgetPassword.sending')
+                  : t('passwordRecovery.forgetPassword.sendButton')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
