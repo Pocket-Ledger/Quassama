@@ -180,16 +180,22 @@ const GroupDetailsScreen = () => {
             <Text className="text-center text-base text-black/75">
               {t('groupDetails.totalGroupExpenses')}
             </Text>
-            <Text className="text-center text-2xl font-medium text-black">$ {TotalExpenses}</Text>
+            <Text className="text-center text-2xl font-medium text-black">
+              {t('common.currency')} {TotalExpenses}
+            </Text>
 
             <View className="mt-6 flex-row justify-between">
               <View className="flex-1">
                 <Text className="text-sm text-black/75">{t('groupDetails.youPaid')}</Text>
-                <Text className="text-xl text-black">$ {youPaid}</Text>
+                <Text className="text-xl text-black">
+                  {t('common.currency')} {youPaid}
+                </Text>
               </View>
               <View className="flex-1 items-end">
                 <Text className="text-sm text-black/75">{t('groupDetails.youOwe')}</Text>
-                <Text className="text-xl text-red-500">-${youOwe}</Text>
+                <Text className="text-xl text-red-500">
+                  -{t('common.currency')} {youOwe}
+                </Text>
               </View>
             </View>
           </View>
