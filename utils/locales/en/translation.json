@@ -188,6 +188,34 @@
     "noExpensesYet": "No expenses yet",
     "personal": "Personal"
   },
+  "editGroup": {
+    "title": "Edit Group",
+    "group_name": "Group Name",
+    "group_name_placeholder": "Enter group name",
+    "add_members": "Add Members",
+    "search_placeholder": "Search by username",
+    "searching": "Searching...",
+    "search_results": "Search Results",
+    "current_members": "Current Members ({{count}})",
+    "no_users_found": "No users found",
+    "allow_invite_others": "Allow members to invite others",
+    "notify_new_expenses": "Notify for new expenses",
+    "updating": "Updating...",
+    "update_group": "Update Group",
+    "you": "You",
+    "cannot_remove_self": "You cannot remove yourself from the group",
+    "errors": {
+      "group_name_required": "Group name is required",
+      "members_required": "At least one member is required"
+    },
+    "search_error_title": "Search Error",
+    "search_error_message": "Failed to search for users. Please try again.",
+    "success_title": "Success",
+    "success_message": "Group updated successfully!",
+    "error_title": "Error",
+    "error_message": "Failed to update group. Please try again.",
+    "fetch_error_message": "Failed to load group data. Please try again."
+  },
   "groupDetails": {
     "totalGroupExpenses": "Total Group Expenses",
     "youPaid": "You Paid",

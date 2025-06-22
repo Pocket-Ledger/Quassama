@@ -187,6 +187,34 @@
     "noExpensesYet": "لا توجد نفقات بعد",
     "personal": "شخصي"
   },
+  "editGroup": {
+    "title": "تعديل المجموعة",
+    "group_name": "اسم المجموعة",
+    "group_name_placeholder": "أدخل اسم المجموعة",
+    "add_members": "إضافة أعضاء",
+    "search_placeholder": "البحث باسم المستخدم",
+    "searching": "جاري البحث...",
+    "search_results": "نتائج البحث",
+    "current_members": "الأعضاء الحاليون ({{count}})",
+    "no_users_found": "لم يتم العثور على مستخدمين",
+    "allow_invite_others": "السماح للأعضاء بدعوة آخرين",
+    "notify_new_expenses": "إشعار بالمصاريف الجديدة",
+    "updating": "جاري التحديث...",
+    "update_group": "تحديث المجموعة",
+    "you": "أنت",
+    "cannot_remove_self": "لا يمكنك إزالة نفسك من المجموعة",
+    "errors": {
+      "group_name_required": "اسم المجموعة مطلوب",
+      "members_required": "عضو واحد على الأقل مطلوب"
+    },
+    "search_error_title": "خطأ في البحث",
+    "search_error_message": "فشل في البحث عن المستخدمين. حاول مرة أخرى.",
+    "success_title": "نجح",
+    "success_message": "تم تحديث المجموعة بنجاح!",
+    "error_title": "خطأ",
+    "error_message": "فشل في تحديث المجموعة. حاول مرة أخرى.",
+    "fetch_error_message": "فشل في تحميل بيانات المجموعة. حاول مرة أخرى."
+  },
   "groupDetails": {
     "totalGroupExpenses": "إجمالي نفقات المجموعة",
     "youPaid": "دفعت",

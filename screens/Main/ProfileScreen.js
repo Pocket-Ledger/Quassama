@@ -147,7 +147,7 @@ const ProfileScreen = () => {
               <Text className="mb-2 font-dmsans-bold text-xl text-black">
                 {userProfile.username}
               </Text>
-              <Text className="text-base text-gray-500">{userProfile.email}</Text>
+              <Text className="text-base font-normal text-gray-500">{userProfile.email}</Text>
             </>
           )}
         </View>

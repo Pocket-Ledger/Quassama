@@ -166,10 +166,22 @@ const GroupDetailsScreen = () => {
     console.log('Expense pressed:', expense);
   };
 
+  const handleEditGroup = () => {
+    navigation.navigate('EditGroup', { groupId });
+  };
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="container">
-        <Header title={name} />
+        <Header
+          title={name}
+          rightIcon={
+            <TouchableOpacity
+              onPress={handleEditGroup}
+              className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+              <Feather name="settings" size={20} color="#2979FF" />
+            </TouchableOpacity>
+          }
+        />
 
         <ScrollView
           className="flex-1"
