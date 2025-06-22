@@ -679,6 +679,73 @@ class Expense {
       throw new Error(`Failed to fetch expenses: ${error.message}`);
     }
   }
+
+  /**
+   * Function for filter with date range or categories or amount range or all of them
+   * @param {string} groupId - The group ID
+   * @param {Date} startDate - Start date for filtering
+   * @param {Date} endDate - End date for filtering
+   * @param {Array<string>} categories - Array of categories to filter by
+   * @param {number} minAmount - Minimum amount for filtering
+   * @param {number} maxAmount - Maximum amount for filtering
+   * @returns {Promise<Array<object>>} - Filtered expenses
+   */
+  static async filterExpenses(groupId, startDate, endDate, categories = [], minAmount = 0, maxAmount = Infinity){
+    if( !groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+    if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+      throw new Error('Start and end dates must be valid Date objects');
+    }
+    if (startDate > endDate) {
+      throw new Error('Start date cannot be after end date');
+    }
+    if (!Array.isArray(categories)) {
+      throw new Error('Categories must be an array');
+    }
+    if (typeof minAmount !== 'number' || typeof maxAmount !== 'number') {
+      throw new Error('Min and max amounts must be numbers');
+    }
+    if (minAmount < 0 || maxAmount < 0) {
+      throw new Error('Amounts must be non-negative');
+    }
+    if (minAmount > maxAmount) {
+      throw new Error('Min amount cannot be greater than max amount');
+    }
+
+    try {
+      const expensesCol = collection(db, 'expenses');
+      let q = query(
+        expensesCol,
+        where('group_id', '==', groupId),
+        where('incurred_at', '>=', Timestamp.fromDate(startDate)),
+        where('incurred_at', '<=', Timestamp.fromDate(endDate)),
+        where('amount', '>=', minAmount),
+        where('amount', '<=', maxAmount)
+      )
+      if (categories.length > 0) {
+        q = query(
+          expensesCol,
+          where('group_id', '==', groupId),
+          where('incurred_at', '>=', Timestamp.fromDate(startDate)),
+          where('incurred_at', '<=', Timestamp.fromDate(endDate)),
+          where('amount', '>=', minAmount),
+          where('amount', '<=', maxAmount),
+          where('category', 'in', categories)
+        );
+      }
+      const snapshot = await getDocs(q);
+      const expenses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return expenses;
+    } catch (error) {
+      console.error('Error filtering expenses:', error);
+      throw new Error(`Failed to filter expenses: ${error.message}`);
+    }
+  }
+
 }
 
 export default Expense;

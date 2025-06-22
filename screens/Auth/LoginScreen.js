@@ -53,7 +53,7 @@ const LoginScreen = () => {
       const loginInstance = new Login(email, password);
       const userCredential = await loginInstance.login();
       console.log('Login successful:', userCredential.user);
-      navigation.navigate('MainTabs');
+      /* navigation.navigate('MainTabs'); */
     } catch (error) {
       console.error('Login failed:', error.message);
       setErrors({ general: error.message });
