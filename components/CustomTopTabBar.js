@@ -1,25 +1,10 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigationType } from 'hooks/useNavigationType';
 
-export function CustomTabBar({ state, descriptors, navigation }) {
-  const insets = useSafeAreaInsets();
-  const { isGestureNavigation } = useNavigationType();
-
-  // Dynamic padding based on navigation type
-  const bottomPadding = isGestureNavigation
-    ? insets.bottom + 8 // More space for gesture navigation
-    : 12; // Standard padding for button navigation
-
+export function CustomTopTabBar({ state, descriptors, navigation }) {
   return (
-    <View
-      className="flex-row justify-between border-t border-gray-200 bg-white px-4 shadow-box"
-      style={{
-        paddingTop: 8,
-        paddingBottom: bottomPadding,
-      }}>
+    <View className="flex-row justify-between border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label = options.tabBarLabel !== undefined ? options.tabBarLabel : route.name;
@@ -56,7 +41,7 @@ export function CustomTabBar({ state, descriptors, navigation }) {
         return (
           <TouchableOpacity
             key={route.key}
-            className="flex-1 items-center py-1"
+            className="flex-1 items-center py-2"
             onPress={onPress}
             activeOpacity={0.7}>
             <View className="relative mb-1">
@@ -68,9 +53,12 @@ export function CustomTabBar({ state, descriptors, navigation }) {
               )}
             </View>
             <Text
-              className={`font-dmsans-bold text-xs ${isFocused ? ' text-blue-500' : ' text-gray-250'}`}>
+              className={`font-dmsans-bold text-xs ${
+                isFocused ? 'text-blue-500' : 'text-gray-400'
+              }`}>
               {label}
             </Text>
+            {isFocused && <View className="absolute bottom-0 h-0.5 w-8 rounded-full bg-blue-500" />}
           </TouchableOpacity>
         );
       })}

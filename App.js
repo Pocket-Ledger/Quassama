@@ -3,6 +3,7 @@ import './global.css';
 import i18n from 'utils/i18n';
 import { I18nextProvider } from 'react-i18next';
 import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from 'utils/AppNavigator';
 import {
   useFonts,
@@ -41,12 +42,14 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
-      <I18nextProvider i18n={i18n}>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </I18nextProvider>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <I18nextProvider i18n={i18n}>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </I18nextProvider>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }
