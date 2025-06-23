@@ -164,9 +164,9 @@ const NewExpenseScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
-        className="container"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}>
+        className="container "
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
+        showsVerticalScrollIndicator={false}>
         <Header title={t('expense.addExpense')} />
 
         <View className="flex-1 gap-6 px-4">
