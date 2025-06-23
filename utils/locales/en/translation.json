@@ -121,7 +121,11 @@
     "error": "Error",
     "success": "Success",
     "noData": "No data available",
-    "retry": "Retry"
+    "retry": "Retry",
+    "unknown": "Unknown",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done"
   },
   "home": {
     "goodMorning": "Good morning 👋",
@@ -158,6 +162,27 @@
       "validAmount": "Please enter a valid amount greater than 0",
       "selectCategory": "Please select a category",
       "selectGroup": "Please select a group"
+    },
+    "title": "All Expenses",
+    "loading": "Loading expenses...",
+    "loadingMore": "Loading more expenses...",
+    "search": {
+      "placeholder": "Eg: \"T9edia\""
+    },
+    "empty": {
+      "title": "No Expenses Yet",
+      "description": "Start by adding your first expense. Keep track of who paid what and split it fairly between your group members.",
+      "addFirstExpense": "Add Your First Expense"
+    },
+    "error": {
+      "title": "Oops! Something went wrong",
+      "tryAgain": "Try Again"
+    },
+    "errors": {
+      "loadFailed": "Failed to load expenses"
+    },
+    "pagination": {
+      "showing": "Showing {{start}}-{{end}} of {{total}} expenses"
     }
   },
   "group": {
@@ -382,6 +407,44 @@
     "validation": {
       "emailRequired": "Email is required",
       "emailInvalid": "Please enter a valid email address"
+    }
+  },
+  "time": {
+    "minutesAgo_one": "{{count}}m ago",
+    "minutesAgo_other": "{{count}}m ago",
+    "hoursAgo_one": "{{count}}h ago",
+    "hoursAgo_other": "{{count}}h ago",
+    "daysAgo_one": "{{count}}d ago",
+    "daysAgo_other": "{{count}}d ago",
+    "yesterday": "Yesterday",
+    "today": "Today",
+    "tomorrow": "Tomorrow"
+  },
+  "filters": {
+    "title": "Filter",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "seeExpenses_one": "See {{count}} Expense",
+    "seeExpenses_other": "See {{count}} Expenses",
+    "dateRange": {
+      "title": "Date Range",
+      "customDate": "Custom Date"
+    },
+    "dateRanges": {
+      "today": "Today",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "thisMonth": "This Month"
+    },
+    "categories": {
+      "title": "Categories"
+    },
+    "amountRange": {
+      "title": "Amount Range"
+    },
+    "group": {
+      "title": "Group",
+      "selectGroup": "Select group"
     }
   }
 }

@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const FilterAmountRange = ({ amountRange, onRangeChange, currency = '$' }) => {
+  const { t } = useTranslation();
+
   return (
     <View>
       <View className="mb-4 flex-row items-center justify-between">
-        <Text className="text-base font-medium text-black">Amount Range</Text>
+        <Text className="text-base font-medium text-black">{t('filters.amountRange.title')}</Text>
         <Text className="text-base font-medium text-black">
           {currency}
           {amountRange.selectedMin}-{amountRange.selectedMax}

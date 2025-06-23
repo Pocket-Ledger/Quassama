@@ -1,16 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
-const FilterDateRange = ({
-  selectedRange,
-  onRangeSelect,
-  ranges = ['Today', 'Last 7 Days', 'Last 30 Days', 'This Month'],
-  showCustomDate = true,
-}) => {
+const FilterDateRange = ({ selectedRange, onRangeSelect, ranges = [], showCustomDate = true }) => {
+  const { t } = useTranslation();
+
   return (
     <View>
-      <Text className="mb-4 text-base font-medium text-black">Date Range</Text>
+      <Text className="mb-4 text-base font-medium text-black">{t('filters.dateRange.title')}</Text>
       <View className="flex-row flex-wrap gap-2">
         {ranges.map((range) => (
           <TouchableOpacity
@@ -30,7 +28,9 @@ const FilterDateRange = ({
         {showCustomDate && (
           <TouchableOpacity className="flex-row items-center rounded-lg border border-gray-200 bg-gray-50 px-4 py-2">
             <Feather name="calendar" size={16} color="#666" />
-            <Text className="ml-2 text-sm font-medium text-gray-600">Custom Date</Text>
+            <Text className="ml-2 text-sm font-medium text-gray-600">
+              {t('filters.dateRange.customDate')}
+            </Text>
           </TouchableOpacity>
         )}
       </View>

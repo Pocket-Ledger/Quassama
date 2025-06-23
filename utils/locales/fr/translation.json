@@ -120,7 +120,11 @@
     "error": "Erreur",
     "success": "Succès",
     "noData": "Aucune donnée disponible",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "unknown": "Inconnu",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé"
   },
   "home": {
     "goodMorning": "Bonjour 👋",
@@ -157,6 +161,27 @@
       "validAmount": "Veuillez saisir un montant valide supérieur à 0",
       "selectCategory": "Veuillez sélectionner une catégorie",
       "selectGroup": "Veuillez sélectionner un groupe"
+    },
+    "title": "Toutes les Dépenses",
+    "loading": "Chargement des dépenses...",
+    "loadingMore": "Chargement de plus de dépenses...",
+    "search": {
+      "placeholder": "Ex: \"T9edia\""
+    },
+    "empty": {
+      "title": "Aucune Dépense Encore",
+      "description": "Commencez par ajouter votre première dépense. Gardez une trace de qui a payé quoi et partagez équitablement entre les membres de votre groupe.",
+      "addFirstExpense": "Ajoutez Votre Première Dépense"
+    },
+    "error": {
+      "title": "Oups! Quelque chose s'est mal passé",
+      "tryAgain": "Réessayer"
+    },
+    "errors": {
+      "loadFailed": "Échec du chargement des dépenses"
+    },
+    "pagination": {
+      "showing": "Affichage de {{start}}-{{end}} sur {{total}} dépenses"
     }
   },
   "group": {
@@ -215,34 +240,7 @@
     "error_message": "Échec de la mise à jour du groupe. Veuillez réessayer.",
     "fetch_error_message": "Échec du chargement des données du groupe. Veuillez réessayer."
   },
-  "editGroup": {
-    "title": "Modifier le Groupe",
-    "group_name": "Nom du Groupe",
-    "group_name_placeholder": "Entrez le nom du groupe",
-    "add_members": "Ajouter des Membres",
-    "search_placeholder": "Rechercher par nom d'utilisateur",
-    "searching": "Recherche en cours...",
-    "search_results": "Résultats de Recherche",
-    "current_members": "Membres Actuels ({{count}})",
-    "no_users_found": "Aucun utilisateur trouvé",
-    "allow_invite_others": "Permettre aux membres d'inviter d'autres",
-    "notify_new_expenses": "Notifier pour les nouvelles dépenses",
-    "updating": "Mise à jour en cours...",
-    "update_group": "Mettre à Jour le Groupe",
-    "you": "Vous",
-    "cannot_remove_self": "Vous ne pouvez pas vous retirer du groupe",
-    "errors": {
-      "group_name_required": "Le nom du groupe est requis",
-      "members_required": "Au moins un membre est requis"
-    },
-    "search_error_title": "Erreur de Recherche",
-    "search_error_message": "Échec de la recherche d'utilisateurs. Veuillez réessayer.",
-    "success_title": "Succès",
-    "success_message": "Groupe mis à jour avec succès!",
-    "error_title": "Erreur",
-    "error_message": "Échec de la mise à jour du groupe. Veuillez réessayer.",
-    "fetch_error_message": "Échec du chargement des données du groupe. Veuillez réessayer."
-  },
+
   "groupDetails": {
     "totalGroupExpenses": "Dépenses Totales du Groupe",
     "youPaid": "Vous Avez Payé",
@@ -408,6 +406,44 @@
     "validation": {
       "emailRequired": "L'email est requis",
       "emailInvalid": "Veuillez entrer une adresse email valide"
+    }
+  },
+  "time": {
+    "minutesAgo_one": "Il y a {{count}} minute",
+    "minutesAgo_other": "Il y a {{count}} minutes",
+    "hoursAgo_one": "Il y a {{count}} heure",
+    "hoursAgo_other": "Il y a {{count}} heures",
+    "daysAgo_one": "Il y a {{count}} jour",
+    "daysAgo_other": "Il y a {{count}} jours",
+    "yesterday": "Hier",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain"
+  },
+  "filters": {
+    "title": "Filtrer",
+    "cancel": "Annuler",
+    "reset": "Réinitialiser",
+    "seeExpenses_one": "Voir {{count}} Dépense",
+    "seeExpenses_other": "Voir {{count}} Dépenses",
+    "dateRange": {
+      "title": "Plage de Dates",
+      "customDate": "Date Personnalisée"
+    },
+    "dateRanges": {
+      "today": "Aujourd'hui",
+      "last7Days": "7 Derniers Jours",
+      "last30Days": "30 Derniers Jours",
+      "thisMonth": "Ce Mois"
+    },
+    "categories": {
+      "title": "Catégories"
+    },
+    "amountRange": {
+      "title": "Plage de Montant"
+    },
+    "group": {
+      "title": "Groupe",
+      "selectGroup": "Sélectionner un groupe"
     }
   }
 }

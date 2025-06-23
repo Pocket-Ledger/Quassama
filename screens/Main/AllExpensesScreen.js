@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, FlatList, SafeAreaView, Text, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import {
+  View,
+  FlatList,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import SearchBar from 'components/FilterSearchBar';
 import FilterModal from 'components/FilterModal';
@@ -9,18 +17,20 @@ import ExpenseListItem from 'components/ExpenseListItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import Expense from 'models/expense/Expense';
+import { useTranslation } from 'react-i18next';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  
+  const { t } = useTranslation();
+
   // Get groupId from route params or default
   const groupId = route.params?.groupId || 'vacation_tager';
 
   const [searchText, setSearchText] = useState('');
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [filterConfig, setFilterConfig] = useState({
-    dateRange: 'Today',
+    dateRange: t('filters.dateRanges.today'),
     selectedCategories: [],
     amountRange: { min: 5, max: 500, selectedMin: 20, selectedMax: 100 },
     selectedGroup: groupId,
@@ -43,45 +53,51 @@ const AllExpensesScreen = () => {
 
   // Sample groups data (you might want to fetch this from your Group model)
   const groups = [
-    { id: 'vacation_tager', name: 'Vacation tager' },
-    { id: 'family_expenses', name: 'Family Expenses' },
-    { id: 'work_team', name: 'Work Team' },
-    { id: 'friends_trip', name: 'Friends Trip' },
+    { id: 'vacation_tager', name: t('groups.vacationTager') },
+    { id: 'family_expenses', name: t('groups.familyExpenses') },
+    { id: 'work_team', name: t('groups.workTeam') },
+    { id: 'friends_trip', name: t('groups.friendsTrip') },
   ];
 
   // Load expenses function
-  const loadExpenses = useCallback(async (page = 1, isRefresh = false) => {
-    try {
-      if (isRefresh) {
-        setRefreshing(true);
-        setError(null);
-      } else if (page === 1) {
-        setLoading(true);
-        setError(null);
-      } else {
-        setLoadingMore(true);
-      }
+  const loadExpenses = useCallback(
+    async (page = 1, isRefresh = false) => {
+      try {
+        if (isRefresh) {
+          setRefreshing(true);
+          setError(null);
+        } else if (page === 1) {
+          setLoading(true);
+          setError(null);
+        } else {
+          setLoadingMore(true);
+        }
 
-      const result = await Expense.getExpensesByGroupPaginated(groupId, page, pagination.pageSize);
-      
-      if (isRefresh || page === 1) {
-        setExpenses(result.expenses);
-      } else {
-        // Append new expenses for pagination
-        setExpenses(prev => [...prev, ...result.expenses]);
+        const result = await Expense.getExpensesByGroupPaginated(
+          groupId,
+          page,
+          pagination.pageSize
+        );
+
+        if (isRefresh || page === 1) {
+          setExpenses(result.expenses);
+        } else {
+          // Append new expenses for pagination
+          setExpenses((prev) => [...prev, ...result.expenses]);
+        }
+
+        setPagination(result.pagination);
+      } catch (err) {
+        console.error('Error loading expenses:', err);
+        setError(err.message || t('expense.errors.loadFailed'));
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+        setLoadingMore(false);
       }
-      
-      setPagination(result.pagination);
-      
-    } catch (err) {
-      console.error('Error loading expenses:', err);
-      setError(err.message || 'Failed to load expenses');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-      setLoadingMore(false);
-    }
-  }, [groupId, pagination.pageSize]);
+    },
+    [groupId, pagination.pageSize, t]
+  );
 
   // Load more expenses for pagination
   const loadMoreExpenses = useCallback(() => {
@@ -101,10 +117,11 @@ const AllExpensesScreen = () => {
   }, [groupId]);
 
   // Filter expenses based on search text
-  const filteredExpenses = expenses.filter(expense =>
-    expense.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-    expense.category?.toLowerCase().includes(searchText.toLowerCase()) ||
-    expense.description?.toLowerCase().includes(searchText.toLowerCase())
+  const filteredExpenses = expenses.filter(
+    (expense) =>
+      expense.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+      expense.category?.toLowerCase().includes(searchText.toLowerCase()) ||
+      expense.description?.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const handleExpensePress = (expense) => {
@@ -122,11 +139,11 @@ const AllExpensesScreen = () => {
   // Render loading footer for pagination
   const renderFooter = () => {
     if (!loadingMore) return null;
-    
+
     return (
       <View className="py-4">
         <ActivityIndicator size="small" color="#2979FF" />
-        <Text className="mt-2 text-sm text-center text-gray-500">Loading more expenses...</Text>
+        <Text className="mt-2 text-center text-sm text-gray-500">{t('expense.loadingMore')}</Text>
       </View>
     );
   };
@@ -139,18 +156,18 @@ const AllExpensesScreen = () => {
       amount={item.amount}
       category={item.category}
       time={formatTime(item.incurred_at)} // Format timestamp
-      paidBy={item.user_name || 'Unknown'} // You might need to fetch user name
+      paidBy={item.user_name || t('common.unknown')} // You might need to fetch user name
       categories={DEFAULT_CATEGORIES}
       onPress={() => handleExpensePress(item)}
       showBorder={true}
-      currency="MAD"
+      currency={t('common.currency')}
     />
   );
 
   // Helper function to format timestamp
   const formatTime = (timestamp) => {
-    if (!timestamp) return 'Unknown';
-    
+    if (!timestamp) return t('common.unknown');
+
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     const now = new Date();
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
@@ -158,13 +175,13 @@ const AllExpensesScreen = () => {
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
+      return t('time.minutesAgo', { count: diffInMinutes });
     } else if (diffInHours < 24) {
-      return `${diffInHours}h ago`;
+      return t('time.hoursAgo', { count: diffInHours });
     } else if (diffInDays === 1) {
-      return 'Yesterday';
+      return t('time.yesterday');
     } else if (diffInDays < 7) {
-      return `${diffInDays}d ago`;
+      return t('time.daysAgo', { count: diffInDays });
     } else {
       return date.toLocaleDateString();
     }
@@ -173,18 +190,15 @@ const AllExpensesScreen = () => {
   // Render empty state
   const renderEmptyState = () => (
     <View className="items-center px-4 py-12">
-      <View className="items-center justify-center mb-4">
+      <View className="mb-4 items-center justify-center">
         <Ionicons name="receipt" size={70} color="#2979FF" />
       </View>
-      <Text className="mb-2 font-dmsans-bold text-[24px]">No Expenses Yet</Text>
-      <Text className="mb-6 text-center text-gray-500">
-        Start by adding your first expense. Keep track of who paid what and split it fairly
-        between your group members.
-      </Text>
+      <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.empty.title')}</Text>
+      <Text className="mb-6 text-center text-gray-500">{t('expense.empty.description')}</Text>
       <TouchableOpacity
-        className="px-6 py-3 rounded-lg bg-primary"
+        className="rounded-lg bg-primary px-6 py-3"
         onPress={() => navigation.navigate('NewExpense', { groupId })}>
-        <Text className="font-semibold text-white">Add Your First Expense</Text>
+        <Text className="font-semibold text-white">{t('expense.empty.addFirstExpense')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -192,15 +206,15 @@ const AllExpensesScreen = () => {
   // Render error state
   const renderErrorState = () => (
     <View className="items-center px-4 py-12">
-      <View className="items-center justify-center mb-4">
+      <View className="mb-4 items-center justify-center">
         <Ionicons name="alert-circle" size={70} color="#FF6B6B" />
       </View>
-      <Text className="mb-2 font-dmsans-bold text-[24px]">Oops! Something went wrong</Text>
+      <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.error.title')}</Text>
       <Text className="mb-6 text-center text-gray-500">{error}</Text>
       <TouchableOpacity
-        className="px-6 py-3 rounded-lg bg-primary"
+        className="rounded-lg bg-primary px-6 py-3"
         onPress={() => loadExpenses(1, false)}>
-        <Text className="font-semibold text-white">Try Again</Text>
+        <Text className="font-semibold text-white">{t('expense.error.tryAgain')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -208,11 +222,15 @@ const AllExpensesScreen = () => {
   // Render pagination info
   const renderPaginationInfo = () => {
     if (expenses.length === 0) return null;
-    
+
     return (
-      <View className="px-4 py-2 bg-gray-50">
-        <Text className="text-sm text-center text-gray-600">
-          Showing {pagination.startIndex}-{pagination.endIndex} of {pagination.totalItems} expenses
+      <View className="bg-gray-50 px-4 py-2">
+        <Text className="text-center text-sm text-gray-600">
+          {t('expense.pagination.showing', {
+            start: pagination.startIndex,
+            end: pagination.endIndex,
+            total: pagination.totalItems,
+          })}
         </Text>
       </View>
     );
@@ -220,13 +238,13 @@ const AllExpensesScreen = () => {
 
   return (
     <SafeAreaView className="container flex-1 bg-white">
-      <Header title="All Expenses" />
-      
+      <Header title={t('expense.title')} />
+
       <View className="mb-4">
         <SearchBar
           searchText={searchText}
           onSearchChange={setSearchText}
-          placeholder='Eg : "T9edia"'
+          placeholder={t('expense.search.placeholder')}
           onFilterPress={() => setIsFilterModalVisible(true)}
         />
       </View>
@@ -234,9 +252,9 @@ const AllExpensesScreen = () => {
       {renderPaginationInfo()}
 
       {loading && expenses.length === 0 ? (
-        <View className="items-center justify-center flex-1">
+        <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2979FF" />
-          <Text className="mt-2 text-gray-500">Loading expenses...</Text>
+          <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
         </View>
       ) : error && expenses.length === 0 ? (
         renderErrorState()
@@ -270,7 +288,7 @@ const AllExpensesScreen = () => {
         onApplyFilter={handleApplyFilter}
         categories={DEFAULT_CATEGORIES}
         groups={groups}
-        currency="MAD"
+        currency={t('common.currency')}
         resultCount={pagination.totalItems}
       />
     </SafeAreaView>

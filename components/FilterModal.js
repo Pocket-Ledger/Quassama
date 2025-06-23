@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'r
 import FilterDateRange from './FilterDateRange';
 import FilterAmountRange from './FilterAmountRange';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 const FilterModal = ({
   visible,
@@ -11,11 +12,18 @@ const FilterModal = ({
   onApplyFilter,
   categories = [],
   groups = [],
-  dateRanges = ['Today', 'Last 7 Days', 'Last 30 Days', 'This Month'],
   currency = '$',
   resultCount = 80,
 }) => {
+  const { t } = useTranslation();
   const [localFilter, setLocalFilter] = useState(initialFilter);
+
+  const dateRanges = [
+    t('filters.dateRanges.today'),
+    t('filters.dateRanges.last7Days'),
+    t('filters.dateRanges.last30Days'),
+    t('filters.dateRanges.thisMonth'),
+  ];
 
   const handleApplyFilter = () => {
     onApplyFilter(localFilter);
@@ -24,7 +32,7 @@ const FilterModal = ({
 
   const handleResetFilter = () => {
     const resetFilter = {
-      dateRange: 'Today',
+      dateRange: t('filters.dateRanges.today'),
       selectedCategories: [],
       amountRange: { min: 5, max: 500, selectedMin: 20, selectedMax: 100 },
       selectedGroup: groups[0]?.id || '',
@@ -65,11 +73,11 @@ const FilterModal = ({
           {/* Modal Header */}
           <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-base text-gray-500">Cancel</Text>
+              <Text className="text-base text-gray-500">{t('filters.cancel')}</Text>
             </TouchableOpacity>
-            <Text className="text-lg font-semibold text-black">Filter</Text>
+            <Text className="text-lg font-semibold text-black">{t('filters.title')}</Text>
             <TouchableOpacity onPress={handleResetFilter}>
-              <Text className="text-base text-gray-500">Reset</Text>
+              <Text className="text-base text-gray-500">{t('filters.reset')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -82,13 +90,10 @@ const FilterModal = ({
             />
 
             {/* Categories */}
-            {/* <FilterCategories
-              categories={categories}
-              selectedCategories={localFilter.selectedCategories}
-              onCategoryToggle={toggleCategory}
-            /> */}
             <View>
-              <Text className="mb-4 text-base font-medium text-black">Categories</Text>
+              <Text className="mb-4 text-base font-medium text-black">
+                {t('filters.categories.title')}
+              </Text>
               <View className="flex-row flex-wrap justify-between gap-1">
                 {categories.map((category) => (
                   <TouchableOpacity
@@ -130,20 +135,18 @@ const FilterModal = ({
             />
 
             {/* Group */}
-            {/* <FilterGroupSelector
-              groups={groups}
-              selectedGroup={localFilter.selectedGroup}
-              onGroupSelect={handleGroupSelect}
-            /> */}
-            <View>
-              <Text className="mb-4 text-base font-medium text-black">Group</Text>
-              <TouchableOpacity className="flex-row items-center justify-between rounded-lg border border-gray-200 px-4 py-4">
+            {/* <View>
+              <Text className="mb-4 text-base font-medium text-black">
+                {t('filters.group.title')}
+              </Text>
+              <TouchableOpacity className="flex-row items-center justify-between px-4 py-4 border border-gray-200 rounded-lg">
                 <Text className="text-base text-black">
-                  {groups.find((g) => g.id === localFilter.selectedGroup)?.name || 'Select group'}
+                  {groups.find((g) => g.id === localFilter.selectedGroup)?.name ||
+                    t('filters.group.selectGroup')}
                 </Text>
                 <Feather name="chevron-down" size={20} color="#666" />
               </TouchableOpacity>
-            </View>
+            </View> */}
           </View>
         </ScrollView>
 
@@ -151,7 +154,7 @@ const FilterModal = ({
         <View className="border-t border-gray-200 px-4 pb-6 pt-4">
           <TouchableOpacity className="rounded-lg bg-primary py-4" onPress={handleApplyFilter}>
             <Text className="text-center text-base font-semibold text-white">
-              See {resultCount} Expenses
+              {t('filters.seeExpenses', { count: resultCount })}
             </Text>
           </TouchableOpacity>
         </View>
