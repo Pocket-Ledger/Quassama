@@ -61,11 +61,11 @@ export function CustomTabBar({ state, descriptors, navigation }) {
             activeOpacity={0.7}>
             <View className="relative mb-1">
               <Ionicons name={getIcon()} size={24} color={isFocused ? '#2979FF' : '#00000040'} />
-              {route.name === 'Profile' && (
+              {/* {route.name === 'Profile' && (
                 <View className="absolute -right-2 -top-1.5 h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
-                  <Text className="font-dmsans-bold text-xs text-white">1</Text>
+                  <Text className="text-xs text-white font-dmsans-bold">1</Text>
                 </View>
-              )}
+              )} */}
             </View>
             <Text
               className={`font-dmsans-bold text-xs ${isFocused ? ' text-blue-500' : ' text-gray-250'}`}>
