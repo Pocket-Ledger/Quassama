@@ -120,7 +120,7 @@ const FilterModal = ({
                           ? 'text-primary'
                           : 'text-gray-600'
                       }`}>
-                      {category.name}
+                      {t(`categories.${category.name.toLowerCase()}`)}
                     </Text>
                   </TouchableOpacity>
                 ))}
