@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
 import { useTranslation } from 'react-i18next';
 import i18n from 'utils/i18n';
-import { useAlert } from 'hooks/useAlert'; // Import your custom hook
+import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
+import { languageUtils } from 'utils/languageUtils';
 
 const LanguagesScreen = () => {
   const navigation = useNavigation();
@@ -36,19 +37,23 @@ const LanguagesScreen = () => {
       flag: '🇫🇷',
       nativeName: 'Français',
     },
-    /* {
-      code: 'es',
-      name: 'Spanish',
-      flag: '🇪🇸',
-      nativeName: 'Español',
-    },
-    {
-      code: 'de',
-      name: 'German',
-      flag: '🇩🇪',
-      nativeName: 'Deutsch',
-    }, */
   ];
+
+  // Load saved language on component mount
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = await languageUtils.loadSavedLanguage();
+        if (savedLanguage) {
+          setSelectedLanguage(savedLanguage);
+        }
+      } catch (error) {
+        console.error('Failed to load saved language:', error);
+      }
+    };
+
+    loadLanguage();
+  }, []);
 
   const handleLanguageSelect = (language) => {
     setSelectedLanguage(language.code);
@@ -57,12 +62,17 @@ const LanguagesScreen = () => {
   const handleChangeLanguage = async () => {
     setIsLoading(true);
     try {
-      await i18n.changeLanguage(selectedLanguage);
-      // Use custom success alert
-      showSuccess(t('languages.success_title'), t('languages.success_message'), () => {
-        hideAlert();
-        navigation.goBack();
-      });
+      const success = await languageUtils.changeAndSaveLanguage(selectedLanguage);
+
+      if (success) {
+        // Use custom success alert
+        showSuccess(t('languages.success_title'), t('languages.success_message'), () => {
+          hideAlert();
+          navigation.goBack();
+        });
+      } else {
+        throw new Error('Failed to change and save language');
+      }
     } catch (error) {
       console.error('Language change failed:', error.message);
       // Use custom error alert

@@ -49,13 +49,13 @@ const ProfileScreen = () => {
     const currentLang = i18n.language;
     switch (currentLang) {
       case 'en':
-        return t('languages.english');
+        return 'English';
       case 'ar':
-        return t('languages.arabic');
+        return 'العربية';
       case 'fr':
-        return t('languages.french');
+        return 'Français';
       default:
-        return t('languages.english');
+        return 'English';
     }
   };
 
@@ -72,7 +72,7 @@ const ProfileScreen = () => {
       title: t('profile.settings'),
       icon: 'settings',
       hasArrow: true,
-      hasNotification: true,
+      // hasNotification: true,
       action: () => navigation.navigate('Settings'),
     },
     {
@@ -80,7 +80,7 @@ const ProfileScreen = () => {
       title: t('profile.language'),
       icon: 'globe',
       hasArrow: true,
-      //rightText: getCurrentLanguageDisplayName(),
+      rightText: getCurrentLanguageDisplayName(),
       action: () => navigation.navigate('Languages'),
     },
     {

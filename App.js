@@ -15,6 +15,7 @@ import {
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { languageUtils } from 'utils/languageUtils';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -27,6 +28,19 @@ export default function App() {
     'DM Sans SemiBold': DMSans_600SemiBold,
   });
 
+  // Initialize language - moved inside the component
+  useEffect(() => {
+    const initLanguage = async () => {
+      try {
+        await languageUtils.initializeLanguage();
+      } catch (error) {
+        console.error('Failed to initialize language:', error);
+      }
+    };
+    initLanguage();
+  }, []);
+
+  // Handle splash screen hiding when fonts are loaded
   useEffect(() => {
     async function prepare() {
       if (fontsLoaded) {
@@ -45,7 +59,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <GestureHandlerRootView>
+        <GestureHandlerRootView style={{ flex: 1 }}>
           <I18nextProvider i18n={i18n}>
             <NavigationContainer>
               <AppNavigator />
