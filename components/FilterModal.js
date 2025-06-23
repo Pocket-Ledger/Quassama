@@ -41,11 +41,14 @@ const FilterModal = ({
   };
 
   const toggleCategory = (categoryId) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    const categoryName = category ? category.name : categoryId;
+
     setLocalFilter((prev) => ({
       ...prev,
-      selectedCategories: prev.selectedCategories.includes(categoryId)
-        ? prev.selectedCategories.filter((id) => id !== categoryId)
-        : [...prev.selectedCategories, categoryId],
+      selectedCategories: prev.selectedCategories.includes(categoryName)
+        ? prev.selectedCategories.filter((name) => name !== categoryName)
+        : [...prev.selectedCategories, categoryName],
     }));
   };
 
@@ -102,7 +105,7 @@ const FilterModal = ({
                     onPress={() => toggleCategory(category.id)}>
                     <View
                       className={`mb-2 h-12 w-12 items-center justify-center rounded-full ${
-                        localFilter.selectedCategories.includes(category.id)
+                        localFilter.selectedCategories.includes(category.name)
                           ? 'bg-primary'
                           : 'bg-primary-50'
                       }`}>
@@ -110,13 +113,15 @@ const FilterModal = ({
                         name={category.icon}
                         size={20}
                         color={
-                          localFilter.selectedCategories.includes(category.id) ? 'white' : '#2979FF'
+                          localFilter.selectedCategories.includes(category.name)
+                            ? 'white'
+                            : '#2979FF'
                         }
                       />
                     </View>
                     <Text
                       className={`text-sm font-medium ${
-                        localFilter.selectedCategories.includes(category.id)
+                        localFilter.selectedCategories.includes(category.name)
                           ? 'text-primary'
                           : 'text-gray-600'
                       }`}>
