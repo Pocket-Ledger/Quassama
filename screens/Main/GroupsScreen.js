@@ -135,6 +135,25 @@ const GroupsScreen = () => {
 
   const userId = getAuth().currentUser.uid;
 
+  /* const handleAcceptInvitation = async (invId, groupId) => {
+    try {
+      const username = await User.getUsernameById(userId);
+      const memberObj = {
+        id: userId,
+        name: username,
+        initial: username ? username[0].toUpperCase() : '',
+        color: '#2979FF',
+      };
+
+      await Group.addMemberToGroup(groupId, memberObj);
+
+      await Invitation.accept(invId);
+
+      
+    } catch (err) {
+      console.error('Accept failed', err);
+    }
+  }; */
   const handleAcceptInvitation = async (invId, groupId) => {
     try {
       // 1) build member object for the current user
@@ -146,24 +165,36 @@ const GroupsScreen = () => {
         color: '#2979FF',
       };
 
-      // add to group
+      // 2) add to group
       await Group.addMemberToGroup(groupId, memberObj);
 
-      // 2) mark invitation accepted
+      // 3) mark invitation accepted
       await Invitation.accept(invId);
 
-      // 3) refresh both lists
-      /*     refreshInvitations();
-    refreshGroups(); */
+      // 4) AUTO UPDATE UI - Remove invitation from the list
+      setInvitations((prev) => prev.filter((inv) => inv.id !== invId));
+
+      // 5) AUTO UPDATE UI - Refresh groups to show the new group
+      const groupsData = await Group.getGroupsByUser(user);
+      setGroups(groupsData);
     } catch (err) {
       console.error('Accept failed', err);
     }
   };
 
+  /* const handleDeclineInvitation = async (invId) => {
+    try {
+      await Invitation.decline(invId);
+    } catch (err) {
+      console.error('Decline failed', err);
+    }
+  }; */
   const handleDeclineInvitation = async (invId) => {
     try {
       await Invitation.decline(invId);
-      /*     refreshInvitations(); */
+
+      // AUTO UPDATE UI - Remove invitation from the list
+      setInvitations((prev) => prev.filter((inv) => inv.id !== invId));
     } catch (err) {
       console.error('Decline failed', err);
     }
