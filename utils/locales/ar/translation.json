@@ -423,6 +423,7 @@
     "title": "تصفية",
     "cancel": "إلغاء",
     "reset": "إعادة تعيين",
+    "see": "عرض",
     "seeExpenses_one": "عرض {{count}} مصروف",
     "seeExpenses_other": "عرض {{count}} مصروف",
     "dateRange": {

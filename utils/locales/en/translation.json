@@ -424,7 +424,7 @@
     "title": "Filter",
     "cancel": "Cancel",
     "reset": "Reset",
-    "seeExpenses_one": "See {{count}} Expense",
+    "seeExpenses_one": "See ",
     "seeExpenses_other": "See {{count}} Expenses",
     "dateRange": {
       "title": "Date Range",

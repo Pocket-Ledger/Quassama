@@ -154,7 +154,7 @@ const FilterModal = ({
         <View className="border-t border-gray-200 px-4 pb-6 pt-4">
           <TouchableOpacity className="rounded-lg bg-primary py-4" onPress={handleApplyFilter}>
             <Text className="text-center text-base font-semibold text-white">
-              {t('filters.seeExpenses', { count: resultCount })}
+              {t('common.search')}
             </Text>
           </TouchableOpacity>
         </View>
