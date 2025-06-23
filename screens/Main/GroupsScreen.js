@@ -197,7 +197,7 @@ const GroupsScreen = () => {
         <ScrollView
           className="flex-1 "
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}>
+          contentContainerStyle={{ paddingBottom: 5 }}>
           {/* Groups List or Empty State */}
           {isLoadingGroups ? (
             // Loading skeleton

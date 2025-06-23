@@ -116,6 +116,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "add": "Add",
+    "adding": "adding...",
     "search": "Search",
     "loading": "Loading...",
     "error": "Error",

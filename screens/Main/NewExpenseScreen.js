@@ -288,7 +288,7 @@ const NewExpenseScreen = () => {
             onPress={handleAddExpense}
             disabled={isSaving}>
             <Text className="btn-primary-text text-center text-base font-semibold text-white">
-              {isSaving ? t('expense.adding') : t('expense.addExpense')}
+              {isSaving ? t('common.adding') : t('expense.addExpense')}
             </Text>
           </TouchableOpacity>
         </View>
