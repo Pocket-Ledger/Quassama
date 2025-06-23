@@ -14,6 +14,7 @@ import {
 } from '@expo-google-fonts/dm-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -44,11 +45,13 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <I18nextProvider i18n={i18n}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </I18nextProvider>
+        <GestureHandlerRootView>
+          <I18nextProvider i18n={i18n}>
+            <NavigationContainer>
+              <AppNavigator />
+            </NavigationContainer>
+          </I18nextProvider>
+        </GestureHandlerRootView>
       </AuthProvider>
     </SafeAreaProvider>
   );

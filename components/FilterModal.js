@@ -34,21 +34,18 @@ const FilterModal = ({
     const resetFilter = {
       dateRange: t('filters.dateRanges.today'),
       selectedCategories: [],
-      amountRange: { min: 5, max: 500, selectedMin: 20, selectedMax: 100 },
+      amountRange: { min: 1, max: 10000, selectedMin: 20, selectedMax: 100 },
       selectedGroup: groups[0]?.id || '',
     };
     setLocalFilter(resetFilter);
   };
 
   const toggleCategory = (categoryId) => {
-    const category = categories.find((cat) => cat.id === categoryId);
-    const categoryName = category ? category.name : categoryId;
-
     setLocalFilter((prev) => ({
       ...prev,
-      selectedCategories: prev.selectedCategories.includes(categoryName)
-        ? prev.selectedCategories.filter((name) => name !== categoryName)
-        : [...prev.selectedCategories, categoryName],
+      selectedCategories: prev.selectedCategories.includes(categoryId)
+        ? prev.selectedCategories.filter((id) => id !== categoryId)
+        : [...prev.selectedCategories, categoryId],
     }));
   };
 
@@ -105,7 +102,7 @@ const FilterModal = ({
                     onPress={() => toggleCategory(category.id)}>
                     <View
                       className={`mb-2 h-12 w-12 items-center justify-center rounded-full ${
-                        localFilter.selectedCategories.includes(category.name)
+                        localFilter.selectedCategories.includes(category.id)
                           ? 'bg-primary'
                           : 'bg-primary-50'
                       }`}>
@@ -113,15 +110,13 @@ const FilterModal = ({
                         name={category.icon}
                         size={20}
                         color={
-                          localFilter.selectedCategories.includes(category.name)
-                            ? 'white'
-                            : '#2979FF'
+                          localFilter.selectedCategories.includes(category.id) ? 'white' : '#2979FF'
                         }
                       />
                     </View>
                     <Text
                       className={`text-sm font-medium ${
-                        localFilter.selectedCategories.includes(category.name)
+                        localFilter.selectedCategories.includes(category.id)
                           ? 'text-primary'
                           : 'text-gray-600'
                       }`}>
