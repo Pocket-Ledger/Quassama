@@ -178,8 +178,8 @@ const GroupDetailsScreen = () => {
           rightIcon={
             <TouchableOpacity
               onPress={handleEditGroup}
-              className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Feather name="settings" size={20} color="#2979FF" />
+              className="h-10 w-10 items-center justify-center rounded-full bg-primary">
+              <Feather name="settings" size={20} color="#ffff" />
             </TouchableOpacity>
           }
         />
