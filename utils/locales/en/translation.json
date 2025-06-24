@@ -126,7 +126,10 @@
     "unknown": "Unknown",
     "back": "Back",
     "next": "Next",
-    "done": "Done"
+    "done": "Done",
+    "days": "days",
+    "confirm": "Confirm",
+    "apply": "Apply"
   },
   "home": {
     "goodMorning": "Good morning 👋",
@@ -431,7 +434,14 @@
     "seeExpenses_other": "See {{count}} Expenses",
     "dateRange": {
       "title": "Date Range",
-      "customDate": "Custom Date"
+      "customDate": "Custom Date",
+      "customDateTitle": "Select Date Range",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "selectedRange": "Selected range",
+      "invalidRange": "End date must be after start date",
+      "selectStartDate": "Select Start Date",
+      "selectEndDate": "Select End Date"
     },
     "dateRanges": {
       "today": "Today",

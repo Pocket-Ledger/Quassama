@@ -1,3 +1,4 @@
+// FilterModal.js - Updated sections
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'react-native';
 import FilterDateRange from './FilterDateRange';
@@ -10,7 +11,7 @@ const FilterModal = ({
   onClose,
   initialFilter,
   onApplyFilter,
-  onResetFilter, // Add this line
+  onResetFilter,
   categories = [],
   groups = [],
   currency = '$',
@@ -32,22 +33,22 @@ const FilterModal = ({
   };
 
   const handleResetFilter = () => {
-  const resetFilter = {
-    dateRange: '',
-    selectedCategories: [],
-    amountRange: { min: 1, max: 10000, selectedMin: 0, selectedMax: 10000 },
-    selectedGroup: groups[0]?.id || '',
+    const resetFilter = {
+      dateRange: '',
+      selectedCategories: [],
+      amountRange: { min: 1, max: 10000, selectedMin: 0, selectedMax: 10000 },
+      selectedGroup: groups[0]?.id || '',
+      customStartDate: null,
+      customEndDate: null,
+    };
+    setLocalFilter(resetFilter);
+
+    if (onResetFilter) {
+      onResetFilter(resetFilter);
+    }
+
+    onClose();
   };
-  setLocalFilter(resetFilter);
-  
-  // Call the parent's reset handler to actually apply the reset
-  if (onResetFilter) {
-    onResetFilter(resetFilter);
-  }
-  
-  // Close the modal after reset
-  onClose();
-};
 
   const toggleCategory = (categoryId) => {
     setLocalFilter((prev) => ({
@@ -62,12 +63,19 @@ const FilterModal = ({
     setLocalFilter((prev) => ({ ...prev, dateRange: range }));
   };
 
+  const handleCustomDateChange = (startDate, endDate) => {
+    setLocalFilter((prev) => ({
+      ...prev,
+      customStartDate: startDate,
+      customEndDate: endDate,
+    }));
+  };
+
   const handleAmountRangeChange = (newRange) => {
     setLocalFilter((prev) => ({ ...prev, amountRange: newRange }));
   };
 
   const handleGroupSelect = () => {
-    // Implementation for group selection modal can be added here
     console.log('Group selection not implemented yet');
   };
 
@@ -96,6 +104,9 @@ const FilterModal = ({
               selectedRange={localFilter.dateRange}
               onRangeSelect={handleRangeSelect}
               ranges={dateRanges}
+              customStartDate={localFilter.customStartDate}
+              customEndDate={localFilter.customEndDate}
+              onCustomDateChange={handleCustomDateChange}
             />
 
             {/* Categories */}
@@ -142,20 +153,6 @@ const FilterModal = ({
               onRangeChange={handleAmountRangeChange}
               currency={currency}
             />
-
-            {/* Group */}
-            {/* <View>
-              <Text className="mb-4 text-base font-medium text-black">
-                {t('filters.group.title')}
-              </Text>
-              <TouchableOpacity className="flex-row items-center justify-between px-4 py-4 border border-gray-200 rounded-lg">
-                <Text className="text-base text-black">
-                  {groups.find((g) => g.id === localFilter.selectedGroup)?.name ||
-                    t('filters.group.selectGroup')}
-                </Text>
-                <Feather name="chevron-down" size={20} color="#666" />
-              </TouchableOpacity>
-            </View> */}
           </View>
         </ScrollView>
 

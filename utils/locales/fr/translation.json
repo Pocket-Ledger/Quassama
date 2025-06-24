@@ -125,7 +125,10 @@
     "unknown": "Inconnu",
     "back": "Retour",
     "next": "Suivant",
-    "done": "Terminé"
+    "done": "Terminé",
+    "days": "jours",
+    "confirm": "Confirmer",
+    "apply": "Appliquer"
   },
   "home": {
     "goodMorning": "Bonjour 👋",
@@ -428,9 +431,17 @@
     "reset": "Réinitialiser",
     "seeExpenses_one": "Voir {{count}} Dépense",
     "seeExpenses_other": "Voir {{count}} Dépenses",
+
     "dateRange": {
       "title": "Plage de Dates",
-      "customDate": "Date Personnalisée"
+      "customDate": "Date Personnalisée",
+      "customDateTitle": "Sélectionner la Plage de Dates",
+      "startDate": "Date de Début",
+      "endDate": "Date de Fin",
+      "selectedRange": "Plage sélectionnée",
+      "invalidRange": "La date de fin doit être après la date de début",
+      "selectStartDate": "Sélectionner la Date de Début",
+      "selectEndDate": "Sélectionner la Date de Fin"
     },
     "dateRanges": {
       "today": "Aujourd'hui",
