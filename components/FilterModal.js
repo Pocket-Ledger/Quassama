@@ -28,7 +28,19 @@ const FilterModal = ({
   ];
 
   const handleApplyFilter = () => {
-    onApplyFilter(localFilter);
+    console.log('localFilter', localFilter);
+
+    const finalFilter = {
+      startDate: localFilter.dateRange === 'custom' ? localFilter.customStartDate : null,
+      endDate: localFilter.dateRange === 'custom' ? localFilter.customEndDate : null,
+      dateRange: localFilter.dateRange,
+      categories: localFilter?.selectedCategories,
+      minAmount: localFilter.amountRange.selectedMin,
+      maxAmount: localFilter.amountRange.selectedMax,
+    };
+    console.log('===============================================');
+    console.log('finalFilter', finalFilter);
+    onApplyFilter(finalFilter);
     onClose();
   };
 

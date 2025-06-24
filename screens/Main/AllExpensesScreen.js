@@ -125,71 +125,71 @@ const AllExpensesScreen = () => {
 
   // Filter expenses based on search text
   const getFilteredExpenses = useCallback(() => {
-  let filtered = expenses;
+    let filtered = expenses;
 
-  // Text search filter (this always applies as user types)
-  if (searchText.trim()) {
-    filtered = filtered.filter(
-      (expense) =>
-        expense.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-        expense.category?.toLowerCase().includes(searchText.toLowerCase()) ||
-        expense.description?.toLowerCase().includes(searchText.toLowerCase())
-    );
-  }
-
-  // Only apply other filters if they have been applied (search button pressed)
-  
-  // Category filter
-  if (appliedFilterConfig.selectedCategories.length > 0) {
-    filtered = filtered.filter((expense) =>
-      appliedFilterConfig.selectedCategories.includes(expense.category)
-    );
-  }
-
-  // Amount range filter
-  if (appliedFilterConfig.amountRange) {
-    const { selectedMin, selectedMax } = appliedFilterConfig.amountRange;
-    filtered = filtered.filter(
-      (expense) => expense.amount >= selectedMin && expense.amount <= selectedMax
-    );
-  }
-
-  // Date range filter (only if not empty)
-  if (appliedFilterConfig.dateRange && appliedFilterConfig.dateRange !== '') {
-    const now = new Date();
-    let startDate;
-    
-    switch (appliedFilterConfig.dateRange) {
-      case t('filters.dateRanges.today'):
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        break;
-      case t('filters.dateRanges.last7Days'):
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case t('filters.dateRanges.last30Days'):
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      case t('filters.dateRanges.thisMonth'):
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        break;
-      default:
-        startDate = null;
+    // Text search filter (this always applies as user types)
+    if (searchText.trim()) {
+      filtered = filtered.filter(
+        (expense) =>
+          expense.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+          expense.category?.toLowerCase().includes(searchText.toLowerCase()) ||
+          expense.description?.toLowerCase().includes(searchText.toLowerCase())
+      );
     }
 
-    if (startDate) {
-      filtered = filtered.filter((expense) => {
-        const expenseDate = expense.incurred_at.toDate ? 
-          expense.incurred_at.toDate() : 
-          new Date(expense.incurred_at);
-        return expenseDate >= startDate;
-      });
+    // Only apply other filters if they have been applied (search button pressed)
+
+    // Category filter
+    if (appliedFilterConfig?.selectedCategories?.length > 0) {
+      filtered = filtered.filter((expense) =>
+        appliedFilterConfig.selectedCategories.includes(expense.category)
+      );
     }
-  }
 
-  return filtered;
-}, [expenses, searchText, appliedFilterConfig, t]);
+    // Amount range filter
+    if (appliedFilterConfig.amountRange) {
+      const { selectedMin, selectedMax } = appliedFilterConfig.amountRange;
+      filtered = filtered.filter(
+        (expense) => expense.amount >= selectedMin && expense.amount <= selectedMax
+      );
+    }
 
-const filteredExpenses = getFilteredExpenses();
+    // Date range filter (only if not empty)
+    if (appliedFilterConfig.dateRange && appliedFilterConfig.dateRange !== '') {
+      const now = new Date();
+      let startDate;
+
+      switch (appliedFilterConfig.dateRange) {
+        case t('filters.dateRanges.today'):
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case t('filters.dateRanges.last7Days'):
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case t('filters.dateRanges.last30Days'):
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case t('filters.dateRanges.thisMonth'):
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        default:
+          startDate = null;
+      }
+
+      if (startDate) {
+        filtered = filtered.filter((expense) => {
+          const expenseDate = expense.incurred_at.toDate
+            ? expense.incurred_at.toDate()
+            : new Date(expense.incurred_at);
+          return expenseDate >= startDate;
+        });
+      }
+    }
+
+    return filtered;
+  }, [expenses, searchText, appliedFilterConfig, t]);
+
+  const filteredExpenses = getFilteredExpenses();
 
   const handleExpensePress = (expense) => {
     console.log('Expense pressed:', expense);
@@ -197,6 +197,7 @@ const filteredExpenses = getFilteredExpenses();
   };
 
   const handleApplyFilter = (newFilter) => {
+    newFilter.groupId = groupId;
     setFilterConfig(newFilter); // Keep for modal state
     setAppliedFilterConfig(newFilter); // Apply the actual filtering
     console.log('Filter applied:', newFilter);
@@ -299,7 +300,7 @@ const filteredExpenses = getFilteredExpenses();
 
   // Render pagination info
   const renderPaginationInfo = () => {
-    if (expenses.length === 0) return null;
+    if (expenses?.length === 0) return null;
 
     return (
       <View className="bg-gray-50 px-4 py-2">
