@@ -117,6 +117,11 @@ const NewExpenseScreen = () => {
       await expense.save();
 
       console.log('Expense saved successfully:', expense);
+      setExpenseName('');
+      setAmount('');
+      setSelectedCategory('');
+      setNote('');
+      setSelectedGroup(null);
 
       showSuccess(t('customAlert.titles.success'), t('expense.success.added'), () => {
         hideAlert();
