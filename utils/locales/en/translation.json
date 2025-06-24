@@ -157,6 +157,8 @@
     "addNote": "Add Note",
     "splitBetween": "Split Between",
     "note": "Note",
+    "added_success": "Expense successfully added",
+
     "validation": {
       "expenseNameRequired": "Expense name is required",
       "amountRequired": "Amount is required",

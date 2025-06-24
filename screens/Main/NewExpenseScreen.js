@@ -123,7 +123,7 @@ const NewExpenseScreen = () => {
       setNote('');
       setSelectedGroup(null);
 
-      showSuccess(t('customAlert.titles.success'), t('expense.success.added'), () => {
+      showSuccess(t('customAlert.titles.success'), t('expense.added_success'), () => {
         hideAlert();
         navigation.goBack();
       });

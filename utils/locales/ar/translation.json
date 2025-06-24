@@ -156,6 +156,7 @@
     "addNote": "إضافة ملاحظة",
     "splitBetween": "تقسيم بين",
     "note": "ملاحظة",
+    "added_success": "تم إضافة المصروف بنجاح",
     "validation": {
       "expenseNameRequired": "اسم المصروف مطلوب",
       "amountRequired": "المبلغ مطلوب",

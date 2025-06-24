@@ -156,6 +156,8 @@
     "addNote": "Ajouter une Note",
     "splitBetween": "Diviser Entre",
     "note": "Note",
+    "added_success": "Dépense ajoutée avec succès",
+
     "validation": {
       "expenseNameRequired": "Le nom de la dépense est requis",
       "amountRequired": "Le montant est requis",
