@@ -47,7 +47,7 @@ const FilterModal = ({
       onResetFilter(resetFilter);
     }
 
-    onClose();
+    //onClose();
   };
 
   const toggleCategory = (categoryId) => {
