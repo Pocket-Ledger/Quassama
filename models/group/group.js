@@ -95,6 +95,62 @@ class Group{
         return members;
     }
 
+
+    /**
+     * Function to update the group details
+     * @param {string} groupId - The ID of the group to update
+     * @param {Object} updates - An object containing the fields to update
+     * @returns {Promise<void>}
+     */
+    static async updateGroup(groupId, updates, currentUserId) {
+        try {
+            if (!groupId) {
+            throw new Error('Group ID is required');
+            }
+
+            if (!currentUserId) {
+            throw new Error('Current user ID is required');
+            }
+
+            if (!updates || typeof updates !== 'object' || Object.keys(updates).length === 0) {
+            throw new Error('Updates object is required and must contain at least one field to update');
+            }
+
+            const groupRef = doc(db, "groups", groupId);
+            
+            const groupSnap = await getDoc(groupRef);
+            if (!groupSnap.exists()) {
+            throw new Error('Group not found');
+            }
+
+            const groupData = groupSnap.data();
+            
+            // Check if current user is the admin (created_by)
+            if (groupData.created_by !== currentUserId) {
+            throw new Error('Only the group admin can update this group');
+            }
+
+            const updateData = { ...updates };
+            
+            if (updates.members) {
+            updateData.memberIds = updates.members.map(m => 
+                typeof m === 'string' ? m : m.id
+            );
+            }
+
+            updateData.updated_at = new Date().toISOString();
+
+            await updateDoc(groupRef, updateData);
+            
+            console.log(`Group ${groupId} updated successfully`);
+
+        } catch (error) {
+            console.error("Error updating group:", error);
+            throw error;
+        }
+    }
+
+
     
 }
 

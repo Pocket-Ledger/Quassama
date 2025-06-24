@@ -10,6 +10,7 @@ const FilterModal = ({
   onClose,
   initialFilter,
   onApplyFilter,
+  onResetFilter, // Add this line
   categories = [],
   groups = [],
   currency = '$',
@@ -31,14 +32,22 @@ const FilterModal = ({
   };
 
   const handleResetFilter = () => {
-    const resetFilter = {
-      dateRange: t('filters.dateRanges.today'),
-      selectedCategories: [],
-      amountRange: { min: 1, max: 10000, selectedMin: 20, selectedMax: 100 },
-      selectedGroup: groups[0]?.id || '',
-    };
-    setLocalFilter(resetFilter);
+  const resetFilter = {
+    dateRange: '',
+    selectedCategories: [],
+    amountRange: { min: 1, max: 10000, selectedMin: 0, selectedMax: 10000 },
+    selectedGroup: groups[0]?.id || '',
   };
+  setLocalFilter(resetFilter);
+  
+  // Call the parent's reset handler to actually apply the reset
+  if (onResetFilter) {
+    onResetFilter(resetFilter);
+  }
+  
+  // Close the modal after reset
+  onClose();
+};
 
   const toggleCategory = (categoryId) => {
     setLocalFilter((prev) => ({

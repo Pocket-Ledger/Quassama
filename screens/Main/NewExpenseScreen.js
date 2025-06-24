@@ -118,7 +118,7 @@ const NewExpenseScreen = () => {
 
       console.log('Expense saved successfully:', expense);
 
-      showSuccess(t('alerts.success'), t('expense.success.added'), () => {
+      showSuccess(t('customAlert.titles.success'), t('expense.success.added'), () => {
         hideAlert();
         navigation.goBack();
       });

@@ -36,6 +36,13 @@ const AllExpensesScreen = () => {
     selectedGroup: groupId,
   });
 
+  const [appliedFilterConfig, setAppliedFilterConfig] = useState({
+    dateRange: '',
+    selectedCategories: [],
+    amountRange: null,
+    selectedGroup: groupId,
+  });
+
   // Pagination and data states
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -117,12 +124,72 @@ const AllExpensesScreen = () => {
   }, [groupId]);
 
   // Filter expenses based on search text
-  const filteredExpenses = expenses.filter(
-    (expense) =>
-      expense.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-      expense.category?.toLowerCase().includes(searchText.toLowerCase()) ||
-      expense.description?.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const getFilteredExpenses = useCallback(() => {
+  let filtered = expenses;
+
+  // Text search filter (this always applies as user types)
+  if (searchText.trim()) {
+    filtered = filtered.filter(
+      (expense) =>
+        expense.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+        expense.category?.toLowerCase().includes(searchText.toLowerCase()) ||
+        expense.description?.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }
+
+  // Only apply other filters if they have been applied (search button pressed)
+  
+  // Category filter
+  if (appliedFilterConfig.selectedCategories.length > 0) {
+    filtered = filtered.filter((expense) =>
+      appliedFilterConfig.selectedCategories.includes(expense.category)
+    );
+  }
+
+  // Amount range filter
+  if (appliedFilterConfig.amountRange) {
+    const { selectedMin, selectedMax } = appliedFilterConfig.amountRange;
+    filtered = filtered.filter(
+      (expense) => expense.amount >= selectedMin && expense.amount <= selectedMax
+    );
+  }
+
+  // Date range filter (only if not empty)
+  if (appliedFilterConfig.dateRange && appliedFilterConfig.dateRange !== '') {
+    const now = new Date();
+    let startDate;
+    
+    switch (appliedFilterConfig.dateRange) {
+      case t('filters.dateRanges.today'):
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case t('filters.dateRanges.last7Days'):
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case t('filters.dateRanges.last30Days'):
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case t('filters.dateRanges.thisMonth'):
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      default:
+        startDate = null;
+    }
+
+    if (startDate) {
+      filtered = filtered.filter((expense) => {
+        const expenseDate = expense.incurred_at.toDate ? 
+          expense.incurred_at.toDate() : 
+          new Date(expense.incurred_at);
+        return expenseDate >= startDate;
+      });
+    }
+  }
+
+  return filtered;
+}, [expenses, searchText, appliedFilterConfig, t]);
+
+const filteredExpenses = getFilteredExpenses();
 
   const handleExpensePress = (expense) => {
     console.log('Expense pressed:', expense);
@@ -130,10 +197,21 @@ const AllExpensesScreen = () => {
   };
 
   const handleApplyFilter = (newFilter) => {
-    setFilterConfig(newFilter);
+    setFilterConfig(newFilter); // Keep for modal state
+    setAppliedFilterConfig(newFilter); // Apply the actual filtering
     console.log('Filter applied:', newFilter);
-    // You can implement additional filtering logic here
-    // For now, we'll just update the filter config
+  };
+
+  const handleResetFilter = () => {
+    const resetFilter = {
+      dateRange: '',
+      selectedCategories: [],
+      amountRange: { min: 5, max: 500, selectedMin: 20, selectedMax: 100 },
+      selectedGroup: groupId,
+    };
+    setFilterConfig(resetFilter);
+    setAppliedFilterConfig(resetFilter); // This will show all expenses
+    console.log('Filter reset - showing all expenses');
   };
 
   // Render loading footer for pagination
@@ -286,6 +364,7 @@ const AllExpensesScreen = () => {
         onClose={() => setIsFilterModalVisible(false)}
         initialFilter={filterConfig}
         onApplyFilter={handleApplyFilter}
+        onResetFilter={handleResetFilter} // Add this line
         categories={DEFAULT_CATEGORIES}
         groups={groups}
         currency={t('common.currency')}

@@ -39,6 +39,7 @@ const EditGroupScreen = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Now holds { docId, id, username, email }
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -67,11 +68,19 @@ const EditGroupScreen = () => {
 
           if (groupSnap.exists() && mounted) {
             const data = groupSnap.data();
+            
+            // Check if current user is admin
+            const auth = getAuth();
+            if (data.created_by !== auth.currentUser?.uid) {
+              showError(t('editGroup.error_title'), t('editGroup.not_admin_error'));
+              navigation.goBack();
+              return;
+            }
+            
             setGroupName(data.name || '');
             setAllowInviteOthers(data.allowInviteOthers ?? true);
             setNotifyForExpenses(data.notifyForExpenses ?? true);
 
-            // Set existing members
             const members = data.members || [];
             setSelectedMembers(members);
             setOriginalMembers(members);
@@ -146,13 +155,13 @@ const EditGroupScreen = () => {
       const auth = getAuth();
 
       // Update group basic info
-      const groupInstance = new Group();
-      await groupInstance.updateGroup(groupId, {
+      // Update group basic info
+      await Group.updateGroup(groupId, {
         name: groupName,
         allowInviteOthers,
         notifyForExpenses,
         members: selectedMembers,
-      });
+      }, auth.currentUser.uid); // Pass current user ID
 
       // Find new members to invite
       const originalMemberIds = originalMembers.map((m) => m.id);
