@@ -91,8 +91,9 @@ const FilterModal = ({
     setLocalFilter((prev) => ({ ...prev, amountRange: newRange }));
   };
 
-  const handleGroupSelect = () => {
-    console.log('Group selection not implemented yet');
+  const handleClose = () => {
+    handleResetFilter();
+    onClose();
   };
 
   return (
@@ -105,7 +106,7 @@ const FilterModal = ({
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {/* Modal Header */}
           <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={handleClose}>
               <Text className="text-base text-gray-500">{t('filters.cancel')}</Text>
             </TouchableOpacity>
             <Text className="text-lg font-semibold text-black">{t('filters.title')}</Text>
