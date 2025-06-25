@@ -13,14 +13,18 @@ import Header from 'components/Header';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import ExpenseListItem from 'components/ExpenseListItem';
 import Avatar from 'components/Avatar';
+import { useAlert } from 'hooks/useAlert';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Expense from 'models/expense/Expense';
+import Group from 'models/group/group'; // Import your Group model
 import User from 'models/auth/user';
 import { extractHourAndMinute, extractHourMinutePeriod } from 'utils/time';
 import FloatingPlusButton from 'components/FloatingPlusButton';
 import { useTranslation } from 'react-i18next';
 import { getAuth } from 'firebase/auth';
+import CustomAlert from 'components/CustomALert';
+import Logger from 'utils/looger';
 
 const LIMIT = 5; // Limit for recent expenses
 
@@ -37,6 +41,12 @@ const GroupDetailsScreen = () => {
   const [recentExpenses, setRecentExpenses] = useState([]);
   const [balanceByAllUsers, setBalanceByAllUsers] = useState({});
   const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+
+  // Use the alert hook
+  const { alertConfig, hideAlert, showSuccess, showError, showConfirm } = useAlert();
+
   console.log('groupData', groupData);
 
   useFocusEffect(
@@ -129,6 +139,46 @@ const GroupDetailsScreen = () => {
     }, [groupId])
   );
 
+  const handleDeleteGroup = async () => {
+    setDeleteLoading(true);
+    Logger.error(groupId);
+
+    try {
+      //await Group.deleteGroup(groupId);
+
+      // Show success alert
+      showSuccess(t('common.success'), t('groupDetails.groupDeletedSuccess'), () => {
+        hideAlert();
+        navigation.goBack();
+      });
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      showError(t('common.error'), t('groupDetails.groupDeleteError'), hideAlert);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleOptionsPress = () => {
+    setShowOptionsMenu(!showOptionsMenu);
+  };
+
+  const handleEditGroup = () => {
+    setShowOptionsMenu(false);
+    navigation.navigate('EditGroup', { groupId });
+  };
+
+  const handleDeletePress = () => {
+    setShowOptionsMenu(false);
+    showConfirm(
+      t('groupDetails.deleteGroupTitle'),
+      t('groupDetails.deleteGroupMessage'),
+      handleDeleteGroup,
+      t('common.delete'),
+      t('common.cancel')
+    );
+  };
+
   if (loading || !groupData) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white">
@@ -169,26 +219,58 @@ const GroupDetailsScreen = () => {
     console.log('Expense pressed:', expense);
   };
 
-  const handleEditGroup = () => {
-    navigation.navigate('EditGroup', { groupId });
-  };
   const auth = getAuth();
   const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+  const isGroupCreator = groupData && groupData.created_by === currentUserId;
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="container">
         <Header
           title={name}
           rightIcon={
-            groupData && groupData.created_by === currentUserId ? (
-              <TouchableOpacity
-                onPress={handleEditGroup}
-                className="h-10 w-10 items-center justify-center rounded-full bg-primary">
-                <Feather name="settings" size={20} color="#ffff" />
-              </TouchableOpacity>
+            isGroupCreator ? (
+              <View>
+                <TouchableOpacity
+                  onPress={handleOptionsPress}
+                  className="h-10 w-10 items-center justify-center rounded-full bg-primary">
+                  <Feather name="more-vertical" size={20} color="#ffff" />
+                </TouchableOpacity>
+
+                {/* Options Menu */}
+                {showOptionsMenu && (
+                  <View className="absolute right-0 top-12 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg">
+                    <TouchableOpacity
+                      onPress={handleEditGroup}
+                      className="flex-row items-center border-b border-gray-100 px-4 py-3">
+                      <Feather name="settings" size={18} color="#374151" />
+                      <Text className="ml-3 text-base text-gray-700">
+                        {t('groupDetails.editGroup')}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleDeletePress}
+                      className="flex-row items-center px-4 py-3">
+                      <Feather name="trash-2" size={18} color="#EF4444" />
+                      <Text className="ml-3 text-base text-red-500">
+                        {t('groupDetails.deleteGroup')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
             ) : null
           }
         />
+
+        {/* Overlay to close menu when clicking outside */}
+        {showOptionsMenu && (
+          <TouchableOpacity
+            className="z-5 absolute inset-0"
+            onPress={() => setShowOptionsMenu(false)}
+            activeOpacity={1}
+          />
+        )}
 
         <ScrollView
           className="flex-1"
@@ -309,6 +391,20 @@ const GroupDetailsScreen = () => {
           </View>
         </ScrollView>
       </View>
+
+      {/* Custom Alert */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
+
       <FloatingPlusButton navigateTo="NewExpense" size={48} bottom={10} right={10} />
     </SafeAreaView>
   );

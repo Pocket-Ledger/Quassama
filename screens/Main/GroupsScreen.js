@@ -88,7 +88,7 @@ const GroupsScreen = () => {
     const fetchFavorites = async () => {
       try {
         const favorites = await Favorites.getFavoritesByUser(user);
-        setFavoriteGroupIds(favorites.map(fav => fav.groupId));
+        setFavoriteGroupIds(favorites.map((fav) => fav.groupId));
       } catch (e) {
         console.error('Error fetching favorites:', e);
       }
@@ -107,7 +107,6 @@ const GroupsScreen = () => {
           Logger.info('Fetched groups:', groupsData);
         } catch (error) {
           console.error('Error fetching groups:', error);
-          
         } finally {
           setIsLoadingGroups(false);
         }
@@ -152,10 +151,10 @@ const GroupsScreen = () => {
     try {
       if (!favoriteGroupIds.includes(groupId)) {
         await Favorites.addFavorite(groupId, user);
-        setFavoriteGroupIds(prev => [...prev, groupId]);
+        setFavoriteGroupIds((prev) => [...prev, groupId]);
       } else {
         await Favorites.removeFavorite(groupId, user);
-        setFavoriteGroupIds(prev => prev.filter(id => id !== groupId));
+        setFavoriteGroupIds((prev) => prev.filter((id) => id !== groupId));
       }
     } catch (e) {
       console.error('Error toggling favorite:', e);
@@ -246,8 +245,8 @@ const GroupsScreen = () => {
   }, [isLoadingGroups]);
 
   // Sort groups: favorites first, then others
-  const favoriteGroups = groups.filter(g => favoriteGroupIds.includes(g.id));
-  const nonFavoriteGroups = groups.filter(g => !favoriteGroupIds.includes(g.id));
+  const favoriteGroups = groups.filter((g) => favoriteGroupIds.includes(g.id));
+  const nonFavoriteGroups = groups.filter((g) => !favoriteGroupIds.includes(g.id));
   const sortedGroups = [...favoriteGroups, ...nonFavoriteGroups];
 
   return (

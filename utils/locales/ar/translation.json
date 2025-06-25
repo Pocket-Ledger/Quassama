@@ -253,7 +253,13 @@
     "recentExpenses": "النفقات الأخيرة",
     "noExpenses": "لا توجد نفقات بعد",
     "noRecentExpenses": "لا توجد مصروفات بعد",
-    "addFirstExpense": "أضف أول مصروف للبدء"
+    "addFirstExpense": "أضف أول مصروف للبدء",
+    "deleteGroup": "حذف المجموعة",
+    "deleteGroupTitle": "حذف المجموعة؟",
+    "deleteGroupMessage": "هل أنت متأكد من أنك تريد حذف هذه المجموعة؟ ستؤدي هذه العملية إلى إزالة المجموعة وجميع مصروفاتها نهائياً. لا يمكن التراجع عن هذا الإجراء.",
+    "groupDeletedSuccess": "تم حذف المجموعة بنجاح",
+    "groupDeleteError": "فشل في حذف المجموعة. يرجى المحاولة مرة أخرى.",
+    "editGroup": "تعديل المجموعة"
   },
   "notifications": {
     "notifications": "الإشعارات",

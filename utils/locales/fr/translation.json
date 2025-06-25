@@ -255,7 +255,13 @@
     "recentExpenses": "Dépenses Récentes",
     "noExpenses": "Pas encore de dépenses",
     "noRecentExpenses": "Aucune dépense pour le moment",
-    "addFirstExpense": "Ajoutez la première dépense pour commencer"
+    "addFirstExpense": "Ajoutez la première dépense pour commencer",
+    "deleteGroup": "Supprimer le groupe",
+    "deleteGroupTitle": "Supprimer le groupe ?",
+    "deleteGroupMessage": "Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action supprimera définitivement le groupe et toutes ses dépenses. Cette action ne peut pas être annulée.",
+    "groupDeletedSuccess": "Groupe supprimé avec succès",
+    "groupDeleteError": "Échec de la suppression du groupe. Veuillez réessayer.",
+    "editGroup": "Modifier le groupe"
   },
   "notifications": {
     "notifications": "Notifications",
