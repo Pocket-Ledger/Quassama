@@ -253,7 +253,9 @@
     "youOwe": "Vous Devez",
     "settleUp": "Régler les Comptes",
     "recentExpenses": "Dépenses Récentes",
-    "noExpenses": "Pas encore de dépenses"
+    "noExpenses": "Pas encore de dépenses",
+    "noRecentExpenses": "Aucune dépense pour le moment",
+    "addFirstExpense": "Ajoutez la première dépense pour commencer"
   },
   "notifications": {
     "notifications": "Notifications",

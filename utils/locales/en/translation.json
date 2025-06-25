@@ -253,7 +253,9 @@
     "youOwe": "You Owe",
     "settleUp": "Settle Up",
     "recentExpenses": "Recently Expenses",
-    "noExpenses": "No expenses yet"
+    "noExpenses": "No expenses yet",
+    "noRecentExpenses": "No expenses yet",
+    "addFirstExpense": "Add the first expense to get started"
   },
   "notifications": {
     "notifications": "Notifications",

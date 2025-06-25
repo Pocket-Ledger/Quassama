@@ -241,7 +241,9 @@ const GroupDetailsScreen = () => {
                   const formattedBalance = formatBalance(memberBalance);
 
                   return (
-                    <View key={member.id || `member-${idx}-${member.name || 'unknown'}`} className="mr-4 items-center">
+                    <View
+                      key={member.id || `member-${idx}-${member.name || 'unknown'}`}
+                      className="mr-4 items-center">
                       <Avatar
                         initial={member.initial}
                         name={member.name}
@@ -276,22 +278,34 @@ const GroupDetailsScreen = () => {
           </View>
 
           {/* Recent Expenses List */}
-          <View className="gap-4 ">
-            {recentExpenses.map((expense) => (
-              <ExpenseListItem
-                key={expense.id}
-                id={expense.id}
-                name={expense.name}
-                amount={expense.amount}
-                category={expense.category}
-                time={expense.time}
-                paidBy={expense.paidBy}
-                categories={DEFAULT_CATEGORIES}
-                onPress={() => console.log('Expense pressed:', expense)}
-                showBorder={true}
-                currency={t('common.currency')}
-              />
-            ))}
+          <View className="gap-4">
+            {recentExpenses.length > 0 ? (
+              recentExpenses.map((expense) => (
+                <ExpenseListItem
+                  key={expense.id}
+                  id={expense.id}
+                  name={expense.name}
+                  amount={expense.amount}
+                  category={expense.category}
+                  time={expense.time}
+                  paidBy={expense.paidBy}
+                  categories={DEFAULT_CATEGORIES}
+                  onPress={() => console.log('Expense pressed:', expense)}
+                  showBorder={true}
+                  currency={t('common.currency')}
+                />
+              ))
+            ) : (
+              <View className="items-center justify-center py-8">
+                <Feather name="receipt" size={48} color="#D1D5DB" />
+                <Text className="mt-4 text-center text-base text-gray-500">
+                  {t('groupDetails.noRecentExpenses')}
+                </Text>
+                <Text className="mt-2 text-center text-sm text-gray-400">
+                  {t('groupDetails.addFirstExpense')}
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </View>

@@ -251,7 +251,9 @@
     "youOwe": "عليك",
     "settleUp": "تسوية الحسابات",
     "recentExpenses": "النفقات الأخيرة",
-    "noExpenses": "لا توجد نفقات بعد"
+    "noExpenses": "لا توجد نفقات بعد",
+    "noRecentExpenses": "لا توجد مصروفات بعد",
+    "addFirstExpense": "أضف أول مصروف للبدء"
   },
   "notifications": {
     "notifications": "الإشعارات",

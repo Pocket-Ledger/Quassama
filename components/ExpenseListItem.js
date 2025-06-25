@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import CategoryItem from './CategoryItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import { useTranslation } from 'react-i18next';
+import Logger from 'utils/looger';
 
 const ExpenseListItem = ({
   id,
@@ -25,7 +26,7 @@ const ExpenseListItem = ({
   };
 
   const categoryDetails = getCategoryDetails(category);
-
+  Logger.info(categoryDetails);
   const handlePress = () => {
     if (onPress) {
       onPress({ id, name, amount, category, time, paidBy });
