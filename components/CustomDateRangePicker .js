@@ -31,19 +31,8 @@ const CustomDateRangePicker = ({ isVisible, onClose, onConfirm }) => {
   };
 
   const handleConfirm = () => {
-    /* if (startDate <= endDate) {
-      onConfirm(startDate, endDate);
-      onClose();
-    } */
     if (startDate <= endDate) {
-      // Format dates for Firebase with time set to start/end of day
-      const formattedStartDate = new Date(startDate);
-      formattedStartDate.setHours(0, 0, 0, 0); // Start of day
-
-      const formattedEndDate = new Date(endDate);
-      formattedEndDate.setHours(23, 59, 59, 999); // End of day
-
-      onConfirm(formattedStartDate, formattedEndDate);
+      onConfirm(startDate, endDate);
       onClose();
     }
   };

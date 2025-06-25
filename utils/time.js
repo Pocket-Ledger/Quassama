@@ -9,3 +9,19 @@ export function extractHourMinutePeriod(timeString) {
 
   return `${hour}:${minute} ${period}`;
 }
+
+export const formatDateForDisplay = (date) => {
+  if (!date) return null;
+
+  const dateObj = date.toDate ? date.toDate() : new Date(date);
+
+  return dateObj.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZoneName: 'short',
+  });
+};

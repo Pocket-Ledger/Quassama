@@ -132,11 +132,11 @@ const AllExpensesScreen = () => {
         let result;
 
         if (useFilter && checkedFilter && appliedFilterConfig.checkedFilter) {
-          console.log('\n\n\n\n');
-          console.log('Using filter for expenses:', useFilter);
+          //console.log('\n\n\n\n');
+          //console.log('Using filter for expenses:', useFilter);
           // Use filter function
           const { startDate, endDate } = getDateRangeFromFilter(appliedFilterConfig);
-          console.log('\n\n\nLoading filtered expenses:');
+          //console.log('\n\n\nLoading filtered expenses:');
 
           const filteredExpenses = await Expense.filterExpenses(
             groupId,
@@ -173,11 +173,11 @@ const AllExpensesScreen = () => {
           if (page === 1 || isRefresh) {
             setFilteredExpensesCache(filteredExpenses);
           }
-          console.log('Filtered expenses loaded:', result);
+          // console.log('Filtered expenses loaded:', result);
         } else {
           // Use regular paginated function
           result = await Expense.getExpensesByGroupPaginated(groupId, page, pagination.pageSize);
-          console.log('Loading paginated expenses:', result);
+          //console.log('Loading paginated expenses:', result);
         }
 
         if (isRefresh || page === 1) {
@@ -197,7 +197,7 @@ const AllExpensesScreen = () => {
         setLoadingMore(false);
       }
     },
-    [groupId, pagination.pageSize, t, checkedFilter, appliedFilterConfig, getDateRangeFromFilter]
+    [groupId, pagination.pageSize, checkedFilter, appliedFilterConfig, getDateRangeFromFilter]
   );
 
   // Cache for filtered expenses (for client-side pagination)
@@ -314,7 +314,7 @@ const AllExpensesScreen = () => {
 
     console.log('Filter reset - showing all expenses');
   };
-  console.log('filteredExpenses', filteredExpenses[0]);
+  //console.log('filteredExpenses', filteredExpenses[0]);
 
   // Render loading footer for pagination
   const renderFooter = () => {
@@ -471,9 +471,9 @@ const AllExpensesScreen = () => {
         onApplyFilter={handleApplyFilter}
         onResetFilter={handleResetFilter}
         categories={DEFAULT_CATEGORIES}
-        groups={groups}
-        currency={t('common.currency')}
-        resultCount={pagination.totalItems}
+        // groups={groups}
+        //currency={t('common.currency')}
+        //resultCount={pagination.totalItems}
       />
     </SafeAreaView>
   );
