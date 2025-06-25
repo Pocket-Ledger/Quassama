@@ -414,14 +414,23 @@ class Expense {
         .map((category) => ({
           category,
           amount: categoryTotals[category],
-          percentage: totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
+          percentage:
+            totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
         }))
         .sort((a, b) => b.amount - a.amount);
 
       // Assign colors to categories
       const colors = [
-        '#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63',
-        '#4CAF50', '#FF5722', '#795548', '#607D8B', '#FFC107'
+        '#2979FF',
+        '#FF9800',
+        '#00BCD4',
+        '#673AB7',
+        '#E91E63',
+        '#4CAF50',
+        '#FF5722',
+        '#795548',
+        '#607D8B',
+        '#FFC107',
       ];
 
       const categoryDataWithColors = categoryData.map((item, index) => ({
@@ -434,7 +443,9 @@ class Expense {
         totalAmount,
         month: targetMonth,
         year: targetYear,
-        monthName: new Date(targetYear, targetMonth - 1).toLocaleDateString('en-US', { month: 'long' }),
+        monthName: new Date(targetYear, targetMonth - 1).toLocaleDateString('en-US', {
+          month: 'long',
+        }),
         expenseCount: expenses.length,
       };
     } catch (error) {
@@ -501,14 +512,23 @@ class Expense {
         .map((category) => ({
           category,
           amount: categoryTotals[category],
-          percentage: totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
+          percentage:
+            totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
         }))
         .sort((a, b) => b.amount - a.amount);
 
       // Assign colors to categories
       const colors = [
-        '#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63',
-        '#4CAF50', '#FF5722', '#795548', '#607D8B', '#FFC107'
+        '#2979FF',
+        '#FF9800',
+        '#00BCD4',
+        '#673AB7',
+        '#E91E63',
+        '#4CAF50',
+        '#FF5722',
+        '#795548',
+        '#607D8B',
+        '#FFC107',
       ];
 
       const categoryDataWithColors = categoryData.map((item, index) => ({
@@ -521,7 +541,9 @@ class Expense {
         totalAmount,
         month: targetMonth,
         year: targetYear,
-        monthName: new Date(targetYear, targetMonth - 1).toLocaleDateString('en-US', { month: 'long' }),
+        monthName: new Date(targetYear, targetMonth - 1).toLocaleDateString('en-US', {
+          month: 'long',
+        }),
         expenseCount: expenses.length,
       };
     } catch (error) {
@@ -530,7 +552,6 @@ class Expense {
     }
   }
 
-  
   /**
    * Returns paginated expenses for a given group.
    * @param {string} groupId - The group ID
@@ -542,7 +563,7 @@ class Expense {
     if (!groupId || typeof groupId !== 'string') {
       throw new Error('A valid groupId (string) is required');
     }
-    
+
     if (typeof page !== 'number' || !Number.isInteger(page) || page <= 0) {
       throw new Error('Page must be a positive integer starting from 1');
     }
@@ -553,17 +574,17 @@ class Expense {
 
     try {
       const expensesCol = collection(db, 'expenses');
-      
+
       // First, get total count for pagination info
       const countQuery = query(expensesCol, where('group_id', '==', groupId));
       const countSnapshot = await getDocs(countQuery);
       const totalItems = countSnapshot.size;
-      
+
       // Calculate pagination values
       const totalPages = Math.ceil(totalItems / pageSize);
       const hasNextPage = page < totalPages;
       const hasPreviousPage = page > 1;
-      
+
       // Get paginated data
       const paginatedQuery = query(
         expensesCol,
@@ -571,21 +592,24 @@ class Expense {
         orderBy('incurred_at', 'desc'),
         limit(pageSize * page) // Get all items up to current page
       );
-      
+
       const snapshot = await getDocs(paginatedQuery);
       const allExpenses = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      
+
       // Extract only the current page items
       const startIndex = (page - 1) * pageSize;
       const endIndex = startIndex + pageSize;
       const expenses = allExpenses.slice(startIndex, endIndex);
-      
+
       // Calculate total amount for current page
-      const currentPageTotal = expenses.reduce((total, expense) => total + (expense.amount || 0), 0);
-      
+      const currentPageTotal = expenses.reduce(
+        (total, expense) => total + (expense.amount || 0),
+        0
+      );
+
       return {
         expenses,
         pagination: {
@@ -601,7 +625,7 @@ class Expense {
         totals: {
           currentPageTotal,
           itemCount: expenses.length,
-        }
+        },
       };
     } catch (error) {
       console.error('Error fetching paginated expenses:', error);
@@ -620,21 +644,21 @@ class Expense {
     if (!groupId || typeof groupId !== 'string') {
       throw new Error('A valid groupId (string) is required');
     }
-    
+
     if (typeof pageSize !== 'number' || !Number.isInteger(pageSize) || pageSize <= 0) {
       throw new Error('PageSize must be a positive integer');
     }
 
     try {
       const expensesCol = collection(db, 'expenses');
-      
+
       let q = query(
         expensesCol,
         where('group_id', '==', groupId),
         orderBy('incurred_at', 'desc'),
         limit(pageSize + 1) // Get one extra to check if there's a next page
       );
-      
+
       // If we have a lastDoc, start after it
       if (lastDoc) {
         q = query(
@@ -645,22 +669,25 @@ class Expense {
           limit(pageSize + 1)
         );
       }
-      
+
       const snapshot = await getDocs(q);
       const docs = snapshot.docs;
-      
+
       // Check if there's a next page
       const hasNextPage = docs.length > pageSize;
-      
+
       // Remove the extra document if it exists
       const expenses = docs.slice(0, pageSize).map((doc) => ({
         id: doc.id,
         ...doc.data(),
         _doc: doc, // Keep reference for next page cursor
       }));
-      
-      const currentPageTotal = expenses.reduce((total, expense) => total + (expense.amount || 0), 0);
-      
+
+      const currentPageTotal = expenses.reduce(
+        (total, expense) => total + (expense.amount || 0),
+        0
+      );
+
       return {
         expenses,
         pagination: {
@@ -672,7 +699,7 @@ class Expense {
         totals: {
           currentPageTotal,
           itemCount: expenses.length,
-        }
+        },
       };
     } catch (error) {
       console.error('Error fetching cursor-based paginated expenses:', error);
@@ -690,23 +717,36 @@ class Expense {
    * @param {number} maxAmount - Maximum amount for filtering
    * @returns {Promise<Array<object>>} - Filtered expenses
    */
-  static async filterExpenses(groupId, startDate = null, endDate = null, categories = [], minAmount = null, maxAmount = null) {
+  static async filterExpenses(
+    groupId,
+    startDate = null,
+    endDate = null,
+    categories = [],
+    minAmount = null,
+    maxAmount = null
+  ) {
+    console.log('MODEL:FilterExpenses called with:', {
+      groupId,
+      startDate,
+      endDate,
+      categories,
+      minAmount,
+      maxAmount,
+    });
+
     try {
-      if(categories) {
+      if (categories) {
         console.log('Filtering by categories:', categories);
       }
-      
+
       // Start with base query filtering by groupId
-      let expenseQuery = query(
-        collection(db, 'expenses'),
-        where('group_id', '==', groupId)
-      );
+      let expenseQuery = query(collection(db, 'expenses'), where('group_id', '==', groupId));
 
       // Apply date range filters if provided
       if (startDate) {
         expenseQuery = query(expenseQuery, where('incurred_at', '>=', startDate));
       }
-      
+
       if (endDate) {
         expenseQuery = query(expenseQuery, where('incurred_at', '<=', endDate));
       }
@@ -721,7 +761,7 @@ class Expense {
       if (minAmount !== null) {
         expenseQuery = query(expenseQuery, where('amount', '>=', minAmount));
       }
-      
+
       if (maxAmount !== null) {
         expenseQuery = query(expenseQuery, where('amount', '<=', maxAmount));
       }
@@ -731,24 +771,22 @@ class Expense {
 
       // Execute the query
       const querySnapshot = await getDocs(expenseQuery);
-      
+
       // Convert documents to array of objects
       const expenses = [];
       querySnapshot.forEach((doc) => {
         expenses.push({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         });
       });
 
       return expenses;
-
     } catch (error) {
       console.error('Error filtering expenses:', error);
       throw new Error(`Failed to filter expenses: ${error.message}`);
     }
   }
-
 }
 
 export default Expense;
