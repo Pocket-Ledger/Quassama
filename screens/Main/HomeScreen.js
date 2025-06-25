@@ -263,6 +263,7 @@ const HomeScreen = () => {
   const getCurrency = () => {
     return t('common.currency');
   };
+  console.log('transformedRecentActivity', transformedRecentActivity);
 
   return (
     <ScrollView className="container flex flex-1 gap-6 bg-white pb-6 pt-2 ">

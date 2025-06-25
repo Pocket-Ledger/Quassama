@@ -18,6 +18,7 @@ import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import Expense from 'models/expense/Expense';
 import { useTranslation } from 'react-i18next';
+import Logger from 'utils/looger';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
@@ -74,42 +75,45 @@ const AllExpensesScreen = () => {
   ];
 
   // Helper function to convert date range to actual dates
-  const getDateRangeFromFilter = useCallback((filterConfig) => {
-    if (filterConfig.dateRange === 'custom') {
-      return {
-        startDate: filterConfig.customStartDate,
-        endDate: filterConfig.customEndDate,
-      };
-    }
+  const getDateRangeFromFilter = useCallback(
+    (filterConfig) => {
+      if (filterConfig.dateRange === 'custom') {
+        return {
+          startDate: filterConfig.customStartDate,
+          endDate: filterConfig.customEndDate,
+        };
+      }
 
-    const now = new Date();
-    let startDate = null;
-    let endDate = null;
+      const now = new Date();
+      let startDate = null;
+      let endDate = null;
 
-    switch (filterConfig.dateRange) {
-      case t('filters.dateRanges.today'):
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-        break;
-      case t('filters.dateRanges.last7Days'):
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        endDate = now;
-        break;
-      case t('filters.dateRanges.last30Days'):
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        endDate = now;
-        break;
-      case t('filters.dateRanges.thisMonth'):
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-        break;
-      default:
-        startDate = null;
-        endDate = null;
-    }
+      switch (filterConfig.dateRange) {
+        case t('filters.dateRanges.today'):
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+          break;
+        case t('filters.dateRanges.last7Days'):
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          endDate = now;
+          break;
+        case t('filters.dateRanges.last30Days'):
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          endDate = now;
+          break;
+        case t('filters.dateRanges.thisMonth'):
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+          break;
+        default:
+          startDate = null;
+          endDate = null;
+      }
 
-    return { startDate, endDate };
-  }, [t]);
+      return { startDate, endDate };
+    },
+    [t]
+  );
 
   // Load expenses function - now handles both filtered and paginated requests
   const loadExpenses = useCallback(
@@ -128,12 +132,12 @@ const AllExpensesScreen = () => {
         let result;
 
         if (useFilter && checkedFilter && appliedFilterConfig.checkedFilter) {
-          console.log("\n\n\n\n");
+          console.log('\n\n\n\n');
           console.log('Using filter for expenses:', useFilter);
           // Use filter function
           const { startDate, endDate } = getDateRangeFromFilter(appliedFilterConfig);
           console.log('\n\n\nLoading filtered expenses:');
-          
+
           const filteredExpenses = await Expense.filterExpenses(
             groupId,
             startDate,
@@ -162,7 +166,7 @@ const AllExpensesScreen = () => {
               hasPreviousPage: page > 1,
               startIndex: startIndex + 1,
               endIndex: Math.min(endIndex, filteredExpenses.length),
-            }
+            },
           };
 
           // Store full filtered results for client-side pagination
@@ -172,11 +176,7 @@ const AllExpensesScreen = () => {
           console.log('Filtered expenses loaded:', result);
         } else {
           // Use regular paginated function
-          result = await Expense.getExpensesByGroupPaginated(
-            groupId,
-            page,
-            pagination.pageSize
-          );
+          result = await Expense.getExpensesByGroupPaginated(groupId, page, pagination.pageSize);
           console.log('Loading paginated expenses:', result);
         }
 
@@ -214,8 +214,8 @@ const AllExpensesScreen = () => {
         const endIndex = startIndex + pageSize;
         const newExpenses = filteredExpensesCache.slice(startIndex, endIndex);
 
-        setExpenses(prev => [...prev, ...newExpenses]);
-        setPagination(prev => ({
+        setExpenses((prev) => [...prev, ...newExpenses]);
+        setPagination((prev) => ({
           ...prev,
           currentPage: nextPage,
           hasNextPage: endIndex < filteredExpensesCache.length,
@@ -226,7 +226,14 @@ const AllExpensesScreen = () => {
         loadExpenses(pagination.currentPage + 1, false, false);
       }
     }
-  }, [loadExpenses, loadingMore, pagination, checkedFilter, appliedFilterConfig, filteredExpensesCache]);
+  }, [
+    loadExpenses,
+    loadingMore,
+    pagination,
+    checkedFilter,
+    appliedFilterConfig,
+    filteredExpensesCache,
+  ]);
 
   // Refresh expenses
   const onRefresh = useCallback(() => {
@@ -266,17 +273,17 @@ const AllExpensesScreen = () => {
 
   const handleApplyFilter = (newFilter) => {
     console.log('Filter applied:', newFilter);
-    
+
     // Update both filter configs
     setFilterConfig(newFilter);
     setAppliedFilterConfig(newFilter);
-    
+
     // Update checked filter state
     setCheckedFilter(newFilter.checkedFilter);
-    
+
     // Reset expenses and load with filter
     setExpenses([]);
-    setPagination(prev => ({
+    setPagination((prev) => ({
       ...prev,
       currentPage: 1,
     }));
@@ -292,21 +299,22 @@ const AllExpensesScreen = () => {
       customEndDate: null,
       checkedFilter: false,
     };
-    
+
     setFilterConfig(resetFilter);
     setAppliedFilterConfig(resetFilter);
     setCheckedFilter(false);
     setFilteredExpensesCache([]);
-    
+
     // Reset expenses and load all expenses
     setExpenses([]);
-    setPagination(prev => ({
+    setPagination((prev) => ({
       ...prev,
       currentPage: 1,
     }));
-    
+
     console.log('Filter reset - showing all expenses');
   };
+  console.log('filteredExpenses', filteredExpenses[0]);
 
   // Render loading footer for pagination
   const renderFooter = () => {
@@ -328,7 +336,7 @@ const AllExpensesScreen = () => {
       amount={item.amount}
       category={item.category}
       time={formatTime(item.incurred_at)} // Format timestamp
-      paidBy={item.user_name || t('common.unknown')} // You might need to fetch user name
+      paidBy={item.username || t('common.unknown')} // You might need to fetch user name
       categories={DEFAULT_CATEGORIES}
       onPress={() => handleExpensePress(item)}
       showBorder={true}

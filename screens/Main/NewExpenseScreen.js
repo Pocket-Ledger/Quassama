@@ -24,6 +24,7 @@ import CategoryList from 'components/CategoryList';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import FloatingPlusButton from 'components/FloatingPlusButton';
+import Logger from 'utils/looger';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -113,10 +114,11 @@ const NewExpenseScreen = () => {
     setIsSaving(true);
     try {
       const iconName = getCategoryIconName(selectedCategory);
+      Logger.info(selectedCategory);
       const expense = new Expense(
         expenseName.trim(), // title
         amount.trim(), // amount
-        iconName, // category (icon name instead of id)
+        selectedCategory, // category (icon name instead of id)
         note.trim(), // note/description
         selectedGroup // group_id
       );
@@ -135,7 +137,7 @@ const NewExpenseScreen = () => {
       });
     } catch (error) {
       console.error('Error saving expense:', error);
-      showError(t('alerts.error'), error.message || t('expense.error.saveFailed'));
+      showError(t('customAlert.titles.error'), error.message || t('expense.error.saveFailed'));
     } finally {
       setIsSaving(false);
     }

@@ -21,12 +21,13 @@ const ExpenseListItem = ({
   const { t } = useTranslation();
 
   const getCategoryDetails = (categoryId) => {
-    const categoryObj = DEFAULT_CATEGORIES.find((cat) => cat.id === categoryId);
+    Logger.info('categoryId', categoryId);
+    const categoryObj = DEFAULT_CATEGORIES.find((cat) => cat.id == categoryId);
     return categoryObj || { icon: 'credit-card', color: '#2979FF' };
   };
 
   const categoryDetails = getCategoryDetails(category);
-  Logger.info(categoryDetails);
+  Logger.info(`Category - Icon: ${categoryDetails.icon}, Color: ${categoryDetails.color}`);
   const handlePress = () => {
     if (onPress) {
       onPress({ id, name, amount, category, time, paidBy });
