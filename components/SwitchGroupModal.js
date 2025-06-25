@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Modal, Pressable, ScrollView } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, Modal, Pressable, ScrollView, RefreshControl } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,8 @@ const SwitchGroupModal = ({
   title = '',
   showCreateNewOption = false,
   onCreateNew = null,
+  onRefresh = null, // new prop
+  refreshing = false, // new prop
 }) => {
   const { t } = useTranslation();
 
@@ -36,7 +38,14 @@ const SwitchGroupModal = ({
           </View>
 
           {/* Groups List */}
-          <ScrollView className="max-h-[300px]">
+          <ScrollView
+            className="max-h-[300px]"
+            refreshControl={
+              onRefresh ? (
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#2979FF"]} />
+              ) : undefined
+            }
+          >
             {groups.length === 0 ? (
               <View className="items-center py-5">
                 <Feather name="users" size={32} color="#ccc" />
