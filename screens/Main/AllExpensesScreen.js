@@ -436,7 +436,6 @@ const AllExpensesScreen = () => {
         />
       </View>
       {renderPaginationInfo()}
-      {renderEmptyState()}
       {loading && expenses.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2979FF" />
