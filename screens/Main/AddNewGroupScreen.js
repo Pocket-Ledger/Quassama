@@ -92,9 +92,9 @@ const AddNewGroupScreen = () => {
     if (!groupName.trim()) {
       newErrors.groupName = t('addGroup.errors.group_name_required');
     }
-    if (selectedMembers.length === 0) {
+/*     if (selectedMembers.length === 0) {
       newErrors.members = t('addGroup.errors.members_required');
-    }
+    } */
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
