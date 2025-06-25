@@ -692,6 +692,9 @@ class Expense {
    */
   static async filterExpenses(groupId, startDate = null, endDate = null, categories = [], minAmount = null, maxAmount = null) {
     try {
+      if(categories) {
+        console.log('Filtering by categories:', categories);
+      }
       
       // Start with base query filtering by groupId
       let expenseQuery = query(
@@ -711,6 +714,7 @@ class Expense {
       // Apply category filter if provided
       if (categories && categories.length > 0) {
         expenseQuery = query(expenseQuery, where('category', 'in', categories));
+        console.log('Filtering by categories:', categories);
       }
 
       // Apply amount range filters if provided

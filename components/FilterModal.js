@@ -37,6 +37,7 @@ const FilterModal = ({
       categories: localFilter?.selectedCategories,
       minAmount: localFilter.amountRange.selectedMin,
       maxAmount: localFilter.amountRange.selectedMax,
+      checkedFilter: true,
     };
     console.log('===============================================');
     console.log('finalFilter', finalFilter);
@@ -52,6 +53,9 @@ const FilterModal = ({
       selectedGroup: groups[0]?.id || '',
       customStartDate: null,
       customEndDate: null,
+      checkedFilter: false,
+      startDate: null,
+      endDate: null,
     };
     setLocalFilter(resetFilter);
 
@@ -63,7 +67,7 @@ const FilterModal = ({
   };
 
   const toggleCategory = (categoryId) => {
-    const category = categories.find((cat) => cat.id === categoryId);
+    /* const category = categories.find((cat) => cat.id === categoryId);
 
     if (!category) {
       console.warn(`Category with ID ${categoryId} not found`);
@@ -84,7 +88,14 @@ const FilterModal = ({
         ...prev,
         selectedCategories: newSelectedCategories,
       };
-    });
+    }); */
+
+    setLocalFilter((prev) => ({
+      ...prev,
+      selectedCategories: prev.selectedCategories.includes(categoryId)
+        ? prev.selectedCategories.filter((id) => id !== categoryId)
+        : [...prev.selectedCategories, categoryId],
+    }));
   };
 
   const handleRangeSelect = (range) => {
@@ -144,7 +155,7 @@ const FilterModal = ({
                 {t('filters.categories.title')}
               </Text>
               <View className="flex-row flex-wrap justify-between gap-1">
-                {categories.map((category) => (
+                {/* {categories.map((category) => (
                   <TouchableOpacity
                     key={category.id}
                     className="mb-4 items-center"
@@ -168,6 +179,35 @@ const FilterModal = ({
                     <Text
                       className={`text-sm font-medium ${
                         localFilter.selectedCategories.includes(category.name)
+                          ? 'text-primary'
+                          : 'text-gray-600'
+                      }`}>
+                      {t(`categories.${category.name.toLowerCase()}`)}
+                    </Text>
+                  </TouchableOpacity>
+                ))} */}
+                {categories.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    className="mb-4 items-center"
+                    onPress={() => toggleCategory(category.id)}>
+                    <View
+                      className={`mb-2 h-12 w-12 items-center justify-center rounded-full ${
+                        localFilter.selectedCategories.includes(category.id)
+                          ? 'bg-primary'
+                          : 'bg-primary-50'
+                      }`}>
+                      <Feather
+                        name={category.icon}
+                        size={20}
+                        color={
+                          localFilter.selectedCategories.includes(category.id) ? 'white' : '#2979FF'
+                        }
+                      />
+                    </View>
+                    <Text
+                      className={`text-sm font-medium ${
+                        localFilter.selectedCategories.includes(category.id)
                           ? 'text-primary'
                           : 'text-gray-600'
                       }`}>
