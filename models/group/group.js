@@ -150,6 +150,38 @@ class Group{
         }
     }
 
+    /**
+     * Function to delete a group
+     * @param {string} groupId - The ID of the group to delete
+     * @param {string} currentUserId - The ID of the user attempting to delete
+     * @returns {Promise<void>}
+     */
+    static async deleteGroup(groupId, currentUserId){
+        try {
+            if(!groupId || !currentUserId){
+                throw new Error('Group ID and current user ID are required');
+            }
+            // only the creator of the group can delete it
+            const groupRef = doc(db, "groups", groupId);
+            const groupSnap = await getDoc(groupRef);
+            if (!groupSnap.exists()) {
+                throw new Error('Group not found');
+            }
+            const groupData = groupSnap.data();
+            if (groupData.created_by !== currentUserId) {
+                throw new Error('Only the group admin can delete this group');
+            }
+            await updateDoc(groupRef, {
+                members: [],
+                memberIds: [],
+            });
+            console.log(`Group ${groupId} deleted successfully`);
+        } catch (error) {
+            console.error("Error deleting group:", error);
+            throw error;
+        }
+    }
+
 
     
 }

@@ -96,7 +96,7 @@ class Expense {
         const members = group.members || [];
         await Promise.all(
           members.map(async (m) => {
-            if (m.id !== this.user_id) {
+            if (m && m.id && m.id !== this.user_id) {
               const notif = new Notification(
                 this.user_id,
                 m.id,

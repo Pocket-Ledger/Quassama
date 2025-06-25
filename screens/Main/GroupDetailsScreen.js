@@ -20,6 +20,7 @@ import User from 'models/auth/user';
 import { extractHourAndMinute, extractHourMinutePeriod } from 'utils/time';
 import FloatingPlusButton from 'components/FloatingPlusButton';
 import { useTranslation } from 'react-i18next';
+import { getAuth } from 'firebase/auth';
 
 const LIMIT = 5; // Limit for recent expenses
 
@@ -80,6 +81,7 @@ const GroupDetailsScreen = () => {
               youPaid: data.youPaid,
               youOwe: data.youOwe,
               members: data.members || [],
+              created_by: data.created_by,
             });
           }
 
@@ -170,17 +172,21 @@ const GroupDetailsScreen = () => {
   const handleEditGroup = () => {
     navigation.navigate('EditGroup', { groupId });
   };
+  const auth = getAuth();
+  const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="container">
         <Header
           title={name}
           rightIcon={
-            <TouchableOpacity
-              onPress={handleEditGroup}
-              className="h-10 w-10 items-center justify-center rounded-full bg-primary">
-              <Feather name="settings" size={20} color="#ffff" />
-            </TouchableOpacity>
+            groupData && groupData.created_by === currentUserId ? (
+              <TouchableOpacity
+                onPress={handleEditGroup}
+                className="h-10 w-10 items-center justify-center rounded-full bg-primary">
+                <Feather name="settings" size={20} color="#ffff" />
+              </TouchableOpacity>
+            ) : null
           }
         />
 

@@ -102,15 +102,21 @@ const NewExpenseScreen = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const getCategoryIconName = (categoryId) => {
+    const cat = DEFAULT_CATEGORIES.find((c) => c.id === categoryId || c.name === categoryId);
+    return cat ? cat.icon : '';
+  };
+
   const handleAddExpense = async () => {
     if (!validateForm()) return;
 
     setIsSaving(true);
     try {
+      const iconName = getCategoryIconName(selectedCategory);
       const expense = new Expense(
         expenseName.trim(), // title
         amount.trim(), // amount
-        selectedCategory, // category
+        iconName, // category (icon name instead of id)
         note.trim(), // note/description
         selectedGroup // group_id
       );
