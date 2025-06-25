@@ -13,6 +13,7 @@ import { auth } from 'firebase';
 import SwitchGroupModal from 'components/SwitchGroupModal';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Notification from 'models/notifications/notifications';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -61,6 +62,9 @@ const HomeScreen = () => {
   // State for pull-to-refresh
   const [refreshing, setRefreshing] = useState(false);
   const [refreshingGroups, setRefreshingGroups] = useState(false);
+
+  // State for unread notifications count
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Function to fetch expense overview
   const fetchExpenseOverview = useCallback(async () => {
@@ -134,6 +138,16 @@ const HomeScreen = () => {
     }
   }, [selectedGroup]);
 
+  // Fetch unread notifications count
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const count = await Notification.countUnreadNotifications();
+      setUnreadCount(count);
+    } catch (e) {
+      setUnreadCount(0);
+    }
+  }, []);
+
   // Pull-to-refresh handler
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -142,13 +156,14 @@ const HomeScreen = () => {
         fetchRecentlyActivity(),
         fetchExpenseOverview(),
         fetchBalances(),
+        fetchUnreadCount(),
       ]);
     } catch (error) {
       console.error('Error during refresh:', error);
     } finally {
       setRefreshing(false);
     }
-  }, [fetchRecentlyActivity, fetchExpenseOverview, fetchBalances]);
+  }, [fetchRecentlyActivity, fetchExpenseOverview, fetchBalances, fetchUnreadCount]);
 
   // Refresh groups handler
   const refreshGroups = useCallback(async () => {
@@ -174,10 +189,11 @@ const HomeScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
+      fetchUnreadCount();
       fetchRecentlyActivity();
       fetchExpenseOverview();
       fetchBalances();
-    }, [fetchRecentlyActivity, fetchExpenseOverview, fetchBalances])
+    }, [fetchRecentlyActivity, fetchExpenseOverview, fetchBalances, fetchUnreadCount])
   );
 
   useEffect(() => {
@@ -335,7 +351,11 @@ const HomeScreen = () => {
         </View>
         <TouchableOpacity className="relative" onPress={() => navigation.navigate('Notifications')}>
           <Feather name="bell" size={24} color="#666" />
-          <View className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-red-500" />
+          {unreadCount > 0 && (
+            <View className="absolute -right-1 -top-1 min-h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
+              <Text className="text-xs font-bold text-white">{unreadCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 

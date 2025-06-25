@@ -109,6 +109,58 @@ class Notification{
             throw new Error('Failed to mark notification as read');
         }
     }
+
+    /**
+     * function to check if there any unread notifications for the current user
+     * @returns {Promise<boolean>}
+     */
+    static async hasUnreadNotifications() {
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            throw new Error('No authenticated user found');
+        }
+        const db = getFirestore();
+        const notificationsRef = collection(db, 'notifications');
+        const q = query(
+            notificationsRef,
+            where('receiver_id', '==', currentUser.uid),
+            where('read', '==', false)
+        );
+        try {
+            const querySnapshot = await getDocs(q);
+            return !querySnapshot.empty; // Returns true if there are unread notifications
+        } catch (error) {
+            console.error('Error checking unread notifications:', error);
+            throw new Error('Failed to check unread notifications');
+        }
+    }
+
+    /**
+     * function to count unread notifications for the current user
+     * @returns {Promise<number>}
+     */
+    static async countUnreadNotifications() {
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            throw new Error('No authenticated user found');
+        }
+        const db = getFirestore();
+        const notificationsRef = collection(db, 'notifications');
+        const q = query(
+            notificationsRef,
+            where('receiver_id', '==', currentUser.uid),
+            where('read', '==', false)
+        );
+        try {
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.size; // Returns the count of unread notifications
+        } catch (error) {
+            console.error('Error counting unread notifications:', error);
+            throw new Error('Failed to count unread notifications');
+        }
+    }
 }
 
 export default Notification;

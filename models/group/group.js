@@ -21,14 +21,16 @@ class Group{
     }
 
     // function to create the group and save it to firebase collection groups
-    async creatGroup(name, created_by, currency, members, description) {
-        const memberIds = members.map(m => (typeof m === 'string' ? m : m.id));
+    async creatGroup(name, created_by, currency, members = [], description) {
+        // If no members provided, only add the creator as a member
+        let finalMembers = members && members.length > 0 ? members : [created_by];
+        const memberIds = finalMembers.map(m => (typeof m === 'string' ? m : m.id || m.user_id || m));
 
         const groupData = {
             name,
             created_by,
             currency,
-            members,
+            members: finalMembers,
             memberIds,
             created_at: new Date().toISOString(),
             description,
