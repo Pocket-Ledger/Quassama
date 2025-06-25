@@ -364,7 +364,7 @@ const HomeScreen = () => {
             </View>
           </TouchableOpacity>
           <View>
-            <Text className="text-sm font-normal text-gray-500">{getDynamicGreeting()}</Text>{' '}
+            <Text className="text-sm font-normal text-gray-500">{getDynamicGreeting()}</Text>
             {isLoadingUser ? (
               <>
                 <View className="mb-2 h-6 w-48 rounded bg-gray-100" />

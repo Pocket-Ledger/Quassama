@@ -6,11 +6,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   SafeAreaView,
   Modal,
   FlatList,
+  Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
@@ -176,10 +177,15 @@ const NewExpenseScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView
-        className="container "
+      <KeyboardAwareScrollView
+        className="container"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 50 : 100}
+        keyboardOpeningTime={0}>
         <Header title={t('expense.addExpense')} />
 
         <View className="flex-1 gap-6 px-4">
@@ -292,6 +298,8 @@ const NewExpenseScreen = () => {
               multiline
               textAlignVertical="top"
               autoCapitalize="sentences"
+              blurOnSubmit={false}
+              returnKeyType="done"
             />
           </View>
 
@@ -305,7 +313,7 @@ const NewExpenseScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Group Selection Modal */}
       <Modal
