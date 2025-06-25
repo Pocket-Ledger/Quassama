@@ -8,7 +8,6 @@ import CustomDateRangePicker from './CustomDateRangePicker ';
 const FilterDateRange = ({
   selectedRange,
   onRangeSelect,
-  ranges = [],
   showCustomDate = true,
   customStartDate,
   customEndDate,
@@ -16,6 +15,25 @@ const FilterDateRange = ({
 }) => {
   const { t } = useTranslation();
   const [showCustomPicker, setShowCustomPicker] = useState(false);
+
+  const dateRanges = [
+    {
+      label: t('filters.dateRanges.today'),
+      value: 'today',
+    },
+    {
+      label: t('filters.dateRanges.last7Days'),
+      value: 'last7Days',
+    },
+    {
+      label: t('filters.dateRanges.last30Days'),
+      value: 'last30Days',
+    },
+    {
+      label: t('filters.dateRanges.thisMonth'),
+      value: 'thisMonth',
+    },
+  ];
 
   const handleCustomDatePress = () => {
     setShowCustomPicker(true);
@@ -44,18 +62,20 @@ const FilterDateRange = ({
           {t('filters.dateRange.title')}
         </Text>
         <View className="flex-row flex-wrap gap-2">
-          {ranges.map((range) => (
+          {dateRanges.map((range) => (
             <TouchableOpacity
-              key={range}
+              key={range.value}
               className={`rounded-lg border px-4 py-2 ${
-                selectedRange === range ? 'border-primary bg-primary' : 'border-gray-200 bg-gray-50'
+                selectedRange === range.value
+                  ? 'border-primary bg-primary'
+                  : 'border-gray-200 bg-gray-50'
               }`}
-              onPress={() => onRangeSelect(range)}>
+              onPress={() => onRangeSelect(range.value)}>
               <Text
                 className={`text-sm font-medium ${
-                  selectedRange === range ? 'text-white' : 'text-gray-600'
+                  selectedRange === range.value ? 'text-white' : 'text-gray-600'
                 }`}>
-                {range}
+                {range.label}
               </Text>
             </TouchableOpacity>
           ))}

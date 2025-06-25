@@ -20,16 +20,7 @@ const FilterModal = ({
   const { t } = useTranslation();
   const [localFilter, setLocalFilter] = useState(initialFilter);
 
-  const dateRanges = [
-    t('filters.dateRanges.today'),
-    t('filters.dateRanges.last7Days'),
-    t('filters.dateRanges.last30Days'),
-    t('filters.dateRanges.thisMonth'),
-  ];
-
   const handleApplyFilter = () => {
-    console.log('localFilter', localFilter);
-
     const finalFilter = {
       startDate: localFilter.dateRange === 'custom' ? localFilter.customStartDate : null,
       endDate: localFilter.dateRange === 'custom' ? localFilter.customEndDate : null,
@@ -143,7 +134,6 @@ const FilterModal = ({
             <FilterDateRange
               selectedRange={localFilter.dateRange}
               onRangeSelect={handleRangeSelect}
-              ranges={dateRanges}
               customStartDate={localFilter.customStartDate}
               customEndDate={localFilter.customEndDate}
               onCustomDateChange={handleCustomDateChange}
@@ -158,7 +148,7 @@ const FilterModal = ({
                 {/* {categories.map((category) => (
                   <TouchableOpacity
                     key={category.id}
-                    className="mb-4 items-center"
+                    className="items-center mb-4"
                     onPress={() => toggleCategory(category.id)}>
                     <View
                       className={`mb-2 h-12 w-12 items-center justify-center rounded-full ${
