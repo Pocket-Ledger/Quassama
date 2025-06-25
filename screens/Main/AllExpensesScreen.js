@@ -128,6 +128,8 @@ const AllExpensesScreen = () => {
         let result;
 
         if (useFilter && checkedFilter && appliedFilterConfig.checkedFilter) {
+          console.log("\n\n\n\n");
+          console.log('Using filter for expenses:', useFilter);
           // Use filter function
           const { startDate, endDate } = getDateRangeFromFilter(appliedFilterConfig);
           console.log('\n\n\nLoading filtered expenses:');
@@ -136,10 +138,11 @@ const AllExpensesScreen = () => {
             groupId,
             startDate,
             endDate,
-            useFilter.selectedCategories,
+            appliedFilterConfig.selectedCategories,
             appliedFilterConfig.amountRange?.selectedMin || null,
             appliedFilterConfig.amountRange?.selectedMax || null
           );
+          console.log(appliedFilterConfig.selectedCategories);
 
           // For filtered results, we don't have pagination from backend
           // So we handle it manually

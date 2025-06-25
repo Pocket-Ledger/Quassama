@@ -34,7 +34,7 @@ const FilterModal = ({
       startDate: localFilter.dateRange === 'custom' ? localFilter.customStartDate : null,
       endDate: localFilter.dateRange === 'custom' ? localFilter.customEndDate : null,
       dateRange: localFilter.dateRange,
-      categories: localFilter?.selectedCategories,
+      selectedCategories: localFilter?.selectedCategories,
       minAmount: localFilter.amountRange.selectedMin,
       maxAmount: localFilter.amountRange.selectedMax,
       checkedFilter: true,
