@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import Logger from 'utils/looger';
 import Expense from 'models/expense/Expense';
+import Favorites from 'models/group/favorites';
 
 // A little card just for one invitation
 const InvitationCard = ({ invitation, onAccept, onDecline }) => {
@@ -78,8 +79,22 @@ const GroupsScreen = () => {
   const [invitations, setInvitations] = useState([]);
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const [groupTotal, setGroupTotal] = useState(0);
+  const [favoriteGroupIds, setFavoriteGroupIds] = useState([]);
 
   const user = auth.currentUser.uid;
+
+  // Fetch favorites on mount
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const favorites = await Favorites.getFavoritesByUser(user);
+        setFavoriteGroupIds(favorites.map(fav => fav.groupId));
+      } catch (e) {
+        console.error('Error fetching favorites:', e);
+      }
+    };
+    fetchFavorites();
+  }, [user]);
 
   useFocusEffect(
     useCallback(() => {
@@ -133,9 +148,18 @@ const GroupsScreen = () => {
     navigation.navigate('GroupDetails', { groupId: group.id });
   };
 
-  const handleStarPress = (groupId) => {
-    console.log('Toggle star for group:', groupId);
-    // Update the groups data state here
+  const handleStarPress = async (groupId) => {
+    try {
+      if (!favoriteGroupIds.includes(groupId)) {
+        await Favorites.addFavorite(groupId, user);
+        setFavoriteGroupIds(prev => [...prev, groupId]);
+      } else {
+        await Favorites.removeFavorite(groupId, user);
+        setFavoriteGroupIds(prev => prev.filter(id => id !== groupId));
+      }
+    } catch (e) {
+      console.error('Error toggling favorite:', e);
+    }
   };
 
   const userId = getAuth().currentUser.uid;
@@ -221,6 +245,11 @@ const GroupsScreen = () => {
     // eslint-disable-next-line
   }, [isLoadingGroups]);
 
+  // Sort groups: favorites first, then others
+  const favoriteGroups = groups.filter(g => favoriteGroupIds.includes(g.id));
+  const nonFavoriteGroups = groups.filter(g => !favoriteGroupIds.includes(g.id));
+  const sortedGroups = [...favoriteGroups, ...nonFavoriteGroups];
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="container">
@@ -263,7 +292,7 @@ const GroupsScreen = () => {
             </View>
           ) : groups.length > 0 ? (
             <GroupsList
-              groups={groups.map((g) => ({
+              groups={sortedGroups.map((g) => ({
                 id: g.id,
                 name: g.name,
                 members: g.members || [],
@@ -271,7 +300,7 @@ const GroupsScreen = () => {
                 amount: g.amount || `0 ${t('common.currency')}`,
                 lastExpense: g.lastExpense || t('group.noExpensesYet'),
                 time: g.time || '',
-                isStarred: g.isStarred || false,
+                isStarred: favoriteGroupIds.includes(g.id),
               }))}
               onGroupPress={handleGroupPress}
               onStarPress={handleStarPress}

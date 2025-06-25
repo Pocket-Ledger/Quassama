@@ -12,6 +12,7 @@ import Group from 'models/group/group';
 import { auth } from 'firebase';
 import SwitchGroupModal from 'components/SwitchGroupModal';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -180,40 +181,38 @@ const HomeScreen = () => {
   );
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndGroups = async () => {
       setIsLoadingUser(true);
       try {
-        const userDetails = auth.currentUser.uid;
+        const userId = auth.currentUser.uid;
+        // Use the new model method to fetch user and groups
+        const { user: userDetails, groups: userGroups } = await Group.getUserAndGroups(userId, User.getUserDetails);
         setUser(userDetails);
-        console.log('User ID:', userDetails);
-        const userGroups = await Group.getGroupsByUser(userDetails);
         setGroups(userGroups);
-        console.log('User Groups:', userGroups);
-
-        // Set initial group if groups exist
-        if (userGroups.length > 0) {
-          const firstGroup = userGroups[0];
-          setSelectedGroup(firstGroup.id);
-          setGroupName(firstGroup.name);
-
-          // Fetch members for the first group
-          const members = await Group.getMembersByGroup(firstGroup.id);
+        let initialGroupId = null;
+        let initialGroupName = t('home.noGroupSet');
+        // Try to restore selected group from storage
+        const storedGroupId = await AsyncStorage.getItem('selectedGroupId');
+        if (storedGroupId && userGroups.some(g => String(g.id) === storedGroupId)) {
+          initialGroupId = storedGroupId;
+          const foundGroup = userGroups.find(g => String(g.id) === storedGroupId);
+          if (foundGroup) initialGroupName = foundGroup.name;
+        } else if (userGroups.length > 0) {
+          initialGroupId = userGroups[0].id;
+          initialGroupName = userGroups[0].name;
+        }
+        setSelectedGroup(initialGroupId);
+        setGroupName(initialGroupName);
+        if (initialGroupId) {
+          // Fetch members and recent activity for the selected group
+          const members = await Group.getMembersByGroup(initialGroupId);
           setGroupMembers(members);
-
-          // Fetch recent activity for the first group
-          const recentActivity = await Expense.getExpensesByGroupWithLimit(firstGroup.id, 3);
+          const recentActivity = await Expense.getExpensesByGroupWithLimit(initialGroupId, 3);
           setRecentlyActivity(recentActivity);
-
-          // Transform the data to include usernames
           const transformedData = await Promise.all(
             recentActivity.map((item) => transformExpenseData(item))
           );
           setTransformedRecentActivity(transformedData);
-
-          console.log('Group Members:', members);
-          console.log('Initial Group Activity:', recentActivity);
-        } else {
-          setGroupName(t('home.noGroupSet'));
         }
       } catch (error) {
         console.error(error);
@@ -221,15 +220,16 @@ const HomeScreen = () => {
         setIsLoadingUser(false);
       }
     };
-    fetchUser();
+    fetchUserAndGroups();
   }, [t]);
 
-  // Function to handle group selection
+  // When user switches group, store it in AsyncStorage
   const handleGroupSelection = async (groupId, groupName) => {
     try {
       setSelectedGroup(groupId);
       setGroupName(groupName);
       setShowGroupModal(false);
+      await AsyncStorage.setItem('selectedGroupId', String(groupId));
 
       // Fetch members for the selected group
       const members = await Group.getMembersByGroup(groupId);

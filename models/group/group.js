@@ -1,6 +1,7 @@
 import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion, getDoc } from "firebase/firestore";
 import { app, db } from "../../firebase";
 import Notification from "models/notifications/notifications";
+import User from '../auth/user';
 
 class Group{
     name;
@@ -92,7 +93,28 @@ class Group{
    */
     static async getMembersByGroup(groupId) {
         const { members = [] } = await this.getGroupById(groupId);
-        return members;
+        // If members are objects with user_id, extract the IDs
+        const memberIds = members.map(m => (typeof m === 'string' ? m : m.user_id || m.id || m));
+        // Remove duplicate IDs
+        const uniqueMemberIds = Array.from(new Set(memberIds));
+        // Fetch user details for each unique member
+        const userDetailsList = await Promise.all(
+            uniqueMemberIds.map(async (userId) => {
+            try {
+                const usersCol = collection(db, 'users');
+                const q = query(usersCol, where('user_id', '==', userId));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                const doc = snap.docs[0];
+                return { id: doc.id, ...doc.data() };
+                }
+                return { id: userId, username: 'Unknown', email: '', user_id: userId };
+            } catch (e) {
+                return { id: userId, username: 'Unknown', email: '', user_id: userId };
+            }
+            })
+        );
+        return userDetailsList;
     }
 
 
@@ -182,8 +204,17 @@ class Group{
         }
     }
 
-
-    
+    /**
+     * Fetch user details and their groups in one call
+     * @param {string} userId
+     * @param {function} getUserDetails - function to get user details
+     * @returns {Promise<{user: any, groups: any[]}>}
+     */
+    static async getUserAndGroups(userId, getUserDetails) {
+        const user = await getUserDetails();
+        const groups = await this.getGroupsByUser(userId);
+        return { user, groups };
+    }
 }
 
 export default Group;
