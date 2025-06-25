@@ -235,7 +235,7 @@ const GroupDetailsScreen = () => {
                   const formattedBalance = formatBalance(memberBalance);
 
                   return (
-                    <View key={member.id ?? `member-${idx}`} className="mr-4 items-center">
+                    <View key={member.id || `member-${idx}-${member.name || 'unknown'}`} className="mr-4 items-center">
                       <Avatar
                         initial={member.initial}
                         name={member.name}
