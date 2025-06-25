@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Logo, SmallLogo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
+import ResetPassword from 'models/auth/ResetPassword';
 
 const OTPVerificationScreen = () => {
   const { t } = useTranslation();
@@ -56,22 +57,27 @@ const OTPVerificationScreen = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Simulate wrong code for demo
-      if (enteredCode === '2528') {
-        setHasError(true);
-        // Reset code
-        setCode(['', '', '', '']);
-        inputRefs.current[0]?.focus();
-      } else {
-        console.log('Code verified successfully');
-        // Navigate to ResetPasswordScreen here
-      }
+      await ResetPassword.verifyCode(enteredCode);
+      // Code verified, navigate to ResetPasswordScreen
+      Alert.alert(
+        t('customAlert.titles.success'),
+        t('passwordRecovery.otpVerification.successMessage'),
+        [
+          {
+            text: t('customAlert.buttons.ok'),
+            onPress: () => console.log('Navigate to ResetPasswordScreen'),
+          },
+        ]
+      );
+      // TODO: Navigate to ResetPasswordScreen, pass code if needed
     } catch (error) {
-      console.error('Code verification failed:', error);
       setHasError(true);
+      setCode(['', '', '', '']);
+      inputRefs.current[0]?.focus();
+      Alert.alert(
+        t('customAlert.titles.error'),
+        error.message || t('passwordRecovery.otpVerification.wrongCode')
+      );
     } finally {
       setIsLoading(false);
     }

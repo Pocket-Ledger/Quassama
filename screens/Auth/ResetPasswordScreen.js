@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
+import ResetPassword from 'models/auth/ResetPassword';
 
 const ResetPasswordScreen = () => {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ const ResetPasswordScreen = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState(''); // Add this if you want to receive the code via navigation params
 
   const validateForm = () => {
     const newErrors = {};
@@ -50,9 +52,8 @@ const ResetPasswordScreen = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Password reset successfully');
+      // You need to get the code from navigation params or state
+      await ResetPassword.resetPassword(code, newPassword);
       Alert.alert(
         t('customAlert.titles.success'),
         t('passwordRecovery.resetPassword.successMessage'),
@@ -64,7 +65,10 @@ const ResetPasswordScreen = () => {
         ]
       );
     } catch (error) {
-      console.error('Failed to reset password:', error);
+      Alert.alert(
+        t('customAlert.titles.error'),
+        error.message || t('passwordRecovery.resetPassword.errorMessage')
+      );
     } finally {
       setIsLoading(false);
     }

@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
+import ResetPassword from 'models/auth/ResetPassword';
 
 // Forget Password Screen
 const ForgetPasswordScreen = () => {
@@ -38,12 +39,23 @@ const ForgetPasswordScreen = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Password reset code sent to:', email);
-      // Navigate to EnterCodeScreen here
+      await ResetPassword.initiatePasswordReset(email);
+      Alert.alert(
+        t('customAlert.titles.success'),
+        t('passwordRecovery.forgetPassword.successMessage'),
+        [
+          {
+            text: t('customAlert.buttons.ok'),
+            onPress: () => console.log('Navigate to OTP verification'),
+          },
+        ]
+      );
+      // TODO: Navigate to OTPVerificationScreen, pass email if needed
     } catch (error) {
-      console.error('Failed to send reset code:', error);
+      Alert.alert(
+        t('customAlert.titles.error'),
+        error.message || t('passwordRecovery.forgetPassword.errorMessage')
+      );
     } finally {
       setIsLoading(false);
     }

@@ -2,235 +2,158 @@ import {
   sendPasswordResetEmail, 
   confirmPasswordReset, 
   verifyPasswordResetCode,
-  checkActionCode 
+  checkActionCode,
+  fetchSignInMethodsForEmail
 } from "firebase/auth";
-import { auth } from "firebase";
+import { auth } from '../../firebase';
 
 class ResetPassword {
+
   /**
-   * Send password reset email to user
-   * @param {string} email - User's email address
-   * @returns {Promise<{success: boolean, message: string, error?: any}>}
+   * Function to check if the email exists in Firebase Auth.
+   * @param {string} email - The email address to check.
+   * @returns {Promise<boolean>} - Resolves with true if the email exists, false otherwise.
    */
-  static async sendResetEmail(email) {
+  static async checkEmailExists(email) {
     try {
-      if (!email || !this.isValidEmail(email)) {
-        return {
-          success: false,
-          message: "Please provide a valid email address",
-          error: "INVALID_EMAIL"
-        };
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      console.log('Sign-in methods for', email, ':', signInMethods);
+      // Only allow password reset for email/password accounts
+      if (signInMethods.includes('password')) {
+        return true;
+      } else if (signInMethods.length > 0) {
+        throw new Error('This account was registered with a different sign-in method (e.g., Google, Facebook). Please use that method to sign in.');
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('Error checking email existence:', error);
+      throw new Error('Failed to check email existence');
+    }
+  }
+
+  /**
+   * Function to send a verification code to the email address using firebase auth.
+   * @param {string} email - The email address to send the verification code to.
+   * @returns {Promise<void>} - Resolves if the email is sent successfully, rejects otherwise.
+   */
+  static async sendVerificationCode(email) {
+    try {
+      // First check if email exists
+      const emailExists = await this.checkEmailExists(email);
+      if (!emailExists) {
+        throw new Error("No user found with this email address");
       }
 
       await sendPasswordResetEmail(auth, email, {
-        // Optional: Custom action code settings
-        url: 'https://yourapp.com/login', // Redirect URL after password reset
-        handleCodeInApp: false, // Set to true if you want to handle the reset in your app
+        // Optional: You can customize the email template
+        // url: 'https://your-app.com/reset-password',
+        handleCodeInApp: false
       });
-
-      return {
-        success: true,
-        message: `Password reset email sent to ${email}. Please check your inbox.`,
-      };
-
-    } catch (error) {
-      console.error("Failed to send reset email:", error);
       
-      const errorResponse = this.handleFirebaseError(error);
-      return {
-        success: false,
-        message: errorResponse.message,
-        error: errorResponse.code
-      };
+      console.log("Password reset email sent successfully");
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+      throw error;
     }
   }
 
   /**
-   * Verify password reset code (optional - for custom implementation)
-   * @param {string} code - Password reset code from email
-   * @returns {Promise<{success: boolean, email?: string, message: string, error?: any}>}
+   * Function to verify the code sent to the email address.
+   * @param {string} code - The verification code sent to the email address.
+   * @returns {Promise<string>} - Resolves with the email if the code is valid, rejects otherwise
    */
-  static async verifyResetCode(code) {
+  static async verifyCode(code) {
     try {
-      if (!code) {
-        return {
-          success: false,
-          message: "Reset code is required",
-          error: "INVALID_CODE"
-        };
-      }
-
+      // Verify the password reset code and get the email
       const email = await verifyPasswordResetCode(auth, code);
-      
-      return {
-        success: true,
-        email: email,
-        message: "Reset code verified successfully",
-      };
-
+      return email;
     } catch (error) {
-      console.error("Failed to verify reset code:", error);
+      console.error("Error verifying reset code:", error);
       
-      const errorResponse = this.handleFirebaseError(error);
-      return {
-        success: false,
-        message: errorResponse.message,
-        error: errorResponse.code
-      };
+      // Handle specific error codes
+      switch (error.code) {
+        case 'auth/expired-action-code':
+          throw new Error("Reset code has expired. Please request a new one.");
+        case 'auth/invalid-action-code':
+          throw new Error("Invalid reset code. Please check and try again.");
+        case 'auth/user-disabled':
+          throw new Error("User account has been disabled.");
+        case 'auth/user-not-found':
+          throw new Error("No user found with this email address.");
+        default:
+          throw new Error("Failed to verify reset code");
+      }
     }
   }
 
   /**
-   * Confirm password reset with new password (optional - for custom implementation)
-   * @param {string} code - Password reset code from email
-   * @param {string} newPassword - New password
-   * @returns {Promise<{success: boolean, message: string, error?: any}>}
+   * Function to reset the password with the verification code and new password
+   * @param {string} code - The verification code sent to the email address.
+   * @param {string} newPassword - The new password to set.
+   * @returns {Promise<void>} - Resolves if password is reset successfully, rejects otherwise.
    */
-  static async confirmReset(code, newPassword) {
+  static async resetPassword(code, newPassword) {
     try {
-      if (!code || !newPassword) {
-        return {
-          success: false,
-          message: "Reset code and new password are required",
-          error: "MISSING_PARAMETERS"
-        };
-      }
-
-      if (!this.isValidPassword(newPassword)) {
-        return {
-          success: false,
-          message: "Password must be at least 6 characters long",
-          error: "WEAK_PASSWORD"
-        };
+      // Validate password strength (optional - add your own validation)
+      if (newPassword.length < 6) {
+        throw new Error("Password must be at least 6 characters long");
       }
 
       await confirmPasswordReset(auth, code, newPassword);
-      
-      return {
-        success: true,
-        message: "Password reset successfully. You can now log in with your new password.",
-      };
-
+      console.log("Password reset successfully");
     } catch (error) {
-      console.error("Failed to confirm password reset:", error);
+      console.error("Error resetting password:", error);
       
-      const errorResponse = this.handleFirebaseError(error);
-      return {
-        success: false,
-        message: errorResponse.message,
-        error: errorResponse.code
-      };
+      // Handle specific error codes
+      switch (error.code) {
+        case 'auth/expired-action-code':
+          throw new Error("Reset code has expired. Please request a new one.");
+        case 'auth/invalid-action-code':
+          throw new Error("Invalid reset code. Please check and try again.");
+        case 'auth/weak-password':
+          throw new Error("Password is too weak. Please choose a stronger password.");
+        case 'auth/user-disabled':
+          throw new Error("User account has been disabled.");
+        case 'auth/user-not-found':
+          throw new Error("No user found with this email address.");
+        default:
+          throw new Error("Failed to reset password");
+      }
     }
   }
 
   /**
-   * Check if action code is valid and get info about it
-   * @param {string} code - Action code from email
-   * @returns {Promise<{success: boolean, info?: any, message: string, error?: any}>}
+   * Function to check action code info (optional utility method)
+   * @param {string} code - The action code to check.
+   * @returns {Promise<object>} - Resolves with action code info.
    */
-  static async checkResetCode(code) {
+  static async checkActionCodeInfo(code) {
     try {
       const info = await checkActionCode(auth, code);
-      
       return {
-        success: true,
-        info: {
-          operation: info.operation,
-          email: info.data.email,
-        },
-        message: "Action code is valid",
+        operation: info.operation,
+        email: info.data.email,
+        previousEmail: info.data.previousEmail
       };
-
     } catch (error) {
-      console.error("Failed to check action code:", error);
-      
-      const errorResponse = this.handleFirebaseError(error);
-      return {
-        success: false,
-        message: errorResponse.message,
-        error: errorResponse.code
-      };
+      console.error("Error checking action code:", error);
+      throw new Error("Invalid or expired action code");
     }
   }
 
   /**
-   * Validate email format
-   * @param {string} email 
-   * @returns {boolean}
+   * Complete password reset flow - combines verification and reset
+   * @param {string} email - The email address to send reset email to.
+   * @returns {Promise<void>} - Resolves when reset email is sent.
    */
-  static isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  /**
-   * Validate password strength
-   * @param {string} password 
-   * @returns {boolean}
-   */
-  static isValidPassword(password) {
-    return password && password.length >= 6;
-  }
-
-  /**
-   * Handle Firebase authentication errors
-   * @param {any} error - Firebase error object
-   * @returns {{code: string, message: string}}
-   */
-  static handleFirebaseError(error) {
-    const errorCode = error.code;
-    let message = "An unexpected error occurred. Please try again.";
-
-    switch (errorCode) {
-      case 'auth/user-not-found':
-        message = "No account found with this email address.";
-        break;
-      case 'auth/invalid-email':
-        message = "Please enter a valid email address.";
-        break;
-      case 'auth/too-many-requests':
-        message = "Too many requests. Please try again later.";
-        break;
-      case 'auth/network-request-failed':
-        message = "Network error. Please check your connection and try again.";
-        break;
-      case 'auth/invalid-action-code':
-        message = "Invalid or expired reset code. Please request a new one.";
-        break;
-      case 'auth/expired-action-code':
-        message = "Reset code has expired. Please request a new one.";
-        break;
-      case 'auth/weak-password':
-        message = "Password is too weak. Please choose a stronger password.";
-        break;
-      case 'auth/user-disabled':
-        message = "This account has been disabled. Please contact support.";
-        break;
-      default:
-        message = error.message || message;
-        break;
+  static async initiatePasswordReset(email) {
+    try {
+      await this.sendVerificationCode(email);
+      return "Password reset email sent. Please check your inbox.";
+    } catch (error) {
+      throw error;
     }
-
-    return {
-      code: errorCode,
-      message: message
-    };
-  }
-
-  /**
-   * Get current authenticated user
-   * @returns {any|null}
-   */
-  static getCurrentUser() {
-    return auth.currentUser;
-  }
-
-  /**
-   * Check if user is authenticated
-   * @returns {boolean}
-   */
-  static isUserAuthenticated() {
-    return !!auth.currentUser;
   }
 }
 
