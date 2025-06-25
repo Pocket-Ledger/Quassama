@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal, Pressable, RefreshControl } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
 import Expense from 'models/expense/Expense';
@@ -56,6 +56,10 @@ const HomeScreen = () => {
     expenseCount: 0,
   });
   const [isLoadingOverview, setIsLoadingOverview] = useState(true);
+
+  // State for pull-to-refresh
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshingGroups, setRefreshingGroups] = useState(false);
 
   // Function to fetch expense overview
   const fetchExpenseOverview = useCallback(async () => {
@@ -128,6 +132,44 @@ const HomeScreen = () => {
       console.error('Error fetching recent activity:', error);
     }
   }, [selectedGroup]);
+
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        fetchRecentlyActivity(),
+        fetchExpenseOverview(),
+        fetchBalances(),
+      ]);
+    } catch (error) {
+      console.error('Error during refresh:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchRecentlyActivity, fetchExpenseOverview, fetchBalances]);
+
+  // Refresh groups handler
+  const refreshGroups = useCallback(async () => {
+    setRefreshingGroups(true);
+    try {
+      const userId = auth.currentUser?.uid || user?.id;
+      if (userId) {
+        const userGroups = await Group.getGroupsByUser(userId);
+        setGroups(userGroups);
+      }
+    } catch (error) {
+      console.error('Error refreshing groups:', error);
+    } finally {
+      setRefreshingGroups(false);
+    }
+  }, [user]);
+
+  // Open modal and refresh groups
+  const openGroupModal = useCallback(() => {
+    refreshGroups();
+    setShowGroupModal(true);
+  }, [refreshGroups]);
 
   useFocusEffect(
     useCallback(() => {
@@ -266,7 +308,12 @@ const HomeScreen = () => {
   console.log('transformedRecentActivity', transformedRecentActivity);
 
   return (
-    <ScrollView className="container flex flex-1 gap-6 bg-white pb-6 pt-2 ">
+    <ScrollView
+      className="container flex flex-1 gap-6 bg-white pb-6 pt-2 "
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
         <View className="flex-row items-center">
@@ -417,7 +464,7 @@ const HomeScreen = () => {
         <View className="mx-4 ">
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-medium text-black">{groupName}</Text>
-            <TouchableOpacity onPress={() => setShowGroupModal(true)}>
+            <TouchableOpacity onPress={openGroupModal}>
               <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
             </TouchableOpacity>
           </View>
@@ -435,6 +482,8 @@ const HomeScreen = () => {
               // Handle navigation to create new group screen
               navigation.navigate('AddNewGroup');
             }}
+            onRefresh={refreshGroups}
+            refreshing={refreshingGroups}
           />
 
           <View className="flex-row justify-between">
