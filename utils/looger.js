@@ -30,3 +30,5 @@ class Logger {
     this.log(`ℹ️ ${message}`, 'blue');
   }
 }
+
+export default Logger;

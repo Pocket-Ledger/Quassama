@@ -9,6 +9,8 @@ import Invitation from 'models/invitation/invitation';
 import User from 'models/auth/user';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import Logger from 'utils/looger';
+import Expense from 'models/expense/Expense';
 
 // A little card just for one invitation
 const InvitationCard = ({ invitation, onAccept, onDecline }) => {
@@ -75,6 +77,7 @@ const GroupsScreen = () => {
   const [groups, setGroups] = useState([]);
   const [invitations, setInvitations] = useState([]);
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+  const [groupTotal, setGroupTotal] = useState(0);
 
   const user = auth.currentUser.uid;
 
@@ -86,8 +89,10 @@ const GroupsScreen = () => {
         try {
           const groupsData = await Group.getGroupsByUser(user);
           setGroups(groupsData);
+          Logger.info('Fetched groups:', groupsData);
         } catch (error) {
           console.error('Error fetching groups:', error);
+          
         } finally {
           setIsLoadingGroups(false);
         }
@@ -199,6 +204,22 @@ const GroupsScreen = () => {
       console.error('Decline failed', err);
     }
   };
+
+  useEffect(() => {
+    if (!isLoadingGroups && groups.length > 0) {
+      const fetchAmounts = async () => {
+        const updatedGroups = await Promise.all(
+          groups.map(async (g) => {
+            const total = await Expense.getTotalExpensesByGroup(g.id);
+            return { ...g, amount: `${total} ${t('common.currency')}` };
+          })
+        );
+        setGroups(updatedGroups);
+      };
+      fetchAmounts();
+    }
+    // eslint-disable-next-line
+  }, [isLoadingGroups]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
