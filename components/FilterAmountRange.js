@@ -2,8 +2,9 @@ import React, { useState, useRef } from 'react';
 import { View, Text, PanResponder } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-const FilterAmountRange = ({ amountRange, onRangeChange, currency = '$' }) => {
+const FilterAmountRange = ({ amountRange, onRangeChange }) => {
   const { t } = useTranslation();
+  const currency = t('common.currency');
   const sliderWidth = useRef(250); // Default width, will be updated on layout
   const [isDragging, setIsDragging] = useState({ min: false, max: false });
 

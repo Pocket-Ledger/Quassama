@@ -13,9 +13,9 @@ const FilterModal = ({
   onApplyFilter,
   onResetFilter,
   categories = [],
-  groups = [],
-  currency = '$',
-  resultCount = 80,
+  // groups = [],
+  //currency = '$',
+  //resultCount = 80,
 }) => {
   const { t } = useTranslation();
   const [localFilter, setLocalFilter] = useState(initialFilter);
@@ -41,7 +41,7 @@ const FilterModal = ({
       dateRange: '',
       selectedCategories: [],
       amountRange: { min: 1, max: 10000, selectedMin: 0, selectedMax: 10000 },
-      selectedGroup: groups[0]?.id || '',
+      // selectedGroup: groups[0]?.id || '',
       customStartDate: null,
       customEndDate: null,
       checkedFilter: false,
@@ -212,7 +212,7 @@ const FilterModal = ({
             <FilterAmountRange
               amountRange={localFilter.amountRange}
               onRangeChange={handleAmountRangeChange}
-              currency={currency}
+              //currency={currency}
             />
           </View>
         </ScrollView>
