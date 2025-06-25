@@ -8,7 +8,6 @@ import CustomDateRangePicker from './CustomDateRangePicker ';
 const FilterDateRange = ({
   selectedRange,
   onRangeSelect,
-  showCustomDate = true,
   customStartDate,
   customEndDate,
   onCustomDateChange,
@@ -80,21 +79,19 @@ const FilterDateRange = ({
             </TouchableOpacity>
           ))}
 
-          {showCustomDate && (
-            <TouchableOpacity
-              className={`flex-row items-center rounded-lg border px-4 py-2 ${
-                isCustomSelected ? 'border-primary bg-primary' : 'border-gray-200 bg-gray-50'
-              }`}
-              onPress={handleCustomDatePress}>
-              <Feather name="calendar" size={16} color={isCustomSelected ? 'white' : '#666'} />
-              <Text
-                className={`ml-2 text-sm font-medium ${
-                  isCustomSelected ? 'text-white' : 'text-gray-600'
-                }`}>
-                {formatCustomDateRange()}
-              </Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            className={`flex-row items-center rounded-lg border px-4 py-2 ${
+              isCustomSelected ? 'border-primary bg-primary' : 'border-gray-200 bg-gray-50'
+            }`}
+            onPress={handleCustomDatePress}>
+            <Feather name="calendar" size={16} color={isCustomSelected ? 'white' : '#666'} />
+            <Text
+              className={`ml-2 text-sm font-medium ${
+                isCustomSelected ? 'text-white' : 'text-gray-600'
+              }`}>
+              {formatCustomDateRange()}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -102,8 +99,6 @@ const FilterDateRange = ({
         isVisible={showCustomPicker}
         onClose={() => setShowCustomPicker(false)}
         onConfirm={handleCustomDateConfirm}
-        initialStartDate={customStartDate}
-        initialEndDate={customEndDate}
       />
     </>
   );

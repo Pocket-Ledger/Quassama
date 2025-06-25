@@ -5,19 +5,21 @@ import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const CustomDateRangePicker = ({
-  isVisible,
-  onClose,
-  onConfirm,
-  initialStartDate,
-  initialEndDate,
-}) => {
+const CustomDateRangePicker = ({ isVisible, onClose, onConfirm }) => {
   const { t } = useTranslation();
-  const [startDate, setStartDate] = useState(initialStartDate || new Date());
-  const [endDate, setEndDate] = useState(initialEndDate || new Date());
+  const getDefaultStartDate = () => {
+    const today = new Date();
+    return new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+  };
+
+  const getDefaultEndDate = () => {
+    return new Date();
+  };
+  const [startDate, setStartDate] = useState(getDefaultStartDate());
+  const [endDate, setEndDate] = useState(getDefaultEndDate());
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-  const [pickerMode, setPickerMode] = useState('start'); // 'start' or 'end'
+  const [pickerMode, setPickerMode] = useState('start');
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', {
@@ -29,16 +31,26 @@ const CustomDateRangePicker = ({
   };
 
   const handleConfirm = () => {
-    if (startDate <= endDate) {
+    /* if (startDate <= endDate) {
       onConfirm(startDate, endDate);
+      onClose();
+    } */
+    if (startDate <= endDate) {
+      // Format dates for Firebase with time set to start/end of day
+      const formattedStartDate = new Date(startDate);
+      formattedStartDate.setHours(0, 0, 0, 0); // Start of day
+
+      const formattedEndDate = new Date(endDate);
+      formattedEndDate.setHours(23, 59, 59, 999); // End of day
+
+      onConfirm(formattedStartDate, formattedEndDate);
       onClose();
     }
   };
 
   const handleCancel = () => {
-    // Reset to initial values
-    setStartDate(initialStartDate || new Date());
-    setEndDate(initialEndDate || new Date());
+    setStartDate(getDefaultStartDate());
+    setEndDate(getDefaultEndDate());
     onClose();
   };
 
