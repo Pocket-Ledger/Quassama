@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal, Pressable, RefreshControl } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  RefreshControl,
+} from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
 import Expense from 'models/expense/Expense';
@@ -202,16 +210,19 @@ const HomeScreen = () => {
       try {
         const userId = auth.currentUser.uid;
         // Use the new model method to fetch user and groups
-        const { user: userDetails, groups: userGroups } = await Group.getUserAndGroups(userId, User.getUserDetails);
+        const { user: userDetails, groups: userGroups } = await Group.getUserAndGroups(
+          userId,
+          User.getUserDetails
+        );
         setUser(userDetails);
         setGroups(userGroups);
         let initialGroupId = null;
         let initialGroupName = t('home.noGroupSet');
         // Try to restore selected group from storage
         const storedGroupId = await AsyncStorage.getItem('selectedGroupId');
-        if (storedGroupId && userGroups.some(g => String(g.id) === storedGroupId)) {
+        if (storedGroupId && userGroups.some((g) => String(g.id) === storedGroupId)) {
           initialGroupId = storedGroupId;
-          const foundGroup = userGroups.find(g => String(g.id) === storedGroupId);
+          const foundGroup = userGroups.find((g) => String(g.id) === storedGroupId);
           if (foundGroup) initialGroupName = foundGroup.name;
         } else if (userGroups.length > 0) {
           initialGroupId = userGroups[0].id;
@@ -323,21 +334,37 @@ const HomeScreen = () => {
   };
   console.log('transformedRecentActivity', transformedRecentActivity);
 
+  const handleProfilePress = () => {
+    navigation.navigate('Profile');
+  };
+  const getDynamicGreeting = () => {
+    const currentHour = new Date().getHours();
+
+    if (currentHour >= 5 && currentHour < 12) {
+      return t('home.goodMorning');
+    } else if (currentHour >= 12 && currentHour < 17) {
+      return t('home.goodAfternoon');
+    } else if (currentHour >= 17 && currentHour < 21) {
+      return t('home.goodEvening');
+    } else {
+      return t('home.goodNight');
+    }
+  };
+
   return (
     <ScrollView
       className="container flex flex-1 gap-6 bg-white pb-6 pt-2 "
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
         <View className="flex-row items-center">
-          <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
-            <Text className="font-dmsans-bold text-lg text-white">M</Text>
-          </View>
+          <TouchableOpacity onPress={handleProfilePress}>
+            <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
+              <Text className="font-dmsans-bold text-lg text-white">M</Text>
+            </View>
+          </TouchableOpacity>
           <View>
-            <Text className="text-sm font-normal text-gray-500">{t('home.goodMorning')}</Text>
+            <Text className="text-sm font-normal text-gray-500">{getDynamicGreeting()}</Text>{' '}
             {isLoadingUser ? (
               <>
                 <View className="mb-2 h-6 w-48 rounded bg-gray-100" />

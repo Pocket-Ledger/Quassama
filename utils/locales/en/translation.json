@@ -133,6 +133,9 @@
   },
   "home": {
     "goodMorning": "Good morning 👋",
+    "goodAfternoon": "Good Afternoon👋",
+    "goodEvening": "Good Evening👋",
+    "goodNight": "Good Night👋",
     "oweYou": "Owe You",
     "youOwe": "You Owe",
     "monthlyOverview": "{{month}} {{year}} Overview",
