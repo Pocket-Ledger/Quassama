@@ -103,7 +103,7 @@ const NewExpenseScreen = () => {
   };
 
   const getCategoryIconName = (categoryId) => {
-    const cat = DEFAULT_CATEGORIES.find((c) => c.id === categoryId || c.name === categoryId);
+    const cat = DEFAULT_CATEGORIES.find((c) => c.id === categoryId || c.icon === categoryId);
     return cat ? cat.icon : '';
   };
 
