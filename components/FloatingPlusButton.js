@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 const FloatingPlusButton = ({
   onPress,
   navigateTo,
+  groupId,
   size = 56,
   bottom = 20,
   right = 20,
@@ -39,7 +40,10 @@ const FloatingPlusButton = ({
         onPress();
       } else if (navigateTo) {
         // navigation.navigate(navigateTo);
-        navigation.navigate('MainTabs', { screen: navigateTo });
+        navigation.navigate('MainTabs', {
+          screen: navigateTo,
+          params: { groupId }, // Pass the groupId here
+        });
       }
     }, 150);
   };

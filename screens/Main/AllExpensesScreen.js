@@ -377,7 +377,12 @@ const AllExpensesScreen = () => {
       <Text className="mb-6 text-center text-gray-500">{t('expense.empty.description')}</Text>
       <TouchableOpacity
         className="rounded-lg bg-primary px-6 py-3"
-        onPress={() => navigation.navigate('NewExpense', { groupId })}>
+        onPress={() =>
+          navigation.navigate('MainTabs', {
+            screen: 'NewExpense',
+            params: { groupId },
+          })
+        }>
         <Text className="font-semibold text-white">{t('expense.empty.addFirstExpense')}</Text>
       </TouchableOpacity>
     </View>
@@ -422,7 +427,6 @@ const AllExpensesScreen = () => {
   return (
     <SafeAreaView className="container flex-1 bg-white">
       <Header title={t('expense.title')} />
-
       <View className="mb-4">
         <SearchBar
           searchText={searchText}
@@ -431,9 +435,8 @@ const AllExpensesScreen = () => {
           onFilterPress={() => setIsFilterModalVisible(true)}
         />
       </View>
-
       {renderPaginationInfo()}
-
+      {renderEmptyState()}
       {loading && expenses.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2979FF" />
@@ -463,7 +466,6 @@ const AllExpensesScreen = () => {
       ) : (
         renderEmptyState()
       )}
-
       <FilterModal
         visible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}

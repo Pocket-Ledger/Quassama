@@ -26,7 +26,7 @@ import { getAuth } from 'firebase/auth';
 import CustomAlert from 'components/CustomALert';
 import Logger from 'utils/looger';
 
-const LIMIT = 5; // Limit for recent expenses
+const LIMIT = 5;
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
@@ -144,7 +144,7 @@ const GroupDetailsScreen = () => {
     Logger.error(groupId);
 
     try {
-      //await Group.deleteGroup(groupId);
+      await Group.deleteGroup(groupId);
 
       // Show success alert
       showSuccess(t('common.success'), t('groupDetails.groupDeletedSuccess'), () => {
@@ -405,7 +405,13 @@ const GroupDetailsScreen = () => {
         cancelText={alertConfig.cancelText}
       />
 
-      <FloatingPlusButton navigateTo="NewExpense" size={48} bottom={10} right={10} />
+      <FloatingPlusButton
+        navigateTo="NewExpense"
+        size={48}
+        bottom={10}
+        right={10}
+        groupId={groupId}
+      />
     </SafeAreaView>
   );
 };
