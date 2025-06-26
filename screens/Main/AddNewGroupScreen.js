@@ -92,7 +92,7 @@ const AddNewGroupScreen = () => {
     if (!groupName.trim()) {
       newErrors.groupName = t('addGroup.errors.group_name_required');
     }
-/*     if (selectedMembers.length === 0) {
+    /*     if (selectedMembers.length === 0) {
       newErrors.members = t('addGroup.errors.members_required');
     } */
     setErrors(newErrors);
@@ -210,7 +210,7 @@ const AddNewGroupScreen = () => {
             </Text>
             <View className="input-container">
               <TextInput
-                className={`input-field rounded-lg border px-4 py-4 text-black ${
+                className={`input-field rounded-lg border px-4  text-black ${
                   errors.groupName ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder={t('addGroup.group_name_placeholder')}
@@ -237,7 +237,7 @@ const AddNewGroupScreen = () => {
             </Text>
             <View className="input-container flex-row">
               <TextInput
-                className="input-field flex-1 rounded-lg border border-gray-200 px-4 py-4 text-black"
+                className="input-field flex-1 rounded-lg border border-gray-200 px-4 text-black"
                 placeholder={t('addGroup.search_placeholder')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={memberInput}

@@ -196,7 +196,7 @@ const NewExpenseScreen = () => {
             </Text>
             <View className="input-container">
               <TextInput
-                className={`input-field rounded-lg border px-4 py-4 text-black ${
+                className={`input-field rounded-lg border px-4 text-black ${
                   errors.expenseName ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder={t('expense.expenseTitle')}
@@ -221,7 +221,7 @@ const NewExpenseScreen = () => {
             </Text>
             <View className="input-container relative">
               <TextInput
-                className={`input-field rounded-lg border px-4 py-4 pr-16 text-black ${
+                className={`input-field rounded-lg border px-4  pr-16 text-black ${
                   errors.amount ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="100"
@@ -290,7 +290,7 @@ const NewExpenseScreen = () => {
               {t('expense.note')}
             </Text>
             <TextInput
-              className="input-field h-24 rounded-lg border border-gray-200 px-4 py-4 text-black"
+              className="input-field h-24 rounded-lg border border-gray-200 px-4 text-black"
               placeholder={t('expense.addNote')}
               placeholderTextColor="rgba(0, 0, 0, 0.4)"
               value={note}

@@ -68,7 +68,7 @@ const EditGroupScreen = () => {
 
           if (groupSnap.exists() && mounted) {
             const data = groupSnap.data();
-            
+
             // Check if current user is admin
             const auth = getAuth();
             if (data.created_by !== auth.currentUser?.uid) {
@@ -76,7 +76,7 @@ const EditGroupScreen = () => {
               navigation.goBack();
               return;
             }
-            
+
             setGroupName(data.name || '');
             setAllowInviteOthers(data.allowInviteOthers ?? true);
             setNotifyForExpenses(data.notifyForExpenses ?? true);
@@ -156,12 +156,16 @@ const EditGroupScreen = () => {
 
       // Update group basic info
       // Update group basic info
-      await Group.updateGroup(groupId, {
-        name: groupName,
-        allowInviteOthers,
-        notifyForExpenses,
-        members: selectedMembers,
-      }, auth.currentUser.uid); // Pass current user ID
+      await Group.updateGroup(
+        groupId,
+        {
+          name: groupName,
+          allowInviteOthers,
+          notifyForExpenses,
+          members: selectedMembers,
+        },
+        auth.currentUser.uid
+      ); // Pass current user ID
 
       // Find new members to invite
       const originalMemberIds = originalMembers.map((m) => m.id);
@@ -253,7 +257,7 @@ const EditGroupScreen = () => {
             </Text>
             <View className="input-container">
               <TextInput
-                className={`input-field rounded-lg border px-4 py-4 text-black ${
+                className={`input-field rounded-lg border px-4 text-black ${
                   errors.groupName ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder={t('editGroup.group_name_placeholder')}
@@ -280,7 +284,7 @@ const EditGroupScreen = () => {
             </Text>
             <View className="input-container flex-row">
               <TextInput
-                className="input-field flex-1 rounded-lg border border-gray-200 px-4 py-4 text-black"
+                className="input-field flex-1 rounded-lg border border-gray-200 px-4  text-black"
                 placeholder={t('editGroup.search_placeholder')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={memberInput}
