@@ -21,11 +21,14 @@ const FilterModal = ({
   const [localFilter, setLocalFilter] = useState(initialFilter);
 
   const handleApplyFilter = () => {
+    const shouldApplyAmountFilter =
+      localFilter.amountRange.selectedMin !== localFilter.amountRange.min ||
+      localFilter.amountRange.selectedMax !== localFilter.amountRange.max;
     const finalFilter = {
       startDate: localFilter.dateRange === 'custom' ? localFilter.customStartDate : null,
       endDate: localFilter.dateRange === 'custom' ? localFilter.customEndDate : null,
       dateRange: localFilter.dateRange,
-      selectedCategories: localFilter?.selectedCategories,
+      categories: localFilter?.selectedCategories,
       minAmount: localFilter.amountRange.selectedMin,
       maxAmount: localFilter.amountRange.selectedMax,
       checkedFilter: true,
@@ -40,7 +43,7 @@ const FilterModal = ({
     const resetFilter = {
       dateRange: '',
       selectedCategories: [],
-      amountRange: { min: 1, max: 10000, selectedMin: 0, selectedMax: 10000 },
+      amountRange: { min: 1, max: 10000, selectedMin: null, selectedMax: null },
       // selectedGroup: groups[0]?.id || '',
       customStartDate: null,
       customEndDate: null,

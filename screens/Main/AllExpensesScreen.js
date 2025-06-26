@@ -18,7 +18,6 @@ import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import Expense from 'models/expense/Expense';
 import { useTranslation } from 'react-i18next';
-import Logger from 'utils/looger';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
@@ -31,13 +30,10 @@ const AllExpensesScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [filterConfig, setFilterConfig] = useState({
-    dateRange: '',
+    dateRange: t('filters.dateRanges.today'),
     selectedCategories: [],
-    amountRange: { min: 5, max: 500, selectedMin: 20, selectedMax: 100 },
+    amountRange: { min: 1, max: 10000, selectedMin: null, selectedMax: null },
     selectedGroup: groupId,
-    customStartDate: null,
-    customEndDate: null,
-    checkedFilter: false,
   });
 
   const [appliedFilterConfig, setAppliedFilterConfig] = useState({
@@ -45,14 +41,10 @@ const AllExpensesScreen = () => {
     selectedCategories: [],
     amountRange: null,
     selectedGroup: groupId,
-    customStartDate: null,
-    customEndDate: null,
-    checkedFilter: false,
   });
 
   // Pagination and data states
   const [expenses, setExpenses] = useState([]);
-  const [checkedFilter, setCheckedFilter] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -74,50 +66,9 @@ const AllExpensesScreen = () => {
     { id: 'friends_trip', name: t('groups.friendsTrip') },
   ];
 
-  // Helper function to convert date range to actual dates
-  const getDateRangeFromFilter = useCallback(
-    (filterConfig) => {
-      if (filterConfig.dateRange === 'custom') {
-        return {
-          startDate: filterConfig.customStartDate,
-          endDate: filterConfig.customEndDate,
-        };
-      }
-
-      const now = new Date();
-      let startDate = null;
-      let endDate = null;
-
-      switch (filterConfig.dateRange) {
-        case t('filters.dateRanges.today'):
-          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-          break;
-        case t('filters.dateRanges.last7Days'):
-          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          endDate = now;
-          break;
-        case t('filters.dateRanges.last30Days'):
-          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-          endDate = now;
-          break;
-        case t('filters.dateRanges.thisMonth'):
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-          endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-          break;
-        default:
-          startDate = null;
-          endDate = null;
-      }
-
-      return { startDate, endDate };
-    },
-    [t]
-  );
-
-  // Load expenses function - now handles both filtered and paginated requests
+  // Load expenses function
   const loadExpenses = useCallback(
-    async (page = 1, isRefresh = false, useFilter = false) => {
+    async (page = 1, isRefresh = false) => {
       try {
         if (isRefresh) {
           setRefreshing(true);
@@ -129,56 +80,11 @@ const AllExpensesScreen = () => {
           setLoadingMore(true);
         }
 
-        let result;
-
-        if (useFilter && checkedFilter && appliedFilterConfig.checkedFilter) {
-          //console.log('\n\n\n\n');
-          //console.log('Using filter for expenses:', useFilter);
-          // Use filter function
-          const { startDate, endDate } = getDateRangeFromFilter(appliedFilterConfig);
-          //console.log('\n\n\nLoading filtered expenses:');
-
-          const filteredExpenses = await Expense.filterExpenses(
-            groupId,
-            startDate,
-            endDate,
-            appliedFilterConfig.selectedCategories,
-            appliedFilterConfig.amountRange?.selectedMin || null,
-            appliedFilterConfig.amountRange?.selectedMax || null
-          );
-          console.log(appliedFilterConfig.selectedCategories);
-
-          // For filtered results, we don't have pagination from backend
-          // So we handle it manually
-          const pageSize = pagination.pageSize;
-          const startIndex = (page - 1) * pageSize;
-          const endIndex = startIndex + pageSize;
-          const paginatedExpenses = filteredExpenses.slice(startIndex, endIndex);
-
-          result = {
-            expenses: paginatedExpenses,
-            pagination: {
-              currentPage: page,
-              pageSize: pageSize,
-              totalItems: filteredExpenses.length,
-              totalPages: Math.ceil(filteredExpenses.length / pageSize),
-              hasNextPage: endIndex < filteredExpenses.length,
-              hasPreviousPage: page > 1,
-              startIndex: startIndex + 1,
-              endIndex: Math.min(endIndex, filteredExpenses.length),
-            },
-          };
-
-          // Store full filtered results for client-side pagination
-          if (page === 1 || isRefresh) {
-            setFilteredExpensesCache(filteredExpenses);
-          }
-          // console.log('Filtered expenses loaded:', result);
-        } else {
-          // Use regular paginated function
-          result = await Expense.getExpensesByGroupPaginated(groupId, page, pagination.pageSize);
-          //console.log('Loading paginated expenses:', result);
-        }
+        const result = await Expense.getExpensesByGroupPaginated(
+          groupId,
+          page,
+          pagination.pageSize
+        );
 
         if (isRefresh || page === 1) {
           setExpenses(result.expenses);
@@ -197,57 +103,27 @@ const AllExpensesScreen = () => {
         setLoadingMore(false);
       }
     },
-    [groupId, pagination.pageSize, checkedFilter, appliedFilterConfig, getDateRangeFromFilter]
+    [groupId, pagination.pageSize, t]
   );
-
-  // Cache for filtered expenses (for client-side pagination)
-  const [filteredExpensesCache, setFilteredExpensesCache] = useState([]);
 
   // Load more expenses for pagination
   const loadMoreExpenses = useCallback(() => {
     if (!loadingMore && pagination.hasNextPage) {
-      if (checkedFilter && appliedFilterConfig.checkedFilter) {
-        // For filtered results, handle pagination from cache
-        const nextPage = pagination.currentPage + 1;
-        const pageSize = pagination.pageSize;
-        const startIndex = (nextPage - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const newExpenses = filteredExpensesCache.slice(startIndex, endIndex);
-
-        setExpenses((prev) => [...prev, ...newExpenses]);
-        setPagination((prev) => ({
-          ...prev,
-          currentPage: nextPage,
-          hasNextPage: endIndex < filteredExpensesCache.length,
-          endIndex: Math.min(endIndex, filteredExpensesCache.length),
-        }));
-      } else {
-        // Regular pagination
-        loadExpenses(pagination.currentPage + 1, false, false);
-      }
+      loadExpenses(pagination.currentPage + 1, false);
     }
-  }, [
-    loadExpenses,
-    loadingMore,
-    pagination,
-    checkedFilter,
-    appliedFilterConfig,
-    filteredExpensesCache,
-  ]);
+  }, [loadExpenses, loadingMore, pagination.hasNextPage, pagination.currentPage]);
 
   // Refresh expenses
   const onRefresh = useCallback(() => {
-    const useFilter = checkedFilter && appliedFilterConfig.checkedFilter;
-    loadExpenses(1, true, useFilter);
-  }, [loadExpenses, checkedFilter, appliedFilterConfig]);
+    loadExpenses(1, true);
+  }, [loadExpenses]);
 
-  // Load expenses on component mount and when groupId or filter state changes
+  // Load expenses on component mount and when groupId changes
   useEffect(() => {
-    const useFilter = checkedFilter && appliedFilterConfig.checkedFilter;
-    loadExpenses(1, false, useFilter);
-  }, [groupId, checkedFilter, appliedFilterConfig.checkedFilter]);
+    loadExpenses(1, false);
+  }, [groupId]);
 
-  // Filter expenses based on search text (this is for real-time search, not the modal filters)
+  // Filter expenses based on search text
   const getFilteredExpenses = useCallback(() => {
     let filtered = expenses;
 
@@ -261,8 +137,57 @@ const AllExpensesScreen = () => {
       );
     }
 
+    // Only apply other filters if they have been applied (search button pressed)
+
+    // Category filter
+    if (appliedFilterConfig?.selectedCategories?.length > 0) {
+      filtered = filtered.filter((expense) =>
+        appliedFilterConfig.selectedCategories.includes(expense.category)
+      );
+    }
+
+    // Amount range filter
+    if (appliedFilterConfig.amountRange) {
+      const { selectedMin, selectedMax } = appliedFilterConfig.amountRange;
+      filtered = filtered.filter(
+        (expense) => expense.amount >= selectedMin && expense.amount <= selectedMax
+      );
+    }
+
+    // Date range filter (only if not empty)
+    if (appliedFilterConfig.dateRange && appliedFilterConfig.dateRange !== '') {
+      const now = new Date();
+      let startDate;
+
+      switch (appliedFilterConfig.dateRange) {
+        case t('filters.dateRanges.today'):
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case t('filters.dateRanges.last7Days'):
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case t('filters.dateRanges.last30Days'):
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case t('filters.dateRanges.thisMonth'):
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        default:
+          startDate = null;
+      }
+
+      if (startDate) {
+        filtered = filtered.filter((expense) => {
+          const expenseDate = expense.incurred_at.toDate
+            ? expense.incurred_at.toDate()
+            : new Date(expense.incurred_at);
+          return expenseDate >= startDate;
+        });
+      }
+    }
+
     return filtered;
-  }, [expenses, searchText]);
+  }, [expenses, searchText, appliedFilterConfig, t]);
 
   const filteredExpenses = getFilteredExpenses();
 
@@ -272,21 +197,10 @@ const AllExpensesScreen = () => {
   };
 
   const handleApplyFilter = (newFilter) => {
+    newFilter.groupId = groupId;
+    setFilterConfig(newFilter); // Keep for modal state
+    setAppliedFilterConfig(newFilter); // Apply the actual filtering
     console.log('Filter applied:', newFilter);
-
-    // Update both filter configs
-    setFilterConfig(newFilter);
-    setAppliedFilterConfig(newFilter);
-
-    // Update checked filter state
-    setCheckedFilter(newFilter.checkedFilter);
-
-    // Reset expenses and load with filter
-    setExpenses([]);
-    setPagination((prev) => ({
-      ...prev,
-      currentPage: 1,
-    }));
   };
 
   const handleResetFilter = () => {
@@ -295,26 +209,11 @@ const AllExpensesScreen = () => {
       selectedCategories: [],
       amountRange: { min: 5, max: 500, selectedMin: 20, selectedMax: 100 },
       selectedGroup: groupId,
-      customStartDate: null,
-      customEndDate: null,
-      checkedFilter: false,
     };
-
     setFilterConfig(resetFilter);
-    setAppliedFilterConfig(resetFilter);
-    setCheckedFilter(false);
-    setFilteredExpensesCache([]);
-
-    // Reset expenses and load all expenses
-    setExpenses([]);
-    setPagination((prev) => ({
-      ...prev,
-      currentPage: 1,
-    }));
-
+    setAppliedFilterConfig(resetFilter); // This will show all expenses
     console.log('Filter reset - showing all expenses');
   };
-  //console.log('filteredExpenses', filteredExpenses[0]);
 
   // Render loading footer for pagination
   const renderFooter = () => {
@@ -336,7 +235,7 @@ const AllExpensesScreen = () => {
       amount={item.amount}
       category={item.category}
       time={formatTime(item.incurred_at)} // Format timestamp
-      paidBy={item.username || t('common.unknown')} // You might need to fetch user name
+      paidBy={item.user_name || t('common.unknown')} // You might need to fetch user name
       categories={DEFAULT_CATEGORIES}
       onPress={() => handleExpensePress(item)}
       showBorder={true}
@@ -377,12 +276,7 @@ const AllExpensesScreen = () => {
       <Text className="mb-6 text-center text-gray-500">{t('expense.empty.description')}</Text>
       <TouchableOpacity
         className="rounded-lg bg-primary px-6 py-3"
-        onPress={() =>
-          navigation.navigate('MainTabs', {
-            screen: 'NewExpense',
-            params: { groupId },
-          })
-        }>
+        onPress={() => navigation.navigate('NewExpense', { groupId })}>
         <Text className="font-semibold text-white">{t('expense.empty.addFirstExpense')}</Text>
       </TouchableOpacity>
     </View>
@@ -398,7 +292,7 @@ const AllExpensesScreen = () => {
       <Text className="mb-6 text-center text-gray-500">{error}</Text>
       <TouchableOpacity
         className="rounded-lg bg-primary px-6 py-3"
-        onPress={() => loadExpenses(1, false, checkedFilter && appliedFilterConfig.checkedFilter)}>
+        onPress={() => loadExpenses(1, false)}>
         <Text className="font-semibold text-white">{t('expense.error.tryAgain')}</Text>
       </TouchableOpacity>
     </View>
@@ -412,13 +306,10 @@ const AllExpensesScreen = () => {
       <View className="bg-gray-50 px-4 py-2">
         <Text className="text-center text-sm text-gray-600">
           {t('expense.pagination.showing', {
-            start: pagination.startIndex || 1,
-            end: pagination.endIndex || expenses.length,
-            total: pagination.totalItems || expenses.length,
+            start: pagination.startIndex,
+            end: pagination.endIndex,
+            total: pagination.totalItems,
           })}
-          {checkedFilter && appliedFilterConfig.checkedFilter && (
-            <Text className="text-primary"> (Filtered)</Text>
-          )}
         </Text>
       </View>
     );
@@ -427,6 +318,7 @@ const AllExpensesScreen = () => {
   return (
     <SafeAreaView className="container flex-1 bg-white">
       <Header title={t('expense.title')} />
+
       <View className="mb-4">
         <SearchBar
           searchText={searchText}
@@ -435,7 +327,9 @@ const AllExpensesScreen = () => {
           onFilterPress={() => setIsFilterModalVisible(true)}
         />
       </View>
+
       {renderPaginationInfo()}
+
       {loading && expenses.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2979FF" />
@@ -465,16 +359,17 @@ const AllExpensesScreen = () => {
       ) : (
         renderEmptyState()
       )}
+
       <FilterModal
         visible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}
         initialFilter={filterConfig}
         onApplyFilter={handleApplyFilter}
-        onResetFilter={handleResetFilter}
+        onResetFilter={handleResetFilter} // Add this line
         categories={DEFAULT_CATEGORIES}
-        // groups={groups}
-        //currency={t('common.currency')}
-        //resultCount={pagination.totalItems}
+        groups={groups}
+        currency={t('common.currency')}
+        resultCount={pagination.totalItems}
       />
     </SafeAreaView>
   );
