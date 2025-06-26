@@ -5,6 +5,7 @@ import FilterDateRange from './FilterDateRange';
 import FilterAmountRange from './FilterAmountRange';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { formatDateForBackend } from 'utils/time';
 
 const FilterModal = ({
   visible,
@@ -22,8 +23,8 @@ const FilterModal = ({
 
   const handleApplyFilter = () => {
     const finalFilter = {
-      startDate: localFilter.startDate,
-      endDate: localFilter.endDate,
+      startDate: formatDateForBackend(localFilter.startDate),
+      endDate: formatDateForBackend(localFilter.endDate),
       categories: localFilter?.selectedCategories,
       minAmount: localFilter.amountRange.selectedMin,
       maxAmount: localFilter.amountRange.selectedMax,

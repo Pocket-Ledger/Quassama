@@ -25,3 +25,19 @@ export const formatDateForDisplay = (date) => {
     timeZoneName: 'short',
   });
 };
+
+export const formatDateForBackend = (date) => {
+  if (!date) return null;
+
+  // Format: "June 19, 2025 at 4:55:48 PM UTC+1"
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    timeZoneName: 'short',
+  });
+};
