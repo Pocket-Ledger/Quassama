@@ -34,13 +34,78 @@ const FilterDateRange = ({
     },
   ];
 
+  const calculateDateRange = (rangeValue) => {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
+
+    switch (rangeValue) {
+      case 'today':
+        return {
+          startDate: startOfDay,
+          endDate: endOfDay,
+        };
+
+      case 'last7Days':
+        const last7DaysStart = new Date(startOfDay);
+        last7DaysStart.setDate(last7DaysStart.getDate() - 6); // 6 days ago + today = 7 days
+        return {
+          startDate: last7DaysStart,
+          endDate: endOfDay,
+        };
+
+      case 'last30Days':
+        const last30DaysStart = new Date(startOfDay);
+        last30DaysStart.setDate(last30DaysStart.getDate() - 29); // 29 days ago + today = 30 days
+        return {
+          startDate: last30DaysStart,
+          endDate: endOfDay,
+        };
+
+      case 'thisMonth':
+        const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const thisMonthEnd = new Date(
+          today.getFullYear(),
+          today.getMonth() + 1,
+          0,
+          23,
+          59,
+          59,
+          999
+        );
+        return {
+          startDate: thisMonthStart,
+          endDate: thisMonthEnd,
+        };
+
+      default:
+        return {
+          startDate: null,
+          endDate: null,
+        };
+    }
+  };
+
+  const handleRangeSelection = (rangeValue) => {
+    const { startDate, endDate } = calculateDateRange(rangeValue);
+    onRangeSelect(rangeValue, startDate, endDate);
+  };
+
   const handleCustomDatePress = () => {
     setShowCustomPicker(true);
   };
 
   const handleCustomDateConfirm = (startDate, endDate) => {
     onCustomDateChange?.(startDate, endDate);
-    onRangeSelect('custom');
+    onRangeSelect('custom', startDate, endDate);
   };
 
   const formatCustomDateRange = () => {
@@ -69,7 +134,7 @@ const FilterDateRange = ({
                   ? 'border-primary bg-primary'
                   : 'border-gray-200 bg-gray-50'
               }`}
-              onPress={() => onRangeSelect(range.value)}>
+              onPress={() => handleRangeSelection(range.value)}>
               <Text
                 className={`text-sm font-medium ${
                   selectedRange === range.value ? 'text-white' : 'text-gray-600'

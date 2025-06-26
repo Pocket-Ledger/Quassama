@@ -21,20 +21,16 @@ const FilterModal = ({
   const [localFilter, setLocalFilter] = useState(initialFilter);
 
   const handleApplyFilter = () => {
-    const shouldApplyAmountFilter =
-      localFilter.amountRange.selectedMin !== localFilter.amountRange.min ||
-      localFilter.amountRange.selectedMax !== localFilter.amountRange.max;
     const finalFilter = {
-      startDate: localFilter.dateRange === 'custom' ? localFilter.customStartDate : null,
-      endDate: localFilter.dateRange === 'custom' ? localFilter.customEndDate : null,
-      dateRange: localFilter.dateRange,
+      startDate: localFilter.startDate,
+      endDate: localFilter.endDate,
       categories: localFilter?.selectedCategories,
       minAmount: localFilter.amountRange.selectedMin,
       maxAmount: localFilter.amountRange.selectedMax,
       checkedFilter: true,
     };
     console.log('===============================================');
-    console.log('finalFilter', finalFilter);
+    console.log('FinalFilter', finalFilter);
     onApplyFilter(finalFilter);
     onClose();
   };
@@ -92,8 +88,16 @@ const FilterModal = ({
     }));
   };
 
-  const handleRangeSelect = (range) => {
-    setLocalFilter((prev) => ({ ...prev, dateRange: range }));
+  const handleRangeSelect = (range, startDate, endDate) => {
+    setLocalFilter((prev) => ({
+      ...prev,
+      dateRange: range,
+      startDate: startDate,
+      endDate: endDate,
+      // Clear custom dates if not custom range
+      customStartDate: range === 'custom' ? prev.customStartDate : null,
+      customEndDate: range === 'custom' ? prev.customEndDate : null,
+    }));
   };
 
   const handleCustomDateChange = (startDate, endDate) => {
@@ -101,6 +105,8 @@ const FilterModal = ({
       ...prev,
       customStartDate: startDate,
       customEndDate: endDate,
+      startDate: startDate,
+      endDate: endDate,
     }));
   };
 
