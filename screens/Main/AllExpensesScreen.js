@@ -84,15 +84,6 @@ const AllExpensesScreen = () => {
         
         // Check if we should apply filters
         if (applyFilters && filterConfig.checkedFilter) {
-          // Debug: Log the filter configuration
-          console.log('Applying filters with config:', {
-            startDate: filterConfig.startDate,
-            endDate: filterConfig.endDate,
-            categories: filterConfig.categories,
-            minAmount: filterConfig.minAmount,
-            maxAmount: filterConfig.maxAmount,
-          });
-          
           // Use filterExpenses method when filters are applied
           const filteredExpenses = await Expense.filterExpenses(
             groupId,
@@ -167,7 +158,7 @@ const AllExpensesScreen = () => {
     loadExpenses(1, false, false);
   }, [groupId]);
 
-  // Load expenses when filter changes
+  // Load expenses when filter changes (but not when manually reset)
   useEffect(() => {
     if (filterConfig.checkedFilter) {
       loadExpenses(1, false, true);
@@ -198,16 +189,6 @@ const AllExpensesScreen = () => {
   };
 
   const handleApplyFilter = (newFilter) => {
-    console.log('AllExpensesScreen: Received filter config:', newFilter);
-    console.log('AllExpensesScreen: Date types:', {
-      startDate: newFilter.startDate,
-      endDate: newFilter.endDate,
-      startDateType: typeof newFilter.startDate,
-      endDateType: typeof newFilter.endDate,
-      startDateInstanceOf: newFilter.startDate instanceof Date,
-      endDateInstanceOf: newFilter.endDate instanceof Date,
-    });
-    
     newFilter.groupId = groupId;
     setFilterConfig(newFilter);
     console.log('Filter applied:', newFilter);
@@ -229,7 +210,9 @@ const AllExpensesScreen = () => {
     };
     setFilterConfig(resetFilter);
     console.log('Filter reset');
-    // The useEffect will handle reloading expenses without filters
+    
+    // Immediately reload expenses without filters
+    loadExpenses(1, false, false);
   };
 
   // Render loading footer for pagination

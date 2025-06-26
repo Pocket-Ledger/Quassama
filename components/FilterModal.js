@@ -28,14 +28,6 @@ const FilterModal = ({
       maxAmount: localFilter.amountRange.selectedMax,
       checkedFilter: true,
     };
-    console.log('===============================================');
-    console.log('FinalFilter', finalFilter);
-    console.log('Raw dates:', {
-      startDate: localFilter.startDate,
-      endDate: localFilter.endDate,
-      startDateType: typeof localFilter.startDate,
-      endDateType: typeof localFilter.endDate,
-    });
     onApplyFilter(finalFilter);
     onClose();
   };
@@ -58,7 +50,8 @@ const FilterModal = ({
       onResetFilter(resetFilter);
     }
 
-    //onClose();
+    // Close the modal immediately after reset
+    onClose();
   };
 
   const toggleCategory = (categoryId) => {
