@@ -180,7 +180,9 @@
     "empty": {
       "title": "Aucune Dépense Encore",
       "description": "Commencez par ajouter votre première dépense. Gardez une trace de qui a payé quoi et partagez équitablement entre les membres de votre groupe.",
-      "addFirstExpense": "Ajoutez Votre Première Dépense"
+      "addFirstExpense": "Ajoutez Votre Première Dépense",
+      "noResults": "Aucun résultat trouvé",
+      "tryDifferentFilters": "Essayez d'ajuster vos critères de recherche ou de filtre pour trouver ce que vous cherchez."
     },
     "error": {
       "title": "Oups! Quelque chose s'est mal passé",
@@ -191,7 +193,8 @@
     },
     "pagination": {
       "showing": "Affichage de {{start}}-{{end}} sur {{total}} dépenses"
-    }
+    },
+    "filtersActive": "Les filtres sont actifs"
   },
   "group": {
     "title": "Groupes",
@@ -440,6 +443,8 @@
     "title": "Filtrer",
     "cancel": "Annuler",
     "reset": "Réinitialiser",
+    "clear": "Effacer",
+    "see": "Voir",
     "seeExpenses_one": "Voir {{count}} Dépense",
     "seeExpenses_other": "Voir {{count}} Dépenses",
 

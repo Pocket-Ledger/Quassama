@@ -445,6 +445,7 @@
     "cancel": "Cancel",
     "reset": "Reset",
     "clear": "Clear",
+    "see": "See",
     "seeExpenses_one": "See ",
     "seeExpenses_other": "See {{count}} Expenses",
     "dateRange": {

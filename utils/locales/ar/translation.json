@@ -179,7 +179,8 @@
     "empty": {
       "title": "لا توجد مصروفات بعد",
       "description": "ابدأ بإضافة أول مصروف لك. تتبع من دفع ماذا وقسمه بعدالة بين أعضاء مجموعتك.",
-      "addFirstExpense": "أضف أول مصروف لك"
+      "noResults": "لم يتم العثور على نتائج",
+      "tryDifferentFilters": "جرب تعديل معايير البحث أو الفلتر للعثور على ما تبحث عنه."
     },
     "error": {
       "title": "عذراً! حدث خطأ ما",
@@ -190,7 +191,8 @@
     },
     "pagination": {
       "showing": "عرض {{start}}-{{end}} من {{total}} مصروف"
-    }
+    },
+    "filtersActive": "المرشحات نشطة"
   },
   "group": {
     "selectGroup": "اختر المجموعة",
@@ -440,6 +442,8 @@
     "cancel": "إلغاء",
     "reset": "إعادة تعيين",
     "see": "عرض",
+    "clear": "مسح",
+
     "seeExpenses_one": "عرض {{count}} مصروف",
     "seeExpenses_other": "عرض {{count}} مصروف",
     "dateRange": {
