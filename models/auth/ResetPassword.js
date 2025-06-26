@@ -39,22 +39,24 @@ class ResetPassword {
    */
   static async sendVerificationCode(email) {
     try {
-      // First check if email exists
-      const emailExists = await this.checkEmailExists(email);
-      if (!emailExists) {
-        throw new Error("No user found with this email address");
-      }
-
       await sendPasswordResetEmail(auth, email, {
-        // Optional: You can customize the email template
-        // url: 'https://your-app.com/reset-password',
+        url: 'https://quassama-a1a15.firebaseapp.com', // <-- Replace with your actual domain if needed
         handleCodeInApp: false
       });
-      
       console.log("Password reset email sent successfully");
     } catch (error) {
       console.error("Error sending password reset email:", error);
-      throw error;
+      // Handle specific error codes for better UX
+      switch (error.code) {
+        case 'auth/user-not-found':
+          throw new Error("No user found with this email address");
+        case 'auth/invalid-email':
+          throw new Error("Invalid email address");
+        case 'auth/invalid-continue-uri':
+          throw new Error("Invalid or missing continue URL. Please contact support.");
+        default:
+          throw new Error("Failed to send password reset email");
+      }
     }
   }
 
