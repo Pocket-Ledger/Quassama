@@ -396,7 +396,9 @@
       "email": "Email",
       "emailPlaceholder": "John.doe@gmail.com",
       "sendButton": "Send",
-      "sending": "Sending..."
+      "sending": "Sending...",
+      "successMessage": "Verification code has been sent to your email address. Please check your inbox.",
+      "errorMessage": "Failed to send verification code. Please try again."
     },
     "otpVerification": {
       "title": "Enter Code",

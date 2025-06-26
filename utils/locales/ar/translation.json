@@ -393,7 +393,9 @@
       "email": "البريد الإلكتروني",
       "emailPlaceholder": "John.doe@gmail.com",
       "sendButton": "إرسال",
-      "sending": "جاري الإرسال..."
+      "sending": "جاري الإرسال...",
+      "successMessage": "تم إرسال رمز التحقق إلى عنوان بريدك الإلكتروني. يرجى مراجعة صندوق الواردات.",
+      "errorMessage": "فشل في إرسال رمز التحقق. يرجى المحاولة مرة أخرى."
     },
     "otpVerification": {
       "title": "أدخل الرمز",

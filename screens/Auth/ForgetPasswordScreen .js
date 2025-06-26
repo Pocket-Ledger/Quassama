@@ -6,13 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Alert,
   Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
 import ResetPassword from 'models/auth/ResetPassword';
+import { useAlert } from 'hooks/useAlert';
+import CustomAlert from 'components/CustomALert';
 
 // Forget Password Screen
 const ForgetPasswordScreen = () => {
@@ -20,6 +21,9 @@ const ForgetPasswordScreen = () => {
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // Use the custom alert hook
+  const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
 
   const validateForm = () => {
     const newErrors = {};
@@ -40,21 +44,20 @@ const ForgetPasswordScreen = () => {
     setIsLoading(true);
     try {
       await ResetPassword.initiatePasswordReset(email);
-      Alert.alert(
+      showSuccess(
         t('customAlert.titles.success'),
         t('passwordRecovery.forgetPassword.successMessage'),
-        [
-          {
-            text: t('customAlert.buttons.ok'),
-            onPress: () => console.log('Navigate to OTP verification'),
-          },
-        ]
+        () => {
+          console.log('Navigate to OTP verification');
+          hideAlert();
+          // TODO: Navigate to OTPVerificationScreen, pass email if needed
+        }
       );
-      // TODO: Navigate to OTPVerificationScreen, pass email if needed
     } catch (error) {
-      Alert.alert(
+      showError(
         t('customAlert.titles.error'),
-        error.message || t('passwordRecovery.forgetPassword.errorMessage')
+        error.message || t('passwordRecovery.forgetPassword.errorMessage'),
+        () => hideAlert()
       );
     } finally {
       setIsLoading(false);
@@ -137,6 +140,19 @@ const ForgetPasswordScreen = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Custom Alert */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </SafeAreaView>
   );
 };

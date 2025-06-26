@@ -395,7 +395,9 @@
       "email": "Email",
       "emailPlaceholder": "John.doe@gmail.com",
       "sendButton": "Envoyer",
-      "sending": "Envoi en cours..."
+      "sending": "Envoi en cours...",
+      "successMessage": "Le code de vérification a été envoyé à votre adresse e-mail. Veuillez vérifier votre boîte de réception.",
+      "errorMessage": "Échec de l'envoi du code de vérification. Veuillez réessayer."
     },
     "otpVerification": {
       "title": "Entrez le Code",
