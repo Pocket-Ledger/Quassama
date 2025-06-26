@@ -1,11 +1,9 @@
-// FilterModal.js - Updated sections
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'react-native';
 import FilterDateRange from './FilterDateRange';
 import FilterAmountRange from './FilterAmountRange';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { formatDateForBackend } from 'utils/time';
 
 const FilterModal = ({
   visible,
@@ -23,8 +21,8 @@ const FilterModal = ({
 
   const handleApplyFilter = () => {
     const finalFilter = {
-      startDate: formatDateForBackend(localFilter.startDate),
-      endDate: formatDateForBackend(localFilter.endDate),
+      startDate: localFilter.startDate, // Pass raw Date object, not formatted string
+      endDate: localFilter.endDate,     // Pass raw Date object, not formatted string
       categories: localFilter?.selectedCategories,
       minAmount: localFilter.amountRange.selectedMin,
       maxAmount: localFilter.amountRange.selectedMax,
@@ -32,6 +30,12 @@ const FilterModal = ({
     };
     console.log('===============================================');
     console.log('FinalFilter', finalFilter);
+    console.log('Raw dates:', {
+      startDate: localFilter.startDate,
+      endDate: localFilter.endDate,
+      startDateType: typeof localFilter.startDate,
+      endDateType: typeof localFilter.endDate,
+    });
     onApplyFilter(finalFilter);
     onClose();
   };

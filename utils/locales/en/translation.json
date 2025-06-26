@@ -181,7 +181,9 @@
     "empty": {
       "title": "No Expenses Yet",
       "description": "Start by adding your first expense. Keep track of who paid what and split it fairly between your group members.",
-      "addFirstExpense": "Add Your First Expense"
+      "addFirstExpense": "Add Your First Expense",
+      "noResults": "No Results Found",
+      "tryDifferentFilters": "Try adjusting your search or filter criteria to find what you're looking for."
     },
     "error": {
       "title": "Oops! Something went wrong",
@@ -192,7 +194,8 @@
     },
     "pagination": {
       "showing": "Showing {{start}}-{{end}} of {{total}} expenses"
-    }
+    },
+    "filtersActive": "Filters are active"
   },
   "group": {
     "selectGroup": "Select Group",
@@ -441,6 +444,7 @@
     "title": "Filter",
     "cancel": "Cancel",
     "reset": "Reset",
+    "clear": "Clear",
     "seeExpenses_one": "See ",
     "seeExpenses_other": "See {{count}} Expenses",
     "dateRange": {

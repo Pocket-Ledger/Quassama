@@ -18,6 +18,7 @@ import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import Expense from 'models/expense/Expense';
 import { useTranslation } from 'react-i18next';
+import { dateToTimestamp } from 'utils/time';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
@@ -34,6 +35,12 @@ const AllExpensesScreen = () => {
     selectedCategories: [],
     amountRange: { min: 1, max: 10000, selectedMin: null, selectedMax: null },
     selectedGroup: groupId,
+    checkedFilter: false,
+    startDate: null,
+    endDate: null,
+    categories: [],
+    minAmount: null,
+    maxAmount: null,
   });
 
   // Pagination and data states
@@ -61,7 +68,7 @@ const AllExpensesScreen = () => {
 
   // Load expenses function
   const loadExpenses = useCallback(
-    async (page = 1, isRefresh = false) => {
+    async (page = 1, isRefresh = false, applyFilters = false) => {
       try {
         if (isRefresh) {
           setRefreshing(true);
@@ -73,11 +80,55 @@ const AllExpensesScreen = () => {
           setLoadingMore(true);
         }
 
-        const result = await Expense.getExpensesByGroupPaginated(
-          groupId,
-          page,
-          pagination.pageSize
-        );
+        let result;
+        
+        // Check if we should apply filters
+        if (applyFilters && filterConfig.checkedFilter) {
+          // Debug: Log the filter configuration
+          console.log('Applying filters with config:', {
+            startDate: filterConfig.startDate,
+            endDate: filterConfig.endDate,
+            categories: filterConfig.categories,
+            minAmount: filterConfig.minAmount,
+            maxAmount: filterConfig.maxAmount,
+          });
+          
+          // Use filterExpenses method when filters are applied
+          const filteredExpenses = await Expense.filterExpenses(
+            groupId,
+            dateToTimestamp(filterConfig.startDate),
+            dateToTimestamp(filterConfig.endDate),
+            filterConfig.categories,
+            filterConfig.minAmount,
+            filterConfig.maxAmount
+          );
+          
+          // For filtered results, we'll handle pagination manually
+          const startIndex = (page - 1) * pagination.pageSize;
+          const endIndex = startIndex + pagination.pageSize;
+          const paginatedExpenses = filteredExpenses.slice(startIndex, endIndex);
+          
+          result = {
+            expenses: paginatedExpenses,
+            pagination: {
+              currentPage: page,
+              pageSize: pagination.pageSize,
+              totalItems: filteredExpenses.length,
+              totalPages: Math.ceil(filteredExpenses.length / pagination.pageSize),
+              hasNextPage: endIndex < filteredExpenses.length,
+              hasPreviousPage: page > 1,
+              startIndex: startIndex + 1,
+              endIndex: Math.min(endIndex, filteredExpenses.length),
+            }
+          };
+        } else {
+          // Use regular pagination when no filters are applied
+          result = await Expense.getExpensesByGroupPaginated(
+            groupId,
+            page,
+            pagination.pageSize
+          );
+        }
 
         if (isRefresh || page === 1) {
           setExpenses(result.expenses);
@@ -96,25 +147,50 @@ const AllExpensesScreen = () => {
         setLoadingMore(false);
       }
     },
-    [groupId, pagination.pageSize, t]
+    [groupId, pagination.pageSize, t, filterConfig]
   );
 
   // Load more expenses for pagination
   const loadMoreExpenses = useCallback(() => {
     if (!loadingMore && pagination.hasNextPage) {
-      loadExpenses(pagination.currentPage + 1, false);
+      loadExpenses(pagination.currentPage + 1, false, filterConfig.checkedFilter);
     }
-  }, [loadExpenses, loadingMore, pagination.hasNextPage, pagination.currentPage]);
+  }, [loadExpenses, loadingMore, pagination.hasNextPage, pagination.currentPage, filterConfig.checkedFilter]);
 
   // Refresh expenses
   const onRefresh = useCallback(() => {
-    loadExpenses(1, true);
-  }, [loadExpenses]);
+    loadExpenses(1, true, filterConfig.checkedFilter);
+  }, [loadExpenses, filterConfig.checkedFilter]);
 
   // Load expenses on component mount and when groupId changes
   useEffect(() => {
-    loadExpenses(1, false);
+    loadExpenses(1, false, false);
   }, [groupId]);
+
+  // Load expenses when filter changes
+  useEffect(() => {
+    if (filterConfig.checkedFilter) {
+      loadExpenses(1, false, true);
+    }
+  }, [filterConfig.checkedFilter, filterConfig.startDate, filterConfig.endDate, filterConfig.categories, filterConfig.minAmount, filterConfig.maxAmount]);
+
+  // Filter expenses by search text
+  const filteredExpenses = React.useMemo(() => {
+    if (!searchText.trim()) {
+      return expenses;
+    }
+    
+    return expenses.filter((expense) => {
+      const title = expense.title?.toLowerCase() || '';
+      const description = expense.description?.toLowerCase() || '';
+      const category = expense.category?.toLowerCase() || '';
+      const search = searchText.toLowerCase();
+      
+      return title.includes(search) || 
+             description.includes(search) || 
+             category.includes(search);
+    });
+  }, [expenses, searchText]);
 
   const handleExpensePress = (expense) => {
     console.log('Expense pressed:', expense);
@@ -122,10 +198,20 @@ const AllExpensesScreen = () => {
   };
 
   const handleApplyFilter = (newFilter) => {
+    console.log('AllExpensesScreen: Received filter config:', newFilter);
+    console.log('AllExpensesScreen: Date types:', {
+      startDate: newFilter.startDate,
+      endDate: newFilter.endDate,
+      startDateType: typeof newFilter.startDate,
+      endDateType: typeof newFilter.endDate,
+      startDateInstanceOf: newFilter.startDate instanceof Date,
+      endDateInstanceOf: newFilter.endDate instanceof Date,
+    });
+    
     newFilter.groupId = groupId;
     setFilterConfig(newFilter);
     console.log('Filter applied:', newFilter);
-    // TODO: Implement server-side filtering by calling loadExpenses with filter parameters
+    // The useEffect will handle reloading expenses with filters
   };
 
   const handleResetFilter = () => {
@@ -134,10 +220,16 @@ const AllExpensesScreen = () => {
       selectedCategories: [],
       amountRange: { min: 5, max: 500, selectedMin: 20, selectedMax: 100 },
       selectedGroup: groupId,
+      checkedFilter: false,
+      startDate: null,
+      endDate: null,
+      categories: [],
+      minAmount: null,
+      maxAmount: null,
     };
     setFilterConfig(resetFilter);
     console.log('Filter reset');
-    // TODO: Implement server-side filter reset by calling loadExpenses without filter parameters
+    // The useEffect will handle reloading expenses without filters
   };
 
   // Render loading footer for pagination
@@ -192,20 +284,35 @@ const AllExpensesScreen = () => {
   };
 
   // Render empty state
-  const renderEmptyState = () => (
-    <View className="items-center px-4 py-12">
-      <View className="mb-4 items-center justify-center">
-        <Ionicons name="receipt" size={70} color="#2979FF" />
+  const renderEmptyState = () => {
+    const isSearchActive = searchText.trim().length > 0;
+    const isFilterActive = filterConfig.checkedFilter;
+    
+    return (
+      <View className="items-center px-4 py-12">
+        <View className="mb-4 items-center justify-center">
+          <Ionicons name="receipt" size={70} color="#2979FF" />
+        </View>
+        <Text className="mb-2 font-dmsans-bold text-[24px]">
+          {isSearchActive || isFilterActive 
+            ? t('expense.empty.noResults') 
+            : t('expense.empty.title')}
+        </Text>
+        <Text className="mb-6 text-center text-gray-500">
+          {isSearchActive || isFilterActive 
+            ? t('expense.empty.tryDifferentFilters') 
+            : t('expense.empty.description')}
+        </Text>
+        {!isSearchActive && !isFilterActive && (
+          <TouchableOpacity
+            className="rounded-lg bg-primary px-6 py-3"
+            onPress={() => navigation.navigate('NewExpense', { groupId })}>
+            <Text className="font-semibold text-white">{t('expense.empty.addFirstExpense')}</Text>
+          </TouchableOpacity>
+        )}
       </View>
-      <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.empty.title')}</Text>
-      <Text className="mb-6 text-center text-gray-500">{t('expense.empty.description')}</Text>
-      <TouchableOpacity
-        className="rounded-lg bg-primary px-6 py-3"
-        onPress={() => navigation.navigate('NewExpense', { groupId })}>
-        <Text className="font-semibold text-white">{t('expense.empty.addFirstExpense')}</Text>
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  };
 
   // Render error state
   const renderErrorState = () => (
@@ -251,6 +358,21 @@ const AllExpensesScreen = () => {
           placeholder={t('expense.search.placeholder')}
           onFilterPress={() => setIsFilterModalVisible(true)}
         />
+        
+        {/* Filter Active Indicator */}
+        {filterConfig.checkedFilter && (
+          <View className="mx-4 mt-2 flex-row items-center rounded-lg bg-blue-50 px-3 py-2">
+            <Feather name="filter" size={16} color="#2979FF" />
+            <Text className="ml-2 flex-1 text-sm text-blue-700">
+              {t('expense.filtersActive')}
+            </Text>
+            <TouchableOpacity onPress={handleResetFilter}>
+              <Text className="text-sm font-medium text-blue-700">
+                {t('filters.clear')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {renderPaginationInfo()}
@@ -262,9 +384,9 @@ const AllExpensesScreen = () => {
         </View>
       ) : error && expenses.length === 0 ? (
         renderErrorState()
-      ) : expenses.length > 0 ? (
+      ) : filteredExpenses.length > 0 ? (
         <FlatList
-          data={expenses}
+          data={filteredExpenses}
           renderItem={renderExpenseItem}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}

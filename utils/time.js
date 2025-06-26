@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore';
+
 export function extractHourMinutePeriod(timeString) {
   if (!timeString) return '';
 
@@ -40,4 +42,31 @@ export const formatDateForBackend = (date) => {
     hour12: true,
     timeZoneName: 'short',
   });
+};
+
+// Convert JavaScript Date to Firebase Timestamp for filtering
+export const dateToTimestamp = (date) => {
+  if (!date) return null;
+  
+  // Handle different types of date inputs
+  let dateObj;
+  
+  if (date instanceof Date) {
+    dateObj = date;
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date);
+  } else if (typeof date === 'number') {
+    dateObj = new Date(date);
+  } else {
+    console.warn('Invalid date format passed to dateToTimestamp:', date);
+    return null;
+  }
+  
+  // Check if the date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date passed to dateToTimestamp:', date);
+    return null;
+  }
+  
+  return Timestamp.fromDate(dateObj);
 };
