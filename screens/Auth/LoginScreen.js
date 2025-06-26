@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import Login from 'models/auth/Login';
 import { useTranslation } from 'react-i18next';
 import i18n from 'utils/i18n';
+import Header from 'components/Header';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -79,10 +80,8 @@ const LoginScreen = () => {
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header with Back Button */}
-
+        <Header />
         <View className="login-content relative ">
-          {/* Logo */}
-          <BackButton />
           <View className="logo-container">
             <Logo />
           </View>
