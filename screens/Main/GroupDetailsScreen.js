@@ -207,8 +207,62 @@ const GroupDetailsScreen = () => {
     return '0.0';
   };
 
-  const handleSettleUp = () => {
-    console.log('Settle up pressed');
+  const handleSettleUp = async () => {
+    // Check if user is group admin
+    if (!isGroupCreator) {
+      showError(
+        t('common.error'), 
+        t('groupDetails.onlyAdminCanSettle'), 
+        hideAlert
+      );
+      return;
+    }
+
+    // Show confirmation dialog
+    showConfirm(
+      t('groupDetails.settleUpTitle'),
+      t('groupDetails.settleUpMessage'),
+      async () => {
+        setLoading(true);
+        try {
+          const result = await Expense.settleUpGroup(groupId);
+          
+          if (result.success) {
+            // Show success message with settlement details
+            const message = result.expensesCreated.length > 0 
+              ? `${result.message}\nTotal balanced: ${t('common.currency')} ${result.totalSettled}`
+              : result.message;
+              
+            showSuccess(
+              t('common.success'),
+              message,
+              () => {
+                hideAlert();
+                // Refresh the screen data
+                navigation.replace('GroupDetails', { groupId });
+              }
+            );
+          }
+        } catch (error) {
+          console.error('Error settling up:', error);
+          let errorMessage = t('groupDetails.settleUpError');
+          
+          if (error.message === 'Only group admin can settle up expenses') {
+            errorMessage = t('groupDetails.onlyAdminCanSettle');
+          } else if (error.message === 'No expenses found to settle') {
+            errorMessage = t('groupDetails.noExpensesToSettle');
+          } else if (error.message === 'All expenses are already settled') {
+            errorMessage = t('groupDetails.alreadySettled');
+          }
+          
+          showError(t('common.error'), errorMessage, hideAlert);
+        } finally {
+          setLoading(false);
+        }
+      },
+      t('groupDetails.settleUp'),
+      t('common.cancel')
+    );
   };
 
   const handleSeeAllExpenses = () => {
@@ -301,12 +355,22 @@ const GroupDetailsScreen = () => {
             </View>
           </View>
 
-          {/* Settle Up Button */}
-          <TouchableOpacity className="mb-6 rounded-lg bg-primary py-4" onPress={handleSettleUp}>
-            <Text className="text-center text-base font-semibold text-white">
-              {t('groupDetails.settleUp')}
-            </Text>
-          </TouchableOpacity>
+          {/* Settle Up Button - Only show for group admin */}
+          {isGroupCreator && (
+            <TouchableOpacity 
+              className="mb-6 rounded-lg bg-primary py-4" 
+              onPress={handleSettleUp}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text className="text-center text-base font-semibold text-white">
+                  {t('groupDetails.settleUp')}
+                </Text>
+              )}
+            </TouchableOpacity>
+          )}
 
           {/* Members List with Horizontal Scroll */}
           <View className="mb-6">

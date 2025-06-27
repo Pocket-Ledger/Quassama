@@ -258,6 +258,12 @@
     "youPaid": "You Paid",
     "youOwe": "You Owe",
     "settleUp": "Settle Up",
+    "settleUpTitle": "Settle Up Group",
+    "settleUpMessage": "This will create balancing expenses to make all members have equal share (zero balance). Are you sure you want to proceed?",
+    "onlyAdminCanSettle": "Only group admin can settle up expenses",
+    "settleUpError": "Failed to settle up. Please try again.",
+    "noExpensesToSettle": "No expenses found to settle",
+    "alreadySettled": "All expenses are already settled",
     "recentExpenses": "Recently Expenses",
     "noExpenses": "No expenses yet",
     "noRecentExpenses": "No expenses yet",
@@ -290,6 +296,7 @@
     "health": "Health",
     "education": "Education",
     "travel": "Travel",
+    "settlement": "Settlement",
     "other": "Other",
     "groceries": "Groceries",
     "restaurant": "Restaurant",
@@ -476,6 +483,11 @@
     "group": {
       "title": "Group",
       "selectGroup": "Select group"
+    },
+    "settlements": {
+      "settled": "Settled",
+      "settlementHistory": "Settlement History",
+      "noSettlements": "No settlements yet"
     }
   }
 }

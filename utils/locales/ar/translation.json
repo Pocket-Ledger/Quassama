@@ -255,6 +255,12 @@
     "youPaid": "دفعت",
     "youOwe": "عليك",
     "settleUp": "تسوية الحسابات",
+    "settleUpTitle": "تسوية حسابات المجموعة",
+    "settleUpMessage": "سيتم إنشاء مصروفات توازن لجعل جميع الأعضاء لديهم نصيب متساوي (رصيد صفر). هل أنت متأكد من أنك تريد المتابعة؟",
+    "onlyAdminCanSettle": "فقط مدير المجموعة يمكنه تسوية الحسابات",
+    "settleUpError": "فشل في التسوية. يرجى المحاولة مرة أخرى.",
+    "noExpensesToSettle": "لا توجد نفقات للتسوية",
+    "alreadySettled": "جميع النفقات تم تسويتها بالفعل",
     "recentExpenses": "النفقات الأخيرة",
     "noExpenses": "لا توجد نفقات بعد",
     "noRecentExpenses": "لا توجد مصروفات بعد",
@@ -287,6 +293,7 @@
     "health": "صحة",
     "education": "تعليم",
     "travel": "سفر",
+    "settlement": "تسوية",
     "other": "أخرى",
     "groceries": "بقالة",
     "restaurant": "مطعم",
@@ -474,6 +481,11 @@
     "group": {
       "title": "المجموعة",
       "selectGroup": "اختر مجموعة"
+    },
+    "settlements": {
+      "settled": "تم التسوية",
+      "settlementHistory": "تاريخ التسويات",
+      "noSettlements": "لا توجد تسويات بعد"
     }
   }
 }

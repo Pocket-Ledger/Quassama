@@ -258,6 +258,12 @@
     "youPaid": "Vous Avez Payé",
     "youOwe": "Vous Devez",
     "settleUp": "Régler les Comptes",
+    "settleUpTitle": "Régler les Comptes du Groupe",
+    "settleUpMessage": "Cela créera des dépenses d'équilibrage pour que tous les membres aient une part égale (solde zéro). Êtes-vous sûr de vouloir continuer ?",
+    "onlyAdminCanSettle": "Seul l'administrateur du groupe peut régler les comptes",
+    "settleUpError": "Échec du règlement. Veuillez réessayer.",
+    "noExpensesToSettle": "Aucune dépense trouvée à régler",
+    "alreadySettled": "Toutes les dépenses sont déjà réglées",
     "recentExpenses": "Dépenses Récentes",
     "noExpenses": "Pas encore de dépenses",
     "noRecentExpenses": "Aucune dépense pour le moment",
@@ -290,6 +296,7 @@
     "health": "Santé",
     "education": "Éducation",
     "travel": "Voyage",
+    "settlement": "Règlement",
     "other": "Autre",
     "groceries": "Épicerie",
     "restaurant": "Restaurant",
@@ -476,6 +483,11 @@
     "group": {
       "title": "Groupe",
       "selectGroup": "Sélectionner un groupe"
+    },
+    "settlements": {
+      "settled": "Réglé",
+      "settlementHistory": "Historique des Règlements",
+      "noSettlements": "Aucun règlement pour le moment"
     }
   }
 }

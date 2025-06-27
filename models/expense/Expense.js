@@ -787,6 +787,163 @@ class Expense {
       throw new Error(`Failed to filter expenses: ${error.message}`);
     }
   }
+
+  /**
+   * Function to handle Settle up expenses between users in a group
+   * This function creates balancing expenses to make all users have equal share (zero balance)
+   * 
+   * Example:
+   * - User A paid 100, balance: +20 (owed 20)
+   * - User B paid 60, balance: -20 (owes 20)  
+   * - User C paid 80, balance: 0 (even)
+   * 
+   * Result: Creates expense of 20 for User B to balance everyone to 0
+   * 
+   * @param {string} groupId - The group ID to settle up
+   * @returns {Promise<Object>} - Settlement summary and created expenses
+   */
+  static async settleUpGroup(groupId) {
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    try {
+      // Get group details to check if current user is admin
+      const group = await Group.getGroupById(groupId);
+      if (!group) {
+        throw new Error('Group not found');
+      }
+
+      // Check if current user is the group creator (admin)
+      if (group.created_by !== currentUser.uid) {
+        throw new Error('Only group admin can settle up expenses');
+      }
+
+      // Get all balances for users in the group
+      const balances = await this.getBalanceByAllUsersInGroup(groupId);
+      
+      if (!balances || Object.keys(balances).length === 0) {
+        throw new Error('No expenses found to settle');
+      }
+
+      // Check if settlement is needed (if any user has non-zero balance)
+      const hasUnbalancedUsers = Object.values(balances).some(balance => Math.abs(balance) > 0.01);
+      
+      if (!hasUnbalancedUsers) {
+        return {
+          success: true,
+          message: 'All expenses are already settled',
+          expensesCreated: [],
+          totalSettled: 0
+        };
+      }
+
+      const expensesCreated = [];
+      let totalSettled = 0;
+
+      // Create balancing expenses for users who owe money (negative balance)
+      for (const [userId, balance] of Object.entries(balances)) {
+        if (balance < -0.01) { // User owes money
+          const owedAmount = Math.abs(balance);
+          
+          // Get username for the expense description
+          const userName = await User.getUsernameById(userId).catch(() => 'Unknown User');
+          
+          // Create a new expense instance for this user to balance their account
+          const balancingExpense = new Expense(
+            `Settlement - ${userName}`,
+            owedAmount,
+            'Settlement',
+            `Balance settlement expense created by admin`,
+            groupId
+          );
+          
+          // Manually set the user_id to the user who owes money
+          balancingExpense.user_id = userId;
+          balancingExpense.incurred_at = Timestamp.now();
+
+          // Save the balancing expense directly to Firestore
+          const expenseData = {
+            user_id: balancingExpense.user_id,
+            title: balancingExpense.title,
+            amount: balancingExpense.amount,
+            category: balancingExpense.category,
+            description: balancingExpense.description,
+            incurred_at: balancingExpense.incurred_at,
+            group_id: balancingExpense.group_id,
+            is_settlement: true, // Mark as settlement expense
+            settled_by: currentUser.uid
+          };
+
+          const expensesCollection = collection(db, 'expenses');
+          const docRef = await addDoc(expensesCollection, expenseData);
+
+          expensesCreated.push({
+            id: docRef.id,
+            userId: userId,
+            userName: userName,
+            amount: owedAmount,
+            title: balancingExpense.title
+          });
+
+          totalSettled += owedAmount;
+
+          // Create notification for the user
+          const userNotification = new Notification(
+            currentUser.uid,
+            userId,
+            'settlement_expense',
+            `Settlement expense of ${owedAmount} has been added to balance your account`
+          );
+          userNotification.groupId = groupId;
+          userNotification.expenseId = docRef.id;
+          await userNotification.save();
+        }
+      }
+
+      // Create notifications for all group members about the settlement
+      const groupMembers = group.members || [];
+      const adminNotificationPromises = [];
+      
+      for (const member of groupMembers) {
+        if (member && member.id && member.id !== currentUser.uid) {
+          const notification = new Notification(
+            currentUser.uid,
+            member.id,
+            'group_settled',
+            `Group expenses have been settled up by admin. ${expensesCreated.length} balancing expenses were created.`
+          );
+          notification.groupId = groupId;
+          adminNotificationPromises.push(notification.save());
+        }
+      }
+
+      await Promise.all(adminNotificationPromises);
+
+      return {
+        success: true,
+        message: `Successfully created ${expensesCreated.length} balancing expenses`,
+        expensesCreated,
+        totalSettled: parseFloat(totalSettled.toFixed(2)),
+        summary: {
+          totalExpenses: expensesCreated.length,
+          usersBalanced: expensesCreated.length
+        }
+      };
+
+    } catch (error) {
+      console.error('Error settling up group:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default Expense;
