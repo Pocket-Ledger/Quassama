@@ -1,7 +1,7 @@
 import { AuthProvider } from 'utils/AuthContext';
 import './global.css';
-import i18n from 'utils/i18n';
-import { I18nextProvider } from 'react-i18next';
+import i18n, { isRTLLanguage } from 'utils/i18n';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from 'utils/AppNavigator';
@@ -16,6 +16,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { languageUtils } from 'utils/languageUtils';
+import { I18nManager } from 'react-native';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -27,6 +28,21 @@ export default function App() {
     'DM Sans Bold': DMSans_700Bold,
     'DM Sans SemiBold': DMSans_600SemiBold,
   });
+
+  useEffect(() => {
+    // Set initial RTL direction based on the current language
+    const currentLanguage = i18n.language;
+    const shouldBeRTL = isRTLLanguage(currentLanguage);
+
+    if (I18nManager.isRTL !== shouldBeRTL) {
+      I18nManager.allowRTL(shouldBeRTL);
+      I18nManager.forceRTL(shouldBeRTL);
+
+      // Optionally restart the app here if needed
+      // This is usually required for RTL changes to take effect properly
+      console.log('RTL direction set to:', shouldBeRTL);
+    }
+  }, [i18n.language]);
 
   // Initialize language - moved inside the component
   useEffect(() => {

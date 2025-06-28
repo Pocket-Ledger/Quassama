@@ -7,6 +7,7 @@ import {
   Modal,
   Pressable,
   RefreshControl,
+  I18nManager,
 } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { CircularProgress } from 'components/CircularProgress';
@@ -22,11 +23,22 @@ import SwitchGroupModal from 'components/SwitchGroupModal';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from 'models/notifications/notifications';
-import { capitalizeFirst } from 'utils/text';
+import { capitalizeFirst, getFirstLetterCapitalized } from 'utils/text';
+import { useRTL } from 'hooks/useRTL';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { t, i18n } = useTranslation();
+
+  const {
+    isRTL,
+    getFlexDirection,
+    getTextAlign,
+    getMargin,
+    getPadding,
+    getPosition,
+    getIconDirection,
+  } = useRTL();
 
   const [user, setUser] = useState('');
   const [isLoadingUser, setIsLoadingUser] = useState(true);
@@ -338,6 +350,7 @@ const HomeScreen = () => {
   const handleProfilePress = () => {
     navigation.navigate('Profile');
   };
+
   const getDynamicGreeting = () => {
     const currentHour = new Date().getHours();
 
@@ -354,25 +367,33 @@ const HomeScreen = () => {
 
   return (
     <ScrollView
-      className="container flex flex-1 gap-6 bg-white pb-6 pt-2 "
+      className="container flex flex-1 gap-6 bg-white pb-6 pt-2"
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
-        <View className="flex-row items-center">
+      <View className={`${getFlexDirection()} items-center justify-between px-4 pb-4 pt-12`}>
+        <View className={`${getFlexDirection()} items-center`}>
           <TouchableOpacity onPress={handleProfilePress}>
-            <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
-              <Text className="font-dmsans-bold text-lg text-white">M</Text>
+            <View
+              className={`${getMargin('right', '3')} h-12 w-12 items-center justify-center rounded-full bg-primary`}>
+              <Text className="font-dmsans-bold text-lg text-white">
+                {getFirstLetterCapitalized(user.username)}
+              </Text>
             </View>
           </TouchableOpacity>
           <View>
-            <Text className="text-sm font-normal text-gray-500">{getDynamicGreeting()}</Text>
+            <Text className={`text-sm font-normal text-gray-500 ${getTextAlign('left')}`}>
+              {getDynamicGreeting()}
+            </Text>
             {isLoadingUser ? (
               <>
                 <View className="mb-2 h-6 w-48 rounded bg-gray-100" />
               </>
             ) : (
               <>
-                <Text className="mb-2 font-dmsans-bold text-xl text-black">{user.username}</Text>
+                <Text
+                  className={`mb-2 font-dmsans-bold text-xl text-black ${getTextAlign('left')}`}>
+                  {user.username}
+                </Text>
               </>
             )}
           </View>
@@ -380,7 +401,8 @@ const HomeScreen = () => {
         <TouchableOpacity className="relative" onPress={() => navigation.navigate('Notifications')}>
           <Feather name="bell" size={24} color="#666" />
           {unreadCount > 0 && (
-            <View className="absolute -right-1 -top-1 min-h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
+            <View
+              className={`absolute ${isRTL ? '-left-1' : '-right-1'} -top-1 min-h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1`}>
               <Text className="text-xs font-bold text-white">{unreadCount}</Text>
             </View>
           )}
@@ -389,16 +411,20 @@ const HomeScreen = () => {
 
       {/* Balance Cards */}
       <View className="flex gap-8 pb-4">
-        <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
-          <View className="mr-2 flex-1">
-            <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.oweYou')}</Text>
-            <Text className="font-dmsans-bold text-2xl text-error">
+        <View className={`${getFlexDirection()} rounded-md border border-gray-100 px-4 py-2`}>
+          <View className={`${getMargin('right', '2')} flex-1`}>
+            <Text className={`mb-1 text-lg font-medium text-gray-500 ${getTextAlign('left')}`}>
+              {t('home.oweYou')}
+            </Text>
+            <Text className={`font-dmsans-bold text-2xl text-error ${getTextAlign('left')}`}>
               {oweYou.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
             </Text>
           </View>
-          <View className="ml-2 flex-1">
-            <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.youOwe')}</Text>
-            <Text className="font-dmsans-bold text-2xl text-green-500">
+          <View className={`${getMargin('left', '2')} flex-1`}>
+            <Text className={`mb-1 text-lg font-medium text-gray-500 ${getTextAlign('left')}`}>
+              {t('home.youOwe')}
+            </Text>
+            <Text className={`font-dmsans-bold text-2xl text-green-500 ${getTextAlign('left')}`}>
               {youOwe.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
             </Text>
           </View>
@@ -406,7 +432,7 @@ const HomeScreen = () => {
 
         {/* Overview Section */}
         <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <Text className="mb-4 text-lg font-medium text-black">
+          <Text className={`mb-4 text-lg font-medium text-black ${getTextAlign('left')}`}>
             {t('home.monthlyOverview', {
               month: overviewData.monthName,
               year: overviewData.year,
@@ -414,8 +440,8 @@ const HomeScreen = () => {
           </Text>
 
           {isLoadingOverview ? (
-            <View className="flex-row items-center">
-              <View className="relative mr-6">
+            <View className={`${getFlexDirection()} items-center`}>
+              <View className={`relative ${getMargin('right', '6')}`}>
                 <View className="h-20 w-20 rounded-full bg-gray-200" />
               </View>
               <View className="flex-1">
@@ -430,30 +456,34 @@ const HomeScreen = () => {
               <Text className="mt-2 text-gray-500">{t('home.noExpensesThisMonth')}</Text>
             </View>
           ) : (
-            <View className="flex-row items-center">
-              <View className="relative mr-6">
+            <View className={`${getFlexDirection()} items-center`}>
+              <View className={`relative ${getMargin('right', '6')}`}>
                 <CircularProgress percentage={primaryPercentage} color={primaryColor} />
               </View>
 
               <View className="flex-1">
                 {overviewData.categoryData.slice(0, 4).map((item, index) => (
-                  <View key={index} className="mb-2 flex-row items-center justify-between">
-                    <View className="flex-row items-center">
+                  <View
+                    key={index}
+                    className={`mb-2 ${getFlexDirection()} items-center justify-between`}>
+                    <View className={`${getFlexDirection()} items-center`}>
                       <View
-                        className="mr-2 h-3 w-3 rounded-full"
+                        className={`${getMargin('right', '2')} h-3 w-3 rounded-full`}
                         style={{ backgroundColor: item.color }}
                       />
-                      <Text className="text-lg font-normal text-gray-500">
+                      <Text className={`text-lg font-normal text-gray-500 ${getTextAlign('left')}`}>
                         {t(`categories.${item.category.toLowerCase()}`, {
                           defaultValue: item.category,
                         })}
                       </Text>
                     </View>
-                    <Text className="text-lg font-medium text-black">{item.percentage}%</Text>
+                    <Text className={`text-lg font-medium text-black ${getTextAlign('right')}`}>
+                      {item.percentage}%
+                    </Text>
                   </View>
                 ))}
                 {overviewData.categoryData.length > 4 && (
-                  <Text className="text-sm text-gray-400">
+                  <Text className={`text-sm text-gray-400 ${getTextAlign('left')}`}>
                     {t('home.moreCategoriesCount', { count: overviewData.categoryData.length - 4 })}
                   </Text>
                 )}
@@ -464,27 +494,37 @@ const HomeScreen = () => {
           {/* Total amount display */}
           {!isLoadingOverview && overviewData.totalAmount > 0 && (
             <View className="mt-4 border-t border-gray-100 pt-4">
-              <View className="flex-row justify-between">
-                <Text className="text-gray-500">{t('home.totalExpenses')}</Text>
-                <Text className="font-dmsans-bold text-black">
+              <View className={`${getFlexDirection()} justify-between`}>
+                <Text className={`text-gray-500 ${getTextAlign('left')}`}>
+                  {t('home.totalExpenses')}
+                </Text>
+                <Text className={`font-dmsans-bold text-black ${getTextAlign('right')}`}>
                   {overviewData.totalAmount.toFixed(2)} {getCurrency()}
                 </Text>
               </View>
-              <View className="mt-1 flex-row justify-between">
-                <Text className="text-gray-500">{t('home.totalTransactions')}</Text>
-                <Text className="text-black">{overviewData.expenseCount}</Text>
+              <View className={`mt-1 ${getFlexDirection()} justify-between`}>
+                <Text className={`text-gray-500 ${getTextAlign('left')}`}>
+                  {t('home.totalTransactions')}
+                </Text>
+                <Text className={`text-black ${getTextAlign('right')}`}>
+                  {overviewData.expenseCount}
+                </Text>
               </View>
             </View>
           )}
         </View>
 
         {/* Recent Activity */}
-        <View className="mx-4 ">
-          <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">{t('home.recentActivity')}</Text>
+        <View className="mx-4">
+          <View className={`mb-4 ${getFlexDirection()} items-center justify-between`}>
+            <Text className={`text-lg font-medium text-black ${getTextAlign('left')}`}>
+              {t('home.recentActivity')}
+            </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('AllExpenses', { groupId: selectedGroup })}>
-              <Text className="font-medium text-primary">{t('common.seeAll')}</Text>
+              <Text className={`font-medium text-primary ${getTextAlign('right')}`}>
+                {t('common.seeAll')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -509,14 +549,20 @@ const HomeScreen = () => {
         </View>
 
         {/* Group Members */}
-        <View className="mx-4 ">
-          <View className="mb-4 flex-row items-start justify-between">
+        <View className="mx-4">
+          <View className={`mb-4 ${getFlexDirection()} items-start justify-between`}>
             <View>
-              <Text className="text-lg font-medium text-black ">{capitalizeFirst(groupName)}</Text>
-              <Text className="text-xs font-light text-black">{t('group.groupMembers')}</Text>
+              <Text className={`text-lg font-medium text-black ${getTextAlign('left')}`}>
+                {capitalizeFirst(groupName)}
+              </Text>
+              <Text className={`text-xs font-light text-black ${getTextAlign('left')}`}>
+                {t('group.groupMembers')}
+              </Text>
             </View>
             <TouchableOpacity onPress={openGroupModal}>
-              <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
+              <Text className={`font-medium text-primary ${getTextAlign('right')}`}>
+                {t('home.switchGroup')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -537,7 +583,7 @@ const HomeScreen = () => {
             refreshing={refreshingGroups}
           />
 
-          <View className="flex-row justify-between">
+          <View className={`${getFlexDirection()} justify-between`}>
             {friends.length === 0 ? (
               <View className="w-full items-center py-8">
                 <Feather name="users" size={48} color="#ccc" />
