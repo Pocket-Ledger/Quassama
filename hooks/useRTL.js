@@ -75,6 +75,7 @@ export const useRTL = () => {
       'chevron-right': isRTL ? 'chevron-left' : 'chevron-right',
       'arrow-left': isRTL ? 'arrow-right' : 'arrow-left',
       'arrow-right': isRTL ? 'arrow-left' : 'arrow-right',
+      'chevron-back': isRTL ? 'chevron-forward' : 'chevron-back',
     };
 
     return rtlIcons[iconName] || iconName;

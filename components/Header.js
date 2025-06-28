@@ -2,18 +2,26 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { BackButton } from './BackButton';
 import PlusIconButton from './PlusIconButton';
+import { useRTL } from 'hooks/useRTL';
+import Logger from 'utils/looger';
 
 const Header = ({ title, showIcon = false, route, rightIcon }) => {
+  const { isRTL, getFlexDirection, getTextAlign } = useRTL();
   const hasRightContent = showIcon || rightIcon;
-
+  Logger.info(isRTL);
   return (
     <View
-      className={`items mb-6 flex flex-row items-center ${
+      className={`mb-6 flex items-center  ${getFlexDirection()} ${
         hasRightContent ? 'justify-between' : 'justify-start'
       }`}>
-      <View className="flex-row items-end gap-2">
+      {/* Back button and title container */}
+      <View className={`items-center gap-2 ${getFlexDirection()}`}>
         <BackButton />
-        <Text className="font-dmsans-bold text-xl text-black">{title}</Text>
+        {title && (
+          <Text className={`font-dmsans-bold text-xl text-black ${getTextAlign('left')}`}>
+            {title}
+          </Text>
+        )}
       </View>
 
       {/* Right side content */}

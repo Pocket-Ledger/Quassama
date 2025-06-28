@@ -279,7 +279,7 @@ const GroupDetailsScreen = () => {
           title={name}
           rightIcon={
             isGroupCreator ? (
-              <View>
+              <View className="relative">
                 <TouchableOpacity
                   onPress={handleOptionsPress}
                   className="h-10 w-10 items-center justify-center rounded-full bg-primary">
@@ -289,22 +289,22 @@ const GroupDetailsScreen = () => {
                 {/* Options Menu */}
                 {showOptionsMenu && (
                   <View
-                    className={`absolute right-0 top-12 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg`}>
+                    className={`absolute top-12 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg ${getPosition('right', '0')}`}>
                     <TouchableOpacity
                       onPress={handleEditGroup}
-                      className={`${getFlexDirection()} items-center border-b border-gray-100 px-4 py-3`}>
+                      className={`items-center border-b border-gray-100 px-4 py-3 ${getFlexDirection()}`}>
                       <Feather name="settings" size={18} color="#374151" />
                       <Text
-                        className={`${getMargin('left', '3')} text-base text-gray-700 ${getTextAlign('left')}`}>
+                        className={`text-base text-gray-700 ${getMargin('left', '3')} ${getTextAlign('left')}`}>
                         {t('groupDetails.editGroup')}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={handleDeletePress}
-                      className={`${getFlexDirection()} items-center px-4 py-3`}>
+                      className={`items-center px-4 py-3 ${getFlexDirection()}`}>
                       <Feather name="trash-2" size={18} color="#EF4444" />
                       <Text
-                        className={`${getMargin('left', '3')} text-base text-red-500 ${getTextAlign('left')}`}>
+                        className={`text-base text-red-500 ${getMargin('left', '3')} ${getTextAlign('left')}`}>
                         {t('groupDetails.deleteGroup')}
                       </Text>
                     </TouchableOpacity>
