@@ -489,5 +489,12 @@
       "settlementHistory": "Historique des Règlements",
       "noSettlements": "Aucun règlement pour le moment"
     }
+  },
+  "logoutModal": {
+    "title": "Se déconnecter",
+    "message": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "cancel": "Annuler",
+    "logout": "Se déconnecter",
+    "loggingOut": "Déconnexion en cours..."
   }
 }

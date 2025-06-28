@@ -1,9 +1,14 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, Pressable, Dimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL';
 
 const { width } = Dimensions.get('window');
 
 const LogoutModal = ({ visible, onClose, onConfirm, isLoading = false }) => {
+  const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign } = useRTL();
+
   return (
     <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
       <Pressable className="flex-1 items-center justify-center bg-black/50 px-4" onPress={onClose}>
@@ -13,19 +18,22 @@ const LogoutModal = ({ visible, onClose, onConfirm, isLoading = false }) => {
           style={{ width: width * 0.85, maxWidth: 340 }}>
           {/* Modal Header */}
           <View className="mb-4 items-center">
-            <Text className="mb-2 text-xl font-bold text-black">Logout</Text>
-            <Text className="text-center text-base font-normal leading-5 text-gray-600">
-              Are you sure you want to log out?
+            <Text className={`mb-2 text-xl font-bold text-black ${getTextAlign('center')}`}>
+              {t('logoutModal.title')}
+            </Text>
+            <Text
+              className={`text-center text-base font-normal leading-5 text-gray-600 ${getTextAlign('center')}`}>
+              {t('logoutModal.message')}
             </Text>
           </View>
 
           {/* Modal Actions */}
-          <View className="mt-6 flex-row gap-3">
+          <View className={`mt-6 gap-3 ${getFlexDirection()}`}>
             <TouchableOpacity
               className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-4 py-3"
               onPress={onClose}
               disabled={isLoading}>
-              <Text className="text-base font-medium text-gray-700">Cancel</Text>
+              <Text className="text-base font-medium text-gray-700">{t('logoutModal.cancel')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -33,7 +41,7 @@ const LogoutModal = ({ visible, onClose, onConfirm, isLoading = false }) => {
               onPress={onConfirm}
               disabled={isLoading}>
               <Text className="text-base font-medium text-white">
-                {isLoading ? 'Logging out...' : 'Logout'}
+                {isLoading ? t('logoutModal.loggingOut') : t('logoutModal.logout')}
               </Text>
             </TouchableOpacity>
           </View>

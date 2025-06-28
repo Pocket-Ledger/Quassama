@@ -489,5 +489,12 @@
       "settlementHistory": "Settlement History",
       "noSettlements": "No settlements yet"
     }
+  },
+  "logoutModal": {
+    "title": "Logout",
+    "message": "Are you sure you want to log out?",
+    "cancel": "Cancel",
+    "logout": "Logout",
+    "loggingOut": "Logging out..."
   }
 }
