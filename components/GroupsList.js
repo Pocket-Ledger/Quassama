@@ -8,6 +8,7 @@ const GroupsList = ({
   onStarPress,
   showScrollIndicator = false,
   contentContainerStyle = { paddingBottom: 20 },
+  isRTL, // Add RTL prop
 }) => {
   return (
     <ScrollView
@@ -15,7 +16,13 @@ const GroupsList = ({
       showsVerticalScrollIndicator={showScrollIndicator}
       contentContainerStyle={contentContainerStyle}>
       {groups.map((group) => (
-        <GroupItem key={group.id} group={group} onPress={onGroupPress} onStarPress={onStarPress} />
+        <GroupItem
+          key={group.id}
+          group={group}
+          onPress={onGroupPress}
+          onStarPress={onStarPress}
+          isRTL={isRTL} // Pass RTL prop to GroupItem
+        />
       ))}
     </ScrollView>
   );

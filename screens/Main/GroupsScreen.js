@@ -9,13 +9,16 @@ import Invitation from 'models/invitation/invitation';
 import User from 'models/auth/user';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 import Logger from 'utils/looger';
 import Expense from 'models/expense/Expense';
 import Favorites from 'models/group/favorites';
 
 // A little card just for one invitation
-const InvitationCard = ({ invitation, onAccept, onDecline }) => {
+const InvitationCard = ({ invitation, onAccept, onDecline, isRTL }) => {
   const { t } = useTranslation();
+  const { getFlexDirection, getTextAlign, getMargin, getPadding } = useRTL();
+
   const [inviterName, setInviterName] = useState('…');
 
   useEffect(() => {
@@ -34,32 +37,34 @@ const InvitationCard = ({ invitation, onAccept, onDecline }) => {
 
   return (
     <View className="my-6 rounded-xl bg-blue-50 p-4">
-      <View className="flex-row items-center">
+      <View className={`${getFlexDirection()} items-center`}>
         <View
-          className="mr-3 h-12 w-12 items-center justify-center rounded-full"
+          className={`${getMargin('right', '3')} h-12 w-12 items-center justify-center rounded-full`}
           style={{ backgroundColor: '#E91E63' }}>
           <Text className="font-dmsans-bold text-lg text-white">
             {inviterName[0]?.toUpperCase() || '?'}
           </Text>
         </View>
         <View className="flex-1">
-          <Text className="font-dmsans-bold text-base text-black">
+          <Text className={`font-dmsans-bold text-base text-black ${getTextAlign('left')}`}>
             {t('invitations.join', { groupName: invitation.group_name })}
           </Text>
-          <Text className="text-sm text-gray-500">
+          <Text className={`text-sm text-gray-500 ${getTextAlign('left')}`}>
             {t('invitations.invitedBy', { name: inviterName })}
           </Text>
         </View>
       </View>
 
-      <View className="mt-4 flex-row gap-3">
+      <View className={`mt-4 ${getFlexDirection()} gap-3`}>
         <TouchableOpacity className="flex-1 rounded-lg bg-primary py-3" onPress={onAccept}>
-          <Text className="text-center font-semibold text-white">{t('invitations.accept')}</Text>
+          <Text className={`text-center font-semibold text-white ${getTextAlign('center')}`}>
+            {t('invitations.accept')}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="flex-1 rounded-lg border border-gray-300 py-3"
           onPress={onDecline}>
-          <Text className="text-center font-semibold text-gray-900">
+          <Text className={`text-center font-semibold text-gray-900 ${getTextAlign('center')}`}>
             {t('invitations.decline')}
           </Text>
         </TouchableOpacity>
@@ -72,6 +77,7 @@ const GroupsScreen = () => {
   const auth = getAuth();
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding } = useRTL(); // Use RTL hook
 
   const [activeTab, setActiveTab] = useState(t('group.tabs.all'));
   const [isLoading, setIsLoading] = useState(true);
@@ -163,25 +169,6 @@ const GroupsScreen = () => {
 
   const userId = getAuth().currentUser.uid;
 
-  /* const handleAcceptInvitation = async (invId, groupId) => {
-    try {
-      const username = await User.getUsernameById(userId);
-      const memberObj = {
-        id: userId,
-        name: username,
-        initial: username ? username[0].toUpperCase() : '',
-        color: '#2979FF',
-      };
-
-      await Group.addMemberToGroup(groupId, memberObj);
-
-      await Invitation.accept(invId);
-
-      
-    } catch (err) {
-      console.error('Accept failed', err);
-    }
-  }; */
   const handleAcceptInvitation = async (invId, groupId) => {
     try {
       // 1) build member object for the current user
@@ -210,13 +197,6 @@ const GroupsScreen = () => {
     }
   };
 
-  /* const handleDeclineInvitation = async (invId) => {
-    try {
-      await Invitation.decline(invId);
-    } catch (err) {
-      console.error('Decline failed', err);
-    }
-  }; */
   const handleDeclineInvitation = async (invId) => {
     try {
       await Invitation.decline(invId);
@@ -257,15 +237,19 @@ const GroupsScreen = () => {
 
         {/* Tabs */}
         <View className="mb-6 px-4">
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className={getFlexDirection()}>
             {tabs.map((tab, index) => (
               <TouchableOpacity
                 key={index}
-                className={`mr-4 rounded-[3px] border border-gray-100 px-4 py-2 ${
+                className={`${getMargin('right', '4')} rounded-[3px] border border-gray-100 px-4 py-2 ${
                   activeTab === tab ? 'bg-primary' : 'bg-white'
                 }`}
                 onPress={() => handleTabPress(tab)}>
-                <Text className={`text-sm ${activeTab === tab ? 'text-white' : 'text-gray-600'}`}>
+                <Text
+                  className={`text-sm ${getTextAlign('center')} ${activeTab === tab ? 'text-white' : 'text-gray-600'}`}>
                   {tab}
                 </Text>
               </TouchableOpacity>
@@ -275,7 +259,7 @@ const GroupsScreen = () => {
 
         {/* Groups List with Invitation */}
         <ScrollView
-          className="flex-1 "
+          className="flex-1"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 5 }}>
           {/* Groups List or Empty State */}
@@ -284,8 +268,8 @@ const GroupsScreen = () => {
             <View className="px-4">
               {[1, 2, 3].map((item) => (
                 <View key={item} className="mb-4 rounded-xl bg-gray-100 p-4">
-                  <View className="mb-2 h-4 w-3/4 rounded bg-gray-200" />
-                  <View className="h-3 w-1/2 rounded bg-gray-200" />
+                  <View className={`mb-2 h-4 w-3/4 rounded bg-gray-200 ${getTextAlign('left')}`} />
+                  <View className={`h-3 w-1/2 rounded bg-gray-200 ${getTextAlign('left')}`} />
                 </View>
               ))}
             </View>
@@ -303,19 +287,26 @@ const GroupsScreen = () => {
               }))}
               onGroupPress={handleGroupPress}
               onStarPress={handleStarPress}
+              isRTL={isRTL} // Pass RTL prop to GroupsList
             />
           ) : (
             // Empty state
             <View className="items-center px-4 py-12">
               <View className="mb-4 items-center justify-center">
-                <Ionicons name="people" size={70} color="#2979FF" />{' '}
+                <Ionicons name="people" size={70} color="#2979FF" />
               </View>
-              <Text className="mb-2 font-dmsans-bold text-[24px] ">{t('group.noGroupsYet')}</Text>
-              <Text className="mb-6 text-center text-gray-500">{t('group.startByCreating')}</Text>
+              <Text className={`mb-2 font-dmsans-bold text-[24px] ${getTextAlign('center')}`}>
+                {t('group.noGroupsYet')}
+              </Text>
+              <Text className={`mb-6 text-center text-gray-500 ${getTextAlign('center')}`}>
+                {t('group.startByCreating')}
+              </Text>
               <TouchableOpacity
                 className="rounded-lg bg-primary px-6 py-3"
                 onPress={() => navigation.navigate('AddNewGroup')}>
-                <Text className="font-semibold text-white">{t('group.createFirstGroup')}</Text>
+                <Text className={`font-semibold text-white ${getTextAlign('center')}`}>
+                  {t('group.createFirstGroup')}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -327,6 +318,7 @@ const GroupsScreen = () => {
               invitation={inv}
               onAccept={() => handleAcceptInvitation(inv.id, inv.group_id)}
               onDecline={() => handleDeclineInvitation(inv.id)}
+              isRTL={isRTL} // Pass RTL prop
             />
           ))}
         </ScrollView>

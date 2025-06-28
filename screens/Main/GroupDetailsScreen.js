@@ -17,11 +17,12 @@ import { useAlert } from 'hooks/useAlert';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Expense from 'models/expense/Expense';
-import Group from 'models/group/group'; // Import your Group model
+import Group from 'models/group/group';
 import User from 'models/auth/user';
 import { extractHourAndMinute, extractHourMinutePeriod } from 'utils/time';
 import FloatingPlusButton from 'components/FloatingPlusButton';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 import { getAuth } from 'firebase/auth';
 import CustomAlert from 'components/CustomALert';
 import Logger from 'utils/looger';
@@ -33,6 +34,7 @@ const GroupDetailsScreen = () => {
   const route = useRoute();
   const { groupId } = route.params;
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getPosition } = useRTL(); // Use RTL hook
 
   const [groupData, setGroupData] = useState(null);
   const [TotalExpenses, setTotalExpenses] = useState(0);
@@ -183,7 +185,7 @@ const GroupDetailsScreen = () => {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#2979FF" />
-        <Text className="mt-4">{t('common.loading')}</Text>
+        <Text className={`mt-4 ${getTextAlign('center')}`}>{t('common.loading')}</Text>
       </SafeAreaView>
     );
   }
@@ -210,11 +212,7 @@ const GroupDetailsScreen = () => {
   const handleSettleUp = async () => {
     // Check if user is group admin
     if (!isGroupCreator) {
-      showError(
-        t('common.error'), 
-        t('groupDetails.onlyAdminCanSettle'), 
-        hideAlert
-      );
+      showError(t('common.error'), t('groupDetails.onlyAdminCanSettle'), hideAlert);
       return;
     }
 
@@ -226,27 +224,24 @@ const GroupDetailsScreen = () => {
         setLoading(true);
         try {
           const result = await Expense.settleUpGroup(groupId);
-          
+
           if (result.success) {
             // Show success message with settlement details
-            const message = result.expensesCreated.length > 0 
-              ? `${result.message}\nTotal balanced: ${t('common.currency')} ${result.totalSettled}`
-              : result.message;
-              
-            showSuccess(
-              t('common.success'),
-              message,
-              () => {
-                hideAlert();
-                // Refresh the screen data
-                navigation.replace('GroupDetails', { groupId });
-              }
-            );
+            const message =
+              result.expensesCreated.length > 0
+                ? `${result.message}\nTotal balanced: ${t('common.currency')} ${result.totalSettled}`
+                : result.message;
+
+            showSuccess(t('common.success'), message, () => {
+              hideAlert();
+              // Refresh the screen data
+              navigation.replace('GroupDetails', { groupId });
+            });
           }
         } catch (error) {
           console.error('Error settling up:', error);
           let errorMessage = t('groupDetails.settleUpError');
-          
+
           if (error.message === 'Only group admin can settle up expenses') {
             errorMessage = t('groupDetails.onlyAdminCanSettle');
           } else if (error.message === 'No expenses found to settle') {
@@ -254,7 +249,7 @@ const GroupDetailsScreen = () => {
           } else if (error.message === 'All expenses are already settled') {
             errorMessage = t('groupDetails.alreadySettled');
           }
-          
+
           showError(t('common.error'), errorMessage, hideAlert);
         } finally {
           setLoading(false);
@@ -293,20 +288,23 @@ const GroupDetailsScreen = () => {
 
                 {/* Options Menu */}
                 {showOptionsMenu && (
-                  <View className="absolute right-0 top-12 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg">
+                  <View
+                    className={`absolute right-0 top-12 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg`}>
                     <TouchableOpacity
                       onPress={handleEditGroup}
-                      className="flex-row items-center border-b border-gray-100 px-4 py-3">
+                      className={`${getFlexDirection()} items-center border-b border-gray-100 px-4 py-3`}>
                       <Feather name="settings" size={18} color="#374151" />
-                      <Text className="ml-3 text-base text-gray-700">
+                      <Text
+                        className={`${getMargin('left', '3')} text-base text-gray-700 ${getTextAlign('left')}`}>
                         {t('groupDetails.editGroup')}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={handleDeletePress}
-                      className="flex-row items-center px-4 py-3">
+                      className={`${getFlexDirection()} items-center px-4 py-3`}>
                       <Feather name="trash-2" size={18} color="#EF4444" />
-                      <Text className="ml-3 text-base text-red-500">
+                      <Text
+                        className={`${getMargin('left', '3')} text-base text-red-500 ${getTextAlign('left')}`}>
                         {t('groupDetails.deleteGroup')}
                       </Text>
                     </TouchableOpacity>
@@ -332,23 +330,28 @@ const GroupDetailsScreen = () => {
           contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Group Summary Card */}
           <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-            <Text className="text-center text-base text-black/75">
+            <Text className={`text-center text-base text-black/75 ${getTextAlign('center')}`}>
               {t('groupDetails.totalGroupExpenses')}
             </Text>
-            <Text className="text-center text-2xl font-medium text-black">
+            <Text
+              className={`text-center text-2xl font-medium text-black ${getTextAlign('center')}`}>
               {t('common.currency')} {TotalExpenses}
             </Text>
 
-            <View className="mt-6 flex-row justify-between">
+            <View className={`mt-6 ${getFlexDirection()} justify-between`}>
               <View className="flex-1">
-                <Text className="text-sm text-black/75">{t('groupDetails.youPaid')}</Text>
-                <Text className="text-xl text-black">
+                <Text className={`text-sm text-black/75 ${getTextAlign('left')}`}>
+                  {t('groupDetails.youPaid')}
+                </Text>
+                <Text className={`text-xl text-black ${getTextAlign('left')}`}>
                   {t('common.currency')} {youPaid}
                 </Text>
               </View>
-              <View className="flex-1 items-end">
-                <Text className="text-sm text-black/75">{t('groupDetails.youOwe')}</Text>
-                <Text className="text-xl text-red-500">
+              <View className={`flex-1 items-${isRTL ? 'start' : 'end'}`}>
+                <Text className={`text-sm text-black/75 ${getTextAlign('right')}`}>
+                  {t('groupDetails.youOwe')}
+                </Text>
+                <Text className={`text-xl text-red-500 ${getTextAlign('right')}`}>
                   -{t('common.currency')} {youOwe}
                 </Text>
               </View>
@@ -357,15 +360,15 @@ const GroupDetailsScreen = () => {
 
           {/* Settle Up Button - Only show for group admin */}
           {isGroupCreator && (
-            <TouchableOpacity 
-              className="mb-6 rounded-lg bg-primary py-4" 
+            <TouchableOpacity
+              className="mb-6 rounded-lg bg-primary py-4"
               onPress={handleSettleUp}
-              disabled={loading}
-            >
+              disabled={loading}>
               {loading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text className="text-center text-base font-semibold text-white">
+                <Text
+                  className={`text-center text-base font-semibold text-white ${getTextAlign('center')}`}>
                   {t('groupDetails.settleUp')}
                 </Text>
               )}
@@ -374,12 +377,14 @@ const GroupDetailsScreen = () => {
 
           {/* Members List with Horizontal Scroll */}
           <View className="mb-6">
-            <Text className="mb-3 text-lg font-medium text-black">Members</Text>
+            <Text className={`mb-3 text-lg font-medium text-black ${getTextAlign('left')}`}>
+              Members
+            </Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 4 }}
-              className="flex-row">
+              className={getFlexDirection()}>
               {members
                 .filter((member) => typeof member === 'object' && member !== null)
                 .map((member, idx) => {
@@ -389,16 +394,17 @@ const GroupDetailsScreen = () => {
                   return (
                     <View
                       key={member.id || `member-${idx}-${member.name || 'unknown'}`}
-                      className="mr-4 items-center">
+                      className={`${getMargin('right', '4')} items-center`}>
                       <Avatar
                         initial={member.initial}
                         name={member.name}
                         color={member.color}
                         size="medium"
                         showName={true}
+                        isRTL={isRTL} // Pass RTL prop
                       />
                       <Text
-                        className={`mt-1 text-xs font-medium ${
+                        className={`mt-1 text-xs font-medium ${getTextAlign('center')} ${
                           memberBalance > 0
                             ? 'text-green-500'
                             : memberBalance < 0
@@ -414,12 +420,14 @@ const GroupDetailsScreen = () => {
           </View>
 
           {/* Recently Expenses Header */}
-          <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">
+          <View className={`mb-4 ${getFlexDirection()} items-center justify-between`}>
+            <Text className={`text-lg font-medium text-black ${getTextAlign('left')}`}>
               {t('groupDetails.recentExpenses')}
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId })}>
-              <Text className="text-base font-medium text-primary">{t('common.seeAll')}</Text>
+              <Text className={`text-base font-medium text-primary ${getTextAlign('right')}`}>
+                {t('common.seeAll')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -439,15 +447,18 @@ const GroupDetailsScreen = () => {
                   onPress={() => console.log('Expense pressed:', expense)}
                   showBorder={true}
                   currency={t('common.currency')}
+                  isRTL={isRTL} // Pass RTL prop
                 />
               ))
             ) : (
               <View className="items-center justify-center py-8">
                 <Feather name="receipt" size={48} color="#D1D5DB" />
-                <Text className="mt-4 text-center text-base text-gray-500">
+                <Text
+                  className={`mt-4 text-center text-base text-gray-500 ${getTextAlign('center')}`}>
                   {t('groupDetails.noRecentExpenses')}
                 </Text>
-                <Text className="mt-2 text-center text-sm text-gray-400">
+                <Text
+                  className={`mt-2 text-center text-sm text-gray-400 ${getTextAlign('center')}`}>
                   {t('groupDetails.addFirstExpense')}
                 </Text>
               </View>
@@ -467,6 +478,7 @@ const GroupDetailsScreen = () => {
         showCancel={alertConfig.showCancel}
         confirmText={alertConfig.confirmText}
         cancelText={alertConfig.cancelText}
+        isRTL={isRTL} // Pass RTL prop
       />
 
       <FloatingPlusButton
@@ -475,6 +487,7 @@ const GroupDetailsScreen = () => {
         bottom={10}
         right={10}
         groupId={groupId}
+        isRTL={isRTL} // Pass RTL prop
       />
     </SafeAreaView>
   );
