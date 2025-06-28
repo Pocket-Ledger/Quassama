@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 import i18n from 'utils/i18n';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
@@ -12,6 +13,9 @@ import { languageUtils } from 'utils/languageUtils';
 const LanguagesScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getIconDirection } =
+    useRTL(); // Use RTL hook
+
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -91,7 +95,9 @@ const LanguagesScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <Header title={t('languages.title')} />
-        <Text className="text-sm font-normal">{t('languages.subtitle')}</Text>
+        <Text className={`text-sm font-normal ${getTextAlign('left')}`}>
+          {t('languages.subtitle')}
+        </Text>
         <View className="relative pt-4">
           <View className="form-container">
             {/* Language Options */}
@@ -99,22 +105,24 @@ const LanguagesScreen = () => {
               {languages.map((language) => (
                 <TouchableOpacity
                   key={language.code}
-                  className={`mb-2 flex-row items-center justify-between rounded-lg border p-4 ${
+                  className={`mb-2 ${getFlexDirection()} items-center justify-between rounded-lg border p-4 ${
                     selectedLanguage === language.code
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 bg-white'
                   }`}
                   onPress={() => handleLanguageSelect(language)}>
-                  <View className="flex-row items-center">
-                    <Text className="mr-3 text-2xl">{language.flag}</Text>
+                  <View className={`${getFlexDirection()} items-center`}>
+                    <Text className={`${getMargin('right', '3')} text-2xl`}>{language.flag}</Text>
                     <View>
                       <Text
-                        className={`text-lg font-medium ${
+                        className={`text-lg font-medium ${getTextAlign('left')} ${
                           selectedLanguage === language.code ? 'text-blue-600' : 'text-black'
                         }`}>
                         {language.name}
                       </Text>
-                      <Text className="text-sm text-gray-500">{language.nativeName}</Text>
+                      <Text className={`text-sm text-gray-500 ${getTextAlign('left')}`}>
+                        {language.nativeName}
+                      </Text>
                     </View>
                   </View>
 
@@ -155,6 +163,7 @@ const LanguagesScreen = () => {
         showCancel={alertConfig.showCancel}
         confirmText={alertConfig.confirmText}
         cancelText={alertConfig.cancelText}
+        isRTL={isRTL} // Pass RTL prop to alert
       />
     </SafeAreaView>
   );

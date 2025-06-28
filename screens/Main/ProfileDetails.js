@@ -16,6 +16,7 @@ import Header from 'components/Header';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 
 const SkeletonPlaceholder = ({ width, height, style = {} }) => {
   const shimmerValue = new Animated.Value(0);
@@ -60,18 +61,26 @@ const SkeletonPlaceholder = ({ width, height, style = {} }) => {
 };
 
 // Input Field Skeleton
-const InputFieldSkeleton = () => (
-  <View className="input-group">
-    <SkeletonPlaceholder width={60} height={16} style={{ marginBottom: 8 }} />
-    <View className="input-container">
-      <SkeletonPlaceholder width="100%" height={56} style={{ borderRadius: 12 }} />
+const InputFieldSkeleton = () => {
+  const { getTextAlign } = useRTL();
+
+  return (
+    <View className="input-group">
+      <View
+        style={{ alignItems: getTextAlign('left') === 'text-left' ? 'flex-start' : 'flex-end' }}>
+        <SkeletonPlaceholder width={60} height={16} style={{ marginBottom: 8 }} />
+      </View>
+      <View className="input-container">
+        <SkeletonPlaceholder width="100%" height={56} style={{ borderRadius: 12 }} />
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 // Loading Screen Component
 const LoadingScreen = () => {
   const { t } = useTranslation();
+  const { getTextAlign } = useRTL();
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -80,7 +89,10 @@ const LoadingScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <Header title={t('profile.title')} />
-        <SkeletonPlaceholder width="80%" height={16} style={{ marginBottom: 16 }} />
+        <View
+          style={{ alignItems: getTextAlign('left') === 'text-left' ? 'flex-start' : 'flex-end' }}>
+          <SkeletonPlaceholder width="80%" height={16} style={{ marginBottom: 16 }} />
+        </View>
         <View className="relative pt-4">
           <View className="form-container gap-4">
             <View className="gap-4">
@@ -102,6 +114,8 @@ const LoadingScreen = () => {
 const ProfileDetailsScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getPosition } = useRTL(); // Use RTL hook
+
   const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -160,6 +174,23 @@ const ProfileDetailsScreen = () => {
     }
   };
 
+  // Get icon position for RTL
+  const getIconStyle = (hasError) => ({
+    position: 'absolute',
+    [isRTL ? 'right' : 'left']: 16,
+    top: '50%',
+    transform: [{ translateY: -10 }],
+    color: hasError ? 'red' : 'rgba(0, 0, 0, 0.2)',
+    zIndex: 1,
+  });
+
+  // Get text input style for RTL
+  const getInputStyle = (hasError) => ({
+    textAlign: isRTL ? 'right' : 'left',
+    [isRTL ? 'paddingRight' : 'paddingLeft']: 48, // Space for icon
+    [isRTL ? 'paddingLeft' : 'paddingRight']: 16,
+  });
+
   // Show skeleton loading screen while user data is loading
   if (isLoadingUser) {
     return <LoadingScreen />;
@@ -172,27 +203,22 @@ const ProfileDetailsScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <Header title={t('profile.title')} />
-        <Text className="text-sm font-normal">{t('profileDetails.subtitle')}</Text>
+        <Text className={`text-sm font-normal ${getTextAlign('left')}`}>
+          {t('profileDetails.subtitle')}
+        </Text>
         <View className="relative pt-4">
           <View className="form-container gap-4">
             <View className="gap-4">
+              {/* Name Input */}
               <View className="input-group">
-                <Text className="input-label">{t('profileDetails.name')}</Text>
+                <Text className={`input-label ${getTextAlign('left')}`}>
+                  {t('profileDetails.name')}
+                </Text>
                 <View className="input-container">
-                  <Ionicons
-                    name="person-outline"
-                    size={20}
-                    style={{
-                      position: 'absolute',
-                      left: 16,
-                      top: '50%',
-                      transform: [{ translateY: -10 }],
-                      color: errors.name ? 'red' : 'rgba(0, 0, 0, 0.2)',
-                      zIndex: 1,
-                    }}
-                  />
+                  <Ionicons name="person-outline" size={20} style={getIconStyle(errors.name)} />
                   <TextInput
                     className={`input-field ${errors.name ? 'input-field-error' : ''}`}
+                    style={getInputStyle(errors.name)}
                     placeholder={t('profileDetails.namePlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={name}
@@ -206,26 +232,21 @@ const ProfileDetailsScreen = () => {
                     autoCorrect={false}
                   />
                 </View>
-                {errors.name && <Text className="error-text">{errors.name}</Text>}
+                {errors.name && (
+                  <Text className={`error-text ${getTextAlign('left')}`}>{errors.name}</Text>
+                )}
               </View>
 
+              {/* Email Input */}
               <View className="input-group">
-                <Text className="input-label">{t('profileDetails.email')}</Text>
+                <Text className={`input-label ${getTextAlign('left')}`}>
+                  {t('profileDetails.email')}
+                </Text>
                 <View className="input-container">
-                  <Ionicons
-                    name="mail-outline"
-                    size={20}
-                    style={{
-                      position: 'absolute',
-                      left: 16,
-                      top: '50%',
-                      transform: [{ translateY: -10 }],
-                      color: errors.email ? 'red' : 'rgba(0, 0, 0, 0.2)',
-                      zIndex: 1,
-                    }}
-                  />
+                  <Ionicons name="mail-outline" size={20} style={getIconStyle(errors.email)} />
                   <TextInput
                     className={`input-field ${errors.email ? 'input-field-error' : ''}`}
+                    style={getInputStyle(errors.email)}
                     placeholder={t('profileDetails.emailPlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={email}
@@ -240,19 +261,25 @@ const ProfileDetailsScreen = () => {
                     autoCorrect={false}
                   />
                 </View>
-                {errors.email && <Text className="error-text">{errors.email}</Text>}
+                {errors.email && (
+                  <Text className={`error-text ${getTextAlign('left')}`}>{errors.email}</Text>
+                )}
               </View>
 
+              {/* Update Button */}
               <TouchableOpacity
                 className={`btn-primary ${isLoading ? 'opacity-50' : ''}`}
                 onPress={handleUpdateProfile}
                 disabled={isLoading}>
                 {isLoading ? (
-                  <View className="flex-row items-center justify-center">
+                  <View className={`${getFlexDirection()} items-center justify-center`}>
                     <SkeletonPlaceholder
                       width={20}
                       height={20}
-                      style={{ borderRadius: 10, marginRight: 8 }}
+                      style={{
+                        borderRadius: 10,
+                        [isRTL ? 'marginLeft' : 'marginRight']: 8,
+                      }}
                     />
                     <Text className="btn-primary-text">{t('profileDetails.updating')}</Text>
                   </View>
@@ -272,6 +299,7 @@ const ProfileDetailsScreen = () => {
         title={alertConfig.title}
         message={alertConfig.message}
         onClose={hideAlert}
+        isRTL={isRTL} // Pass RTL prop to alert
       />
     </SafeAreaView>
   );

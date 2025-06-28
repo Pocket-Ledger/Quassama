@@ -13,11 +13,15 @@ import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import Header from 'components/Header';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 import i18n from 'utils/i18n';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getIconDirection } =
+    useRTL(); // Use RTL hook
+
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState('MAD');
   const [isLoading, setIsLoading] = useState(false);
@@ -56,16 +60,22 @@ const SettingsScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <Header title={t('settings.title')} />
-        <Text className="text-sm font-normal">{t('settings.subtitle')}</Text>
+        <Text className={`text-sm font-normal ${getTextAlign('left')}`}>
+          {t('settings.subtitle')}
+        </Text>
         <View className="relative pt-4">
           <View className="form-container">
             {/* Notifications Setting */}
-            <View className="flex-row items-center justify-between px-0 py-4 border-gray-200">
-              <View className="flex-row items-center ">
-                <View className="items-center justify-center w-10 h-10 ">
+            <View
+              className={`${getFlexDirection()} items-center justify-between border-gray-200 px-0 py-4`}>
+              <View className={`${getFlexDirection()} items-center`}>
+                <View
+                  className={`h-10 w-10 items-center justify-center ${getMargin('right', '3')}`}>
                   <Ionicons name="notifications-outline" size={20} color="#666" />
                 </View>
-                <Text className="text-lg font-normal text-black">{t('settings.notifications')}</Text>
+                <Text className={`text-lg font-normal text-black ${getTextAlign('left')}`}>
+                  {t('settings.notifications')}
+                </Text>
               </View>
               <Switch
                 value={notificationsEnabled}
@@ -78,14 +88,18 @@ const SettingsScreen = () => {
 
             {/* Currency Setting */}
             <View className="mb-6">
-              <Text className="mb-2 input-label">{t('settings.currency')}</Text>
+              <Text className={`input-label mb-2 ${getTextAlign('left')}`}>
+                {t('settings.currency')}
+              </Text>
               <TouchableOpacity
                 className="input-container"
                 onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
-                <View className="flex-row items-center justify-between input-field">
-                  <Text className="text-base text-black">{selectedCurrency}</Text>
+                <View className={`${getFlexDirection()} input-field items-center justify-between`}>
+                  <Text className={`text-base text-black ${getTextAlign('left')}`}>
+                    {selectedCurrency}
+                  </Text>
                   <Ionicons
-                    name={showCurrencyDropdown ? 'chevron-up' : 'chevron-down'}
+                    name={getIconDirection(showCurrencyDropdown ? 'chevron-up' : 'chevron-down')}
                     size={20}
                     color="#666"
                   />
@@ -94,7 +108,7 @@ const SettingsScreen = () => {
 
               {/* Currency Dropdown */}
               {showCurrencyDropdown && (
-                <View className="mt-2 bg-white border border-gray-200 rounded-lg">
+                <View className="mt-2 rounded-lg border border-gray-200 bg-white">
                   {currencies.map((currency) => (
                     <TouchableOpacity
                       key={currency.code}
@@ -102,10 +116,14 @@ const SettingsScreen = () => {
                         selectedCurrency === currency.code ? 'bg-blue-50' : ''
                       }`}
                       onPress={() => handleCurrencySelect(currency)}>
-                      <View className="flex-row items-center justify-between">
+                      <View className={`${getFlexDirection()} items-center justify-between`}>
                         <View>
-                          <Text className="font-medium text-black">{currency.code}</Text>
-                          <Text className="text-sm text-gray-500">{currency.name}</Text>
+                          <Text className={`font-medium text-black ${getTextAlign('left')}`}>
+                            {currency.code}
+                          </Text>
+                          <Text className={`text-sm text-gray-500 ${getTextAlign('left')}`}>
+                            {currency.name}
+                          </Text>
                         </View>
                         {selectedCurrency === currency.code && (
                           <Ionicons name="checkmark" size={20} color="#2979FF" />
@@ -121,7 +139,9 @@ const SettingsScreen = () => {
               className="btn-primary"
               onPress={handleUpdateSettings}
               disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? t('settings.updating') : t('settings.update_info')}</Text>
+              <Text className="btn-primary-text">
+                {isLoading ? t('settings.updating') : t('settings.update_info')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
