@@ -6,20 +6,24 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Alert,
   Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
 import ResetPassword from 'models/auth/ResetPassword';
-import { useRTL } from 'hooks/useRTL'; // Import RTL hook
+import { useRTL } from 'hooks/useRTL';
 import Header from 'components/Header';
+import CustomAlert from 'components/CustomALert';
+import { useAlert } from 'hooks/useAlert';
 
 const ResetPasswordScreen = () => {
   const { t } = useTranslation();
   const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getIconDirection } =
-    useRTL(); // Use RTL hook
+    useRTL();
+
+  // Initialize custom alert hook
+  const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -59,18 +63,19 @@ const ResetPasswordScreen = () => {
     try {
       // You need to get the code from navigation params or state
       await ResetPassword.resetPassword(code, newPassword);
-      Alert.alert(
+
+      // Use custom success alert instead of regular Alert
+      showSuccess(
         t('customAlert.titles.success'),
         t('passwordRecovery.resetPassword.successMessage'),
-        [
-          {
-            text: t('customAlert.buttons.ok'),
-            onPress: () => console.log('Navigate to login'),
-          },
-        ]
+        () => {
+          console.log('Navigate to login');
+          // Add navigation logic here
+        }
       );
     } catch (error) {
-      Alert.alert(
+      // Use custom error alert instead of regular Alert
+      showError(
         t('customAlert.titles.error'),
         error.message || t('passwordRecovery.resetPassword.errorMessage')
       );
@@ -237,6 +242,19 @@ const ResetPasswordScreen = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Custom Alert Component */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </SafeAreaView>
   );
 };

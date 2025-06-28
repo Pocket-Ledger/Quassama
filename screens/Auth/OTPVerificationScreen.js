@@ -6,20 +6,24 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Alert,
   Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo, SmallLogo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
 import ResetPassword from 'models/auth/ResetPassword';
-import { useRTL } from 'hooks/useRTL'; // Import RTL hook
+import { useRTL } from 'hooks/useRTL';
 import Header from 'components/Header';
+import CustomAlert from 'components/CustomALert';
+import { useAlert } from 'hooks/useAlert';
 
 const OTPVerificationScreen = () => {
   const { t } = useTranslation();
   const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getIconDirection } =
-    useRTL(); // Use RTL hook
+    useRTL();
+
+  // Initialize custom alert hook
+  const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
 
   const [code, setCode] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,23 +73,23 @@ const OTPVerificationScreen = () => {
     setIsLoading(true);
     try {
       await ResetPassword.verifyCode(enteredCode);
-      // Code verified, navigate to ResetPasswordScreen
-      Alert.alert(
+
+      // Use custom success alert instead of regular Alert
+      showSuccess(
         t('customAlert.titles.success'),
         t('passwordRecovery.otpVerification.successMessage'),
-        [
-          {
-            text: t('customAlert.buttons.ok'),
-            onPress: () => console.log('Navigate to ResetPasswordScreen'),
-          },
-        ]
+        () => {
+          console.log('Navigate to ResetPasswordScreen');
+          // TODO: Navigate to ResetPasswordScreen, pass code if needed
+        }
       );
-      // TODO: Navigate to ResetPasswordScreen, pass code if needed
     } catch (error) {
       setHasError(true);
       setCode(['', '', '', '']);
       inputRefs.current[0]?.focus();
-      Alert.alert(
+
+      // Use custom error alert instead of regular Alert
+      showError(
         t('customAlert.titles.error'),
         error.message || t('passwordRecovery.otpVerification.wrongCode')
       );
@@ -104,8 +108,23 @@ const OTPVerificationScreen = () => {
       setCanResend(false);
       // Reset timer for next resend
       setTimeout(() => setCanResend(true), 30000);
+
+      // Optional: Show success message for code resent
+      showSuccess(
+        t('customAlert.titles.success'),
+        t('passwordRecovery.otpVerification.codeResent', {
+          defaultValue: 'Verification code has been sent to your email.',
+        })
+      );
     } catch (error) {
       console.error('Failed to resend code:', error);
+      // Show error if resend fails
+      showError(
+        t('customAlert.titles.error'),
+        t('passwordRecovery.otpVerification.resendError', {
+          defaultValue: 'Failed to resend code. Please try again.',
+        })
+      );
     }
   };
 
@@ -193,6 +212,19 @@ const OTPVerificationScreen = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Custom Alert Component */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </SafeAreaView>
   );
 };
