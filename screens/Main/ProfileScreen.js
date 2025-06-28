@@ -8,10 +8,14 @@ import LogoutModal from 'components/LogoutModal';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const { t, i18n } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getIconDirection } =
+    useRTL(); // Use RTL hook
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
@@ -144,10 +148,13 @@ const ProfileScreen = () => {
             </>
           ) : (
             <>
-              <Text className="mb-2 font-dmsans-bold text-xl text-black">
+              <Text
+                className={`mb-2 font-dmsans-bold text-xl text-black ${getTextAlign('center')}`}>
                 {userProfile.username}
               </Text>
-              <Text className="text-base font-normal text-gray-500">{userProfile.email}</Text>
+              <Text className={`text-base font-normal text-gray-500 ${getTextAlign('center')}`}>
+                {userProfile.email}
+              </Text>
             </>
           )}
         </View>
@@ -157,27 +164,35 @@ const ProfileScreen = () => {
           {menuItems.map((item) => (
             <TouchableOpacity
               key={item.id}
-              className="mb-1 flex-row items-center justify-between border-b border-gray-250 py-4"
+              className={`mb-1 ${getFlexDirection()} items-center justify-between border-b border-gray-250 py-4`}
               onPress={item.action}
               disabled={item.hasSwitch}>
-              <View className="flex-row items-center">
+              <View className={`${getFlexDirection()} items-center`}>
                 {/* Icon */}
-                <View className="mr-4 h-10 w-10 items-center justify-center">
+                <View
+                  className={`${getMargin('right', '4')} h-10 w-10 items-center justify-center`}>
                   <Feather name={item.icon} size={20} color="#666" />
                 </View>
 
                 {/* Title */}
-                <Text className="text-lg font-normal text-black">{item.title}</Text>
+                <Text className={`text-lg font-normal text-black ${getTextAlign('left')}`}>
+                  {item.title}
+                </Text>
               </View>
 
               {/* Right Side Content */}
-              <View className="flex-row items-center">
+              <View className={`${getFlexDirection()} items-center`}>
                 {/* Notification Dot */}
-                {item.hasNotification && <View className="mr-2 h-2 w-2 rounded-full bg-red-500" />}
+                {item.hasNotification && (
+                  <View className={`${getMargin('right', '2')} h-2 w-2 rounded-full bg-red-500`} />
+                )}
 
                 {/* Right Text */}
                 {item.rightText && (
-                  <Text className="mr-2 text-base text-gray-500">{item.rightText}</Text>
+                  <Text
+                    className={`${getMargin('right', '2')} text-base text-gray-500 ${getTextAlign('right')}`}>
+                    {item.rightText}
+                  </Text>
                 )}
 
                 {/* Switch */}
@@ -192,17 +207,23 @@ const ProfileScreen = () => {
                 )}
 
                 {/* Arrow */}
-                {item.hasArrow && <Feather name="chevron-right" size={20} color="#C7C7CC" />}
+                {item.hasArrow && (
+                  <Feather name={getIconDirection('chevron-right')} size={20} color="#C7C7CC" />
+                )}
               </View>
             </TouchableOpacity>
           ))}
 
           {/* Logout Button */}
-          <TouchableOpacity className="mb-1 flex-row items-center py-4" onPress={handleLogoutPress}>
-            <View className="mr-4 h-10 w-10 items-center justify-center">
+          <TouchableOpacity
+            className={`mb-1 ${getFlexDirection()} items-center py-4`}
+            onPress={handleLogoutPress}>
+            <View className={`${getMargin('right', '4')} h-10 w-10 items-center justify-center`}>
               <Feather name="log-out" size={20} color="#FF3B30" />
             </View>
-            <Text className="text-lg font-normal text-error">{t('profile.logout')}</Text>
+            <Text className={`text-lg font-normal text-error ${getTextAlign('left')}`}>
+              {t('profile.logout')}
+            </Text>
           </TouchableOpacity>
 
           {/* Bottom Spacing */}
@@ -216,6 +237,7 @@ const ProfileScreen = () => {
         onClose={handleLogoutCancel}
         onConfirm={handleLogoutConfirm}
         isLoading={isLoggingOut}
+        isRTL={isRTL} // Pass RTL prop to modal
       />
 
       {/* Custom Alert - Add this for success/error messages */}
@@ -229,6 +251,7 @@ const ProfileScreen = () => {
         showCancel={alertConfig.showCancel}
         confirmText={alertConfig.confirmText}
         cancelText={alertConfig.cancelText}
+        isRTL={isRTL} // Pass RTL prop to alert
       />
     </SafeAreaView>
   );
