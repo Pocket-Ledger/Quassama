@@ -18,12 +18,16 @@ import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import Expense from 'models/expense/Expense';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Add RTL hook
 import { dateToTimestamp } from 'utils/time';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { t } = useTranslation();
+
+  // Add RTL hook
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding } = useRTL();
 
   // Get groupId from route params or default
   const groupId = route.params?.groupId || 'vacation_tager';
@@ -81,7 +85,7 @@ const AllExpensesScreen = () => {
         }
 
         let result;
-        
+
         // Check if we should apply filters
         if (applyFilters && filterConfig.checkedFilter) {
           // Use filterExpenses method when filters are applied
@@ -93,12 +97,12 @@ const AllExpensesScreen = () => {
             filterConfig.minAmount,
             filterConfig.maxAmount
           );
-          
+
           // For filtered results, we'll handle pagination manually
           const startIndex = (page - 1) * pagination.pageSize;
           const endIndex = startIndex + pagination.pageSize;
           const paginatedExpenses = filteredExpenses.slice(startIndex, endIndex);
-          
+
           result = {
             expenses: paginatedExpenses,
             pagination: {
@@ -110,15 +114,11 @@ const AllExpensesScreen = () => {
               hasPreviousPage: page > 1,
               startIndex: startIndex + 1,
               endIndex: Math.min(endIndex, filteredExpenses.length),
-            }
+            },
           };
         } else {
           // Use regular pagination when no filters are applied
-          result = await Expense.getExpensesByGroupPaginated(
-            groupId,
-            page,
-            pagination.pageSize
-          );
+          result = await Expense.getExpensesByGroupPaginated(groupId, page, pagination.pageSize);
         }
 
         if (isRefresh || page === 1) {
@@ -146,7 +146,13 @@ const AllExpensesScreen = () => {
     if (!loadingMore && pagination.hasNextPage) {
       loadExpenses(pagination.currentPage + 1, false, filterConfig.checkedFilter);
     }
-  }, [loadExpenses, loadingMore, pagination.hasNextPage, pagination.currentPage, filterConfig.checkedFilter]);
+  }, [
+    loadExpenses,
+    loadingMore,
+    pagination.hasNextPage,
+    pagination.currentPage,
+    filterConfig.checkedFilter,
+  ]);
 
   // Refresh expenses
   const onRefresh = useCallback(() => {
@@ -163,23 +169,28 @@ const AllExpensesScreen = () => {
     if (filterConfig.checkedFilter) {
       loadExpenses(1, false, true);
     }
-  }, [filterConfig.checkedFilter, filterConfig.startDate, filterConfig.endDate, filterConfig.categories, filterConfig.minAmount, filterConfig.maxAmount]);
+  }, [
+    filterConfig.checkedFilter,
+    filterConfig.startDate,
+    filterConfig.endDate,
+    filterConfig.categories,
+    filterConfig.minAmount,
+    filterConfig.maxAmount,
+  ]);
 
   // Filter expenses by search text
   const filteredExpenses = React.useMemo(() => {
     if (!searchText.trim()) {
       return expenses;
     }
-    
+
     return expenses.filter((expense) => {
       const title = expense.title?.toLowerCase() || '';
       const description = expense.description?.toLowerCase() || '';
       const category = expense.category?.toLowerCase() || '';
       const search = searchText.toLowerCase();
-      
-      return title.includes(search) || 
-             description.includes(search) || 
-             category.includes(search);
+
+      return title.includes(search) || description.includes(search) || category.includes(search);
     });
   }, [expenses, searchText]);
 
@@ -210,7 +221,7 @@ const AllExpensesScreen = () => {
     };
     setFilterConfig(resetFilter);
     console.log('Filter reset');
-    
+
     // Immediately reload expenses without filters
     loadExpenses(1, false, false);
   };
@@ -222,7 +233,9 @@ const AllExpensesScreen = () => {
     return (
       <View className="py-4">
         <ActivityIndicator size="small" color="#2979FF" />
-        <Text className="mt-2 text-center text-sm text-gray-500">{t('expense.loadingMore')}</Text>
+        <Text className={`mt-2 text-center text-sm text-gray-500 ${getTextAlign('center')}`}>
+          {t('expense.loadingMore')}
+        </Text>
       </View>
     );
   };
@@ -240,6 +253,7 @@ const AllExpensesScreen = () => {
       onPress={() => handleExpensePress(item)}
       showBorder={true}
       currency={t('common.currency')}
+      isRTL={isRTL} // Pass RTL prop to ExpenseListItem
     />
   );
 
@@ -270,20 +284,20 @@ const AllExpensesScreen = () => {
   const renderEmptyState = () => {
     const isSearchActive = searchText.trim().length > 0;
     const isFilterActive = filterConfig.checkedFilter;
-    
+
     return (
       <View className="items-center px-4 py-12">
         <View className="mb-4 items-center justify-center">
           <Ionicons name="receipt" size={70} color="#2979FF" />
         </View>
-        <Text className="mb-2 font-dmsans-bold text-[24px]">
-          {isSearchActive || isFilterActive 
-            ? t('expense.empty.noResults') 
+        <Text className={`mb-2 font-dmsans-bold text-[24px] ${getTextAlign('center')}`}>
+          {isSearchActive || isFilterActive
+            ? t('expense.empty.noResults')
             : t('expense.empty.title')}
         </Text>
-        <Text className="mb-6 text-center text-gray-500">
-          {isSearchActive || isFilterActive 
-            ? t('expense.empty.tryDifferentFilters') 
+        <Text className={`mb-6 text-center text-gray-500 ${getTextAlign('center')}`}>
+          {isSearchActive || isFilterActive
+            ? t('expense.empty.tryDifferentFilters')
             : t('expense.empty.description')}
         </Text>
         {!isSearchActive && !isFilterActive && (
@@ -303,8 +317,10 @@ const AllExpensesScreen = () => {
       <View className="mb-4 items-center justify-center">
         <Ionicons name="alert-circle" size={70} color="#FF6B6B" />
       </View>
-      <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.error.title')}</Text>
-      <Text className="mb-6 text-center text-gray-500">{error}</Text>
+      <Text className={`mb-2 font-dmsans-bold text-[24px] ${getTextAlign('center')}`}>
+        {t('expense.error.title')}
+      </Text>
+      <Text className={`mb-6 text-center text-gray-500 ${getTextAlign('center')}`}>{error}</Text>
       <TouchableOpacity
         className="rounded-lg bg-primary px-6 py-3"
         onPress={() => loadExpenses(1, false)}>
@@ -319,7 +335,7 @@ const AllExpensesScreen = () => {
 
     return (
       <View className="bg-gray-50 px-4 py-2">
-        <Text className="text-center text-sm text-gray-600">
+        <Text className={`text-center text-sm text-gray-600 ${getTextAlign('center')}`}>
           {t('expense.pagination.showing', {
             start: pagination.startIndex,
             end: pagination.endIndex,
@@ -340,17 +356,20 @@ const AllExpensesScreen = () => {
           onSearchChange={setSearchText}
           placeholder={t('expense.search.placeholder')}
           onFilterPress={() => setIsFilterModalVisible(true)}
+          isRTL={isRTL} // Pass RTL prop to SearchBar
         />
-        
+
         {/* Filter Active Indicator */}
         {filterConfig.checkedFilter && (
-          <View className="mx-4 mt-2 flex-row items-center rounded-lg bg-blue-50 px-3 py-2">
+          <View
+            className={`mx-4 mt-2 ${getFlexDirection()} items-center rounded-lg bg-blue-50 px-3 py-2`}>
             <Feather name="filter" size={16} color="#2979FF" />
-            <Text className="ml-2 flex-1 text-sm text-blue-700">
+            <Text
+              className={`${getMargin('left', '2')} flex-1 text-sm text-blue-700 ${getTextAlign('left')}`}>
               {t('expense.filtersActive')}
             </Text>
             <TouchableOpacity onPress={handleResetFilter}>
-              <Text className="text-sm font-medium text-blue-700">
+              <Text className={`text-sm font-medium text-blue-700 ${getTextAlign('right')}`}>
                 {t('filters.clear')}
               </Text>
             </TouchableOpacity>
@@ -363,7 +382,9 @@ const AllExpensesScreen = () => {
       {loading && expenses.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2979FF" />
-          <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
+          <Text className={`mt-2 text-gray-500 ${getTextAlign('center')}`}>
+            {t('expense.loading')}
+          </Text>
         </View>
       ) : error && expenses.length === 0 ? (
         renderErrorState()
@@ -400,6 +421,7 @@ const AllExpensesScreen = () => {
         groups={groups}
         currency={t('common.currency')}
         resultCount={pagination.totalItems}
+        isRTL={isRTL} // Pass RTL prop to FilterModal
       />
     </SafeAreaView>
   );

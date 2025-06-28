@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 import CustomDateRangePicker from './CustomDateRangePicker ';
 
 const FilterDateRange = ({
@@ -11,8 +12,14 @@ const FilterDateRange = ({
   customStartDate,
   customEndDate,
   onCustomDateChange,
+  isRTL: propIsRTL, // Optional RTL prop override
 }) => {
   const { t } = useTranslation();
+  const { isRTL: hookIsRTL, getFlexDirection, getTextAlign, getMargin, getPadding } = useRTL();
+
+  // Use prop RTL if provided, otherwise use hook
+  const isRTL = propIsRTL !== undefined ? propIsRTL : hookIsRTL;
+
   const [showCustomPicker, setShowCustomPicker] = useState(false);
 
   const dateRanges = [
@@ -112,7 +119,7 @@ const FilterDateRange = ({
     if (customStartDate && customEndDate) {
       const start = customStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const end = customEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      return `${start} - ${end}`;
+      return isRTL ? `${end} - ${start}` : `${start} - ${end}`; // Reverse order for RTL
     }
     return t('filters.dateRange.customDate');
   };
@@ -122,10 +129,10 @@ const FilterDateRange = ({
   return (
     <>
       <View>
-        <Text className="mb-4 text-base font-medium text-black">
+        <Text className={`mb-4 text-base font-medium text-black ${getTextAlign('left')}`}>
           {t('filters.dateRange.title')}
         </Text>
-        <View className="flex-row flex-wrap gap-2">
+        <View className={`${getFlexDirection()} flex-wrap gap-2`}>
           {dateRanges.map((range) => (
             <TouchableOpacity
               key={range.value}
@@ -136,7 +143,7 @@ const FilterDateRange = ({
               }`}
               onPress={() => handleRangeSelection(range.value)}>
               <Text
-                className={`text-sm font-medium ${
+                className={`text-sm font-medium ${getTextAlign('center')} ${
                   selectedRange === range.value ? 'text-white' : 'text-gray-600'
                 }`}>
                 {range.label}
@@ -145,13 +152,13 @@ const FilterDateRange = ({
           ))}
 
           <TouchableOpacity
-            className={`flex-row items-center rounded-lg border px-4 py-2 ${
+            className={`${getFlexDirection()} items-center rounded-lg border px-4 py-2 ${
               isCustomSelected ? 'border-primary bg-primary' : 'border-gray-200 bg-gray-50'
             }`}
             onPress={handleCustomDatePress}>
             <Feather name="calendar" size={16} color={isCustomSelected ? 'white' : '#666'} />
             <Text
-              className={`ml-2 text-sm font-medium ${
+              className={`${getMargin('left', '2')} text-sm font-medium ${getTextAlign('left')} ${
                 isCustomSelected ? 'text-white' : 'text-gray-600'
               }`}>
               {formatCustomDateRange()}
@@ -164,6 +171,7 @@ const FilterDateRange = ({
         isVisible={showCustomPicker}
         onClose={() => setShowCustomPicker(false)}
         onConfirm={handleCustomDateConfirm}
+        isRTL={isRTL} // Pass RTL prop
       />
     </>
   );

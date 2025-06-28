@@ -1,13 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, PanResponder } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL';
 
 const FilterAmountRange = ({ amountRange, onRangeChange }) => {
   const { t } = useTranslation();
   const currency = t('common.currency');
   const sliderWidth = useRef(250); // Default width, will be updated on layout
   const [isDragging, setIsDragging] = useState({ min: false, max: false });
-
+  const { isRTL: hookIsRTL, getFlexDirection, getTextAlign, getMargin, getPadding } = useRTL();
   // Calculate current positions
   const getPosition = (value) => {
     const percentage = (value - amountRange.min) / (amountRange.max - amountRange.min);
@@ -68,9 +69,12 @@ const FilterAmountRange = ({ amountRange, onRangeChange }) => {
 
   return (
     <View className="">
-      <View className="mb-4 flex-row items-center justify-between ">
-        <Text className="text-base font-medium text-black ">{t('filters.amountRange.title')}</Text>
-        <Text className="text-base font-medium text-black">
+      <View className={`mb-4 ${getFlexDirection()} items-center justify-between`}>
+        <Text className={`text-base font-medium text-black ${getTextAlign('left')}`}>
+          {t('filters.amountRange.title')}
+        </Text>
+
+        <Text className={`text-base font-medium text-black ${getTextAlign('right')}`}>
           {currency}
           {amountRange.selectedMin}-{currency}
           {amountRange.selectedMax}

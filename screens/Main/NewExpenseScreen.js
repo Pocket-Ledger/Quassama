@@ -16,6 +16,7 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 
 import Expense from 'models/expense/Expense';
 import Group from 'models/group/group';
@@ -30,6 +31,16 @@ import Logger from 'utils/looger';
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
   const { t, i18n } = useTranslation();
+  const {
+    isRTL,
+    getFlexDirection,
+    getTextAlign,
+    getMargin,
+    getPadding,
+    getPosition,
+    getIconDirection,
+  } = useRTL(); // Use RTL hook
+
   const { alertConfig, hideAlert, showSuccess, showError } = useAlert();
 
   const auth = getAuth();
@@ -156,11 +167,13 @@ const NewExpenseScreen = () => {
 
   const renderGroupItem = ({ item }) => (
     <TouchableOpacity
-      className="flex-row items-center justify-between border-b border-gray-100 px-4 py-4"
+      className={`${getFlexDirection()} items-center justify-between border-b border-gray-100 px-4 py-4`}
       onPress={() => handleGroupSelect(item.id)}>
       <View>
-        <Text className="text-base font-medium text-black">{item.name}</Text>
-        <Text className="text-sm text-gray-500">
+        <Text className={`text-base font-medium text-black ${getTextAlign('left')}`}>
+          {item.name}
+        </Text>
+        <Text className={`text-sm text-gray-500 ${getTextAlign('left')}`}>
           {t('group.memberCount', { count: item.memberCount })}
         </Text>
       </View>
@@ -174,6 +187,26 @@ const NewExpenseScreen = () => {
   const getCurrency = () => {
     return t('common.currency');
   };
+
+  // Get text input style for RTL
+  const getInputStyle = (hasError = false) => ({
+    textAlign: isRTL ? 'right' : 'left',
+    writingDirection: isRTL ? 'rtl' : 'ltr',
+  });
+
+  // Get amount input style with currency positioning
+  const getAmountInputStyle = () => ({
+    textAlign: isRTL ? 'right' : 'left',
+    writingDirection: isRTL ? 'rtl' : 'ltr',
+    [isRTL ? 'paddingLeft' : 'paddingRight']: 60, // Space for currency
+  });
+
+  // Get currency position
+  const getCurrencyStyle = () => ({
+    position: 'absolute',
+    [isRTL ? 'left' : 'right']: 16,
+    top: 16,
+  });
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -191,7 +224,8 @@ const NewExpenseScreen = () => {
         <View className="flex-1 gap-6 px-4">
           {/* Expense Name */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
+            <Text
+              className={`input-label text-base font-medium text-black ${getTextAlign('left')}`}>
               {t('expense.expenseTitle')}
             </Text>
             <View className="input-container">
@@ -199,6 +233,7 @@ const NewExpenseScreen = () => {
                 className={`input-field rounded-lg border px-4 text-black ${
                   errors.expenseName ? 'border-red-500' : 'border-gray-200'
                 }`}
+                style={getInputStyle(errors.expenseName)}
                 placeholder={t('expense.expenseTitle')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={expenseName}
@@ -210,20 +245,24 @@ const NewExpenseScreen = () => {
               />
             </View>
             {errors.expenseName && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.expenseName}</Text>
+              <Text className={`error-text mt-1 text-sm text-red-500 ${getTextAlign('left')}`}>
+                {errors.expenseName}
+              </Text>
             )}
           </View>
 
           {/* Amount */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
+            <Text
+              className={`input-label text-base font-medium text-black ${getTextAlign('left')}`}>
               {t('expense.expenseAmount')}
             </Text>
             <View className="input-container relative">
               <TextInput
-                className={`input-field rounded-lg border px-4  pr-16 text-black ${
+                className={`input-field rounded-lg border px-4 text-black ${
                   errors.amount ? 'border-red-500' : 'border-gray-200'
                 }`}
+                style={getAmountInputStyle()}
                 placeholder="100"
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={amount}
@@ -233,16 +272,21 @@ const NewExpenseScreen = () => {
                 }}
                 keyboardType="numeric"
               />
-              <Text className="absolute right-4 top-4 text-base text-black">{getCurrency()}</Text>
+              <Text className="text-base text-black" style={getCurrencyStyle()}>
+                {getCurrency()}
+              </Text>
             </View>
             {errors.amount && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.amount}</Text>
+              <Text className={`error-text mt-1 text-sm text-red-500 ${getTextAlign('left')}`}>
+                {errors.amount}
+              </Text>
             )}
           </View>
 
           {/* Group Selection */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
+            <Text
+              className={`input-label text-base font-medium text-black ${getTextAlign('left')}`}>
               {t('group.selectGroup')}
             </Text>
             <TouchableOpacity
@@ -250,24 +294,31 @@ const NewExpenseScreen = () => {
                 errors.group ? 'border-red-500' : 'border-gray-200'
               }`}
               onPress={() => setIsGroupModalVisible(true)}>
-              <View className="flex-row items-center justify-between">
+              <View className={`${getFlexDirection()} items-center justify-between`}>
                 <View className="flex-1">
                   {selectedGroupData ? (
-                    <View className="flex flex-row justify-between pr-2">
-                      <Text className="text-base text-black">{selectedGroupData.name}</Text>
-                      <Text className="text-sm text-gray-500">
+                    <View
+                      className={`flex ${getFlexDirection()} justify-between ${getPadding('right', '2')}`}>
+                      <Text className={`text-base text-black ${getTextAlign('left')}`}>
+                        {selectedGroupData.name}
+                      </Text>
+                      <Text className={`text-sm text-gray-500 ${getTextAlign('right')}`}>
                         {t('group.memberCount', { count: selectedGroupData.memberCount })}
                       </Text>
                     </View>
                   ) : (
-                    <Text className="text-base text-gray-400">{t('expense.selectGroup')}</Text>
+                    <Text className={`text-base text-gray-400 ${getTextAlign('left')}`}>
+                      {t('expense.selectGroup')}
+                    </Text>
                   )}
                 </View>
-                <Feather name="chevron-down" size={20} color="#666" />
+                <Feather name={getIconDirection('chevron-down')} size={20} color="#666" />
               </View>
             </TouchableOpacity>
             {errors.group && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.group}</Text>
+              <Text className={`error-text mt-1 text-sm text-red-500 ${getTextAlign('left')}`}>
+                {errors.group}
+              </Text>
             )}
           </View>
 
@@ -279,18 +330,23 @@ const NewExpenseScreen = () => {
             layout="grid"
             numColumns={5}
             title={t('expense.selectCategory')}
+            isRTL={isRTL} // Pass RTL prop to CategoryList
           />
           {errors.category && (
-            <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
+            <Text className={`error-text mt-2 text-sm text-red-500 ${getTextAlign('left')}`}>
+              {errors.category}
+            </Text>
           )}
 
           {/* Note */}
           <View>
-            <Text className="input-label text-base font-medium text-black">
+            <Text
+              className={`input-label text-base font-medium text-black ${getTextAlign('left')}`}>
               {t('expense.note')}
             </Text>
             <TextInput
               className="input-field h-24 rounded-lg border border-gray-200 px-4 text-black"
+              style={getInputStyle()}
               placeholder={t('expense.addNote')}
               placeholderTextColor="rgba(0, 0, 0, 0.4)"
               value={note}
@@ -323,8 +379,11 @@ const NewExpenseScreen = () => {
         onRequestClose={() => setIsGroupModalVisible(false)}>
         <SafeAreaView className="flex-1 bg-white">
           <View className="flex-1">
-            <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
-              <Text className="text-lg font-semibold text-black">{t('group.selectGroup')}</Text>
+            <View
+              className={`${getFlexDirection()} items-center justify-between border-b border-gray-200 px-4 py-4`}>
+              <Text className={`text-lg font-semibold text-black ${getTextAlign('left')}`}>
+                {t('group.selectGroup')}
+              </Text>
               <TouchableOpacity onPress={() => setIsGroupModalVisible(false)}>
                 <Feather name="x" size={24} color="#666" />
               </TouchableOpacity>
@@ -350,6 +409,7 @@ const NewExpenseScreen = () => {
         showCancel={alertConfig.showCancel}
         confirmText={alertConfig.confirmText}
         cancelText={alertConfig.cancelText}
+        isRTL={isRTL} // Pass RTL prop to alert
       />
     </SafeAreaView>
   );

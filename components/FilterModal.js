@@ -4,6 +4,7 @@ import FilterDateRange from './FilterDateRange';
 import FilterAmountRange from './FilterAmountRange';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 
 const FilterModal = ({
   visible,
@@ -12,17 +13,23 @@ const FilterModal = ({
   onApplyFilter,
   onResetFilter,
   categories = [],
+  isRTL: propIsRTL, // Optional RTL prop override
   // groups = [],
   //currency = '$',
   //resultCount = 80,
 }) => {
   const { t } = useTranslation();
+  const { isRTL: hookIsRTL, getFlexDirection, getTextAlign, getMargin, getPadding } = useRTL();
+
+  // Use prop RTL if provided, otherwise use hook
+  const isRTL = propIsRTL !== undefined ? propIsRTL : hookIsRTL;
+
   const [localFilter, setLocalFilter] = useState(initialFilter);
 
   const handleApplyFilter = () => {
     const finalFilter = {
       startDate: localFilter.startDate, // Pass raw Date object, not formatted string
-      endDate: localFilter.endDate,     // Pass raw Date object, not formatted string
+      endDate: localFilter.endDate, // Pass raw Date object, not formatted string
       categories: localFilter?.selectedCategories,
       minAmount: localFilter.amountRange.selectedMin,
       maxAmount: localFilter.amountRange.selectedMax,
@@ -55,29 +62,6 @@ const FilterModal = ({
   };
 
   const toggleCategory = (categoryId) => {
-    /* const category = categories.find((cat) => cat.id === categoryId);
-
-    if (!category) {
-      console.warn(`Category with ID ${categoryId} not found`);
-      return;
-    }
-
-    const categoryName = category.name;
-
-    setLocalFilter((prev) => {
-      const newSelectedCategories = prev.selectedCategories.includes(categoryName)
-        ? prev.selectedCategories.filter((name) => name !== categoryName)
-        : [...prev.selectedCategories, categoryName];
-
-      // Log the new state that will be set
-      console.log('Selected filter categories:', newSelectedCategories);
-
-      return {
-        ...prev,
-        selectedCategories: newSelectedCategories,
-      };
-    }); */
-
     setLocalFilter((prev) => ({
       ...prev,
       selectedCategories: prev.selectedCategories.includes(categoryId)
@@ -126,13 +110,20 @@ const FilterModal = ({
       <SafeAreaView className="flex-1 bg-white">
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {/* Modal Header */}
-          <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
+          <View
+            className={`${getFlexDirection()} items-center justify-between border-b border-gray-200 px-4 py-4`}>
             <TouchableOpacity onPress={handleClose}>
-              <Text className="text-base text-gray-500">{t('filters.cancel')}</Text>
+              <Text className={`text-base text-gray-500 ${getTextAlign('left')}`}>
+                {t('filters.cancel')}
+              </Text>
             </TouchableOpacity>
-            <Text className="text-lg font-semibold text-black">{t('filters.title')}</Text>
+            <Text className={`text-lg font-semibold text-black ${getTextAlign('center')}`}>
+              {t('filters.title')}
+            </Text>
             <TouchableOpacity onPress={handleResetFilter}>
-              <Text className="text-base text-gray-500">{t('filters.reset')}</Text>
+              <Text className={`text-base text-gray-500 ${getTextAlign('right')}`}>
+                {t('filters.reset')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -144,45 +135,15 @@ const FilterModal = ({
               customStartDate={localFilter.customStartDate}
               customEndDate={localFilter.customEndDate}
               onCustomDateChange={handleCustomDateChange}
+              isRTL={isRTL} // Pass RTL prop
             />
 
             {/* Categories */}
             <View>
-              <Text className="mb-4 text-base font-medium text-black">
+              <Text className={`mb-4 text-base font-medium text-black ${getTextAlign('left')}`}>
                 {t('filters.categories.title')}
               </Text>
-              <View className="flex-row flex-wrap justify-between gap-1">
-                {/* {categories.map((category) => (
-                  <TouchableOpacity
-                    key={category.id}
-                    className="items-center mb-4"
-                    onPress={() => toggleCategory(category.id)}>
-                    <View
-                      className={`mb-2 h-12 w-12 items-center justify-center rounded-full ${
-                        localFilter.selectedCategories.includes(category.name)
-                          ? 'bg-primary'
-                          : 'bg-primary-50'
-                      }`}>
-                      <Feather
-                        name={category.icon}
-                        size={20}
-                        color={
-                          localFilter.selectedCategories.includes(category.name)
-                            ? 'white'
-                            : '#2979FF'
-                        }
-                      />
-                    </View>
-                    <Text
-                      className={`text-sm font-medium ${
-                        localFilter.selectedCategories.includes(category.name)
-                          ? 'text-primary'
-                          : 'text-gray-600'
-                      }`}>
-                      {t(`categories.${category.name.toLowerCase()}`)}
-                    </Text>
-                  </TouchableOpacity>
-                ))} */}
+              <View className={`${getFlexDirection()} flex-wrap justify-between gap-1`}>
                 {categories.map((category) => (
                   <TouchableOpacity
                     key={category.id}
@@ -203,7 +164,7 @@ const FilterModal = ({
                       />
                     </View>
                     <Text
-                      className={`text-sm font-medium ${
+                      className={`text-sm font-medium ${getTextAlign('center')} ${
                         localFilter.selectedCategories.includes(category.id)
                           ? 'text-primary'
                           : 'text-gray-600'
@@ -219,7 +180,7 @@ const FilterModal = ({
             <FilterAmountRange
               amountRange={localFilter.amountRange}
               onRangeChange={handleAmountRangeChange}
-              //currency={currency}
+              isRTL={isRTL} // Pass RTL prop
             />
           </View>
         </ScrollView>
@@ -227,7 +188,8 @@ const FilterModal = ({
         {/* Apply Button */}
         <View className="border-t border-gray-200 px-4 pb-6 pt-4">
           <TouchableOpacity className="rounded-lg bg-primary py-4" onPress={handleApplyFilter}>
-            <Text className="text-center text-base font-semibold text-white">
+            <Text
+              className={`text-center text-base font-semibold text-white ${getTextAlign('center')}`}>
               {t('common.search')}
             </Text>
           </TouchableOpacity>
