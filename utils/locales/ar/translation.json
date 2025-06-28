@@ -146,7 +146,8 @@
     "switchGroup": "تبديل المجموعة",
     "noGroupSet": "لم يتم تعيين مجموعة بعد",
     "noGroupMembers": "لا يوجد أعضاء في المجموعة",
-    "moreCategoriesCount": "+{{count}} فئات أخرى"
+    "moreCategoriesCount": "+{{count}} فئات أخرى",
+    "groupMembers": "أعضاء المجموعة"
   },
   "expense": {
     "paidBy": "دفع من قبل {{name}}",

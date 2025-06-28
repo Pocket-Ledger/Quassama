@@ -22,6 +22,7 @@ import SwitchGroupModal from 'components/SwitchGroupModal';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from 'models/notifications/notifications';
+import { capitalizeFirst } from 'utils/text';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -509,8 +510,11 @@ const HomeScreen = () => {
 
         {/* Group Members */}
         <View className="mx-4 ">
-          <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">{groupName}</Text>
+          <View className="mb-4 flex-row items-start justify-between">
+            <View>
+              <Text className="text-lg font-medium text-black ">{capitalizeFirst(groupName)}</Text>
+              <Text className="text-xs font-light text-black">{t('group.groupMembers')}</Text>
+            </View>
             <TouchableOpacity onPress={openGroupModal}>
               <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
             </TouchableOpacity>
