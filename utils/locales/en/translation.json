@@ -9,6 +9,35 @@
     "error_title": "Error",
     "error_message": "Failed to change language. Please try again."
   },
+  "validation": {
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "at_least_6_chars": "At least 6 characters",
+    "mix_chars": "Mix of letters, numbers, or symbols",
+    "passwords_match": "Passwords match",
+    "passwords_no_match": "Passwords do not match",
+
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidAmount": "Invalid amount",
+    "amountTooSmall": "Amount must be greater than 0",
+    "titleTooShort": "Title must be at least 3 characters",
+    "titleTooLong": "Title must be less than 50 characters",
+    "invalidDate": "Invalid date",
+    "selectCategory": "Please select a category",
+    "selectMembers": "Please select at least one member",
+    "username_required": "Username is required",
+    "username_min_length": "Username must be at least 3 characters",
+    "username_invalid": "Username can only contain letters, numbers, and underscores",
+    "email_required": "Email is required",
+    "email_invalid": "Please enter a valid email address",
+    "password_required": "Password is required",
+    "password_min_length": "Password must be at least 6 characters",
+    "password_complexity": "Password needs at least 2 of: uppercase, lowercase, number, or special character",
+    "confirm_password_required": "Please confirm your password",
+    "passwords_dont_match": "Passwords do not match"
+  },
   "login": {
     "title": "Login",
     "subtitle": "Please enter your email and password to enjoy the experience",
@@ -24,6 +53,8 @@
     "sign_up": "Sign Up"
   },
   "register": {
+    "password_strength": "Password Strength",
+
     "title": "Create an Account",
     "subtitle": "Please enter your details to enjoy the experience",
     "username": "Username",
@@ -312,17 +343,7 @@
     "cleaning": "Cleaning",
     "rent": "Rent"
   },
-  "validation": {
-    "required": "This field is required",
-    "invalidEmail": "Invalid email address",
-    "invalidAmount": "Invalid amount",
-    "amountTooSmall": "Amount must be greater than 0",
-    "titleTooShort": "Title must be at least 3 characters",
-    "titleTooLong": "Title must be less than 50 characters",
-    "invalidDate": "Invalid date",
-    "selectCategory": "Please select a category",
-    "selectMembers": "Please select at least one member"
-  },
+
   "errors": {
     "networkError": "Network connection error",
     "serverError": "Server error occurred",

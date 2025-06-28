@@ -9,6 +9,34 @@
     "error_title": "Erreur",
     "error_message": "Échec du changement de langue. Veuillez réessayer."
   },
+  "validation": {
+    "weak": "Faible",
+    "medium": "Moyen",
+    "strong": "Fort",
+    "at_least_6_chars": "Au moins 6 caractères",
+    "mix_chars": "Mélange de lettres, chiffres ou symboles",
+    "passwords_match": "Les mots de passe correspondent",
+    "passwords_no_match": "Les mots de passe ne correspondent pas",
+    "required": "Ce champ est requis",
+    "invalidEmail": "Adresse e-mail invalide",
+    "invalidAmount": "Montant invalide",
+    "amountTooSmall": "Le montant doit être supérieur à 0",
+    "titleTooShort": "Le titre doit contenir au moins 3 caractères",
+    "titleTooLong": "Le titre doit contenir moins de 50 caractères",
+    "invalidDate": "Date invalide",
+    "selectCategory": "Veuillez sélectionner une catégorie",
+    "selectMembers": "Veuillez sélectionner au moins un membre",
+    "username_required": "Le nom d'utilisateur est requis",
+    "username_min_length": "Le nom d'utilisateur doit contenir au moins 3 caractères",
+    "username_invalid": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des traits de soulignement",
+    "email_required": "L'email est requis",
+    "email_invalid": "Veuillez saisir une adresse email valide",
+    "password_required": "Le mot de passe est requis",
+    "password_min_length": "Le mot de passe doit contenir au moins 6 caractères",
+    "password_complexity": "Le mot de passe nécessite au moins 2 éléments parmi : majuscule, minuscule, chiffre ou caractère spécial",
+    "confirm_password_required": "Veuillez confirmer votre mot de passe",
+    "passwords_dont_match": "Les mots de passe ne correspondent pas"
+  },
   "login": {
     "title": "Connexion",
     "subtitle": "Veuillez entrer votre email et mot de passe pour profiter de l'application",
@@ -24,6 +52,8 @@
     "sign_up": "S'inscrire"
   },
   "register": {
+    "password_strength": "Force du mot de passe",
+
     "title": "Créer un compte",
     "subtitle": "Veuillez entrer vos informations pour profiter de l'application",
     "username": "Nom d'utilisateur",
@@ -312,17 +342,7 @@
     "cleaning": "Ménage",
     "rent": "Loyer"
   },
-  "validation": {
-    "required": "Ce champ est requis",
-    "invalidEmail": "Adresse e-mail invalide",
-    "invalidAmount": "Montant invalide",
-    "amountTooSmall": "Le montant doit être supérieur à 0",
-    "titleTooShort": "Le titre doit contenir au moins 3 caractères",
-    "titleTooLong": "Le titre doit contenir moins de 50 caractères",
-    "invalidDate": "Date invalide",
-    "selectCategory": "Veuillez sélectionner une catégorie",
-    "selectMembers": "Veuillez sélectionner au moins un membre"
-  },
+
   "errors": {
     "networkError": "Erreur de connexion réseau",
     "serverError": "Erreur du serveur",

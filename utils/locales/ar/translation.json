@@ -9,6 +9,34 @@
     "error_title": "خطأ",
     "error_message": "فشل تغيير اللغة. حاول مرة أخرى."
   },
+  "validation": {
+    "weak": "ضعيفة",
+    "medium": "متوسطة",
+    "strong": "قوية",
+    "at_least_6_chars": "على الأقل 6 أحرف",
+    "mix_chars": "مزيج من الأحرف والأرقام أو الرموز",
+    "passwords_match": "كلمات المرور متطابقة",
+    "passwords_no_match": "كلمات المرور غير متطابقة",
+    "username_required": "اسم المستخدم مطلوب",
+    "username_min_length": "يجب أن يحتوي اسم المستخدم على 3 أحرف على الأقل",
+    "username_invalid": "يمكن أن يحتوي اسم المستخدم على أحرف وأرقام وخطوط سفلية فقط",
+    "email_required": "البريد الإلكتروني مطلوب",
+    "email_invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+    "password_required": "كلمة المرور مطلوبة",
+    "password_min_length": "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل",
+    "password_complexity": "تحتاج كلمة المرور إلى عنصرين على الأقل من: أحرف كبيرة، أحرف صغيرة، أرقام، أو رموز خاصة",
+    "confirm_password_required": "يرجى تأكيد كلمة المرور",
+    "passwords_dont_match": "كلمات المرور غير متطابقة",
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "عنوان بريد إلكتروني غير صالح",
+    "invalidAmount": "مبلغ غير صالح",
+    "amountTooSmall": "يجب أن يكون المبلغ أكبر من 0",
+    "titleTooShort": "يجب أن يكون العنوان 3 أحرف على الأقل",
+    "titleTooLong": "يجب أن يكون العنوان أقل من 50 حرف",
+    "invalidDate": "تاريخ غير صالح",
+    "selectCategory": "يرجى اختيار فئة",
+    "selectMembers": "يرجى اختيار عضو واحد على الأقل"
+  },
   "login": {
     "title": "تسجيل الدخول",
     "subtitle": "يرجى إدخال البريد الإلكتروني وكلمة المرور للاستمتاع بالتطبيق",
@@ -24,6 +52,7 @@
     "sign_up": "إنشاء حساب"
   },
   "register": {
+    "password_strength": "قوة كلمة المرور",
     "title": "إنشاء حساب",
     "subtitle": "يرجى إدخال بياناتك للاستمتاع بالتطبيق",
     "username": "اسم المستخدم",
@@ -310,17 +339,7 @@
     "cleaning": "تنظيف",
     "rent": "إيجار"
   },
-  "validation": {
-    "required": "هذا الحقل مطلوب",
-    "invalidEmail": "عنوان بريد إلكتروني غير صالح",
-    "invalidAmount": "مبلغ غير صالح",
-    "amountTooSmall": "يجب أن يكون المبلغ أكبر من 0",
-    "titleTooShort": "يجب أن يكون العنوان 3 أحرف على الأقل",
-    "titleTooLong": "يجب أن يكون العنوان أقل من 50 حرف",
-    "invalidDate": "تاريخ غير صالح",
-    "selectCategory": "يرجى اختيار فئة",
-    "selectMembers": "يرجى اختيار عضو واحد على الأقل"
-  },
+
   "errors": {
     "networkError": "خطأ في اتصال الشبكة",
     "serverError": "حدث خطأ في الخادم",

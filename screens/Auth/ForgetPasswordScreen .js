@@ -15,10 +15,13 @@ import ResetPassword from 'models/auth/ResetPassword';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
 import Header from 'components/Header';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 
 // Forget Password Screen
 const ForgetPasswordScreen = () => {
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding } = useRTL(); // Use RTL hook
+
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -76,27 +79,29 @@ const ForgetPasswordScreen = () => {
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="relative ">
+        <View className="relative">
           {/* Header with Back Button */}
           <Header />
 
           {/* Title and Subtitle */}
-          <View className="mt-16">
-            <Text className="title">{t('passwordRecovery.forgetPassword.title')}</Text>
-            <Text className="subtitle">{t('passwordRecovery.forgetPassword.subtitle')}</Text>
+          <View className="mt-8">
+            <Text className={`title `}>{t('passwordRecovery.forgetPassword.title')}</Text>
+            <Text className={`subtitle `}>{t('passwordRecovery.forgetPassword.subtitle')}</Text>
           </View>
 
           {/* Form */}
-          <View className="form-container gap-6 ">
-            <View className="input-group ">
-              <Text className="input-label">{t('passwordRecovery.forgetPassword.email')}</Text>
+          <View className="form-container gap-6">
+            <View className="input-group">
+              <Text className={`input-label ${getTextAlign('left')}`}>
+                {t('passwordRecovery.forgetPassword.email')}
+              </Text>
               <View className="input-container">
                 <Ionicons
                   name="mail-outline"
                   size={20}
                   style={{
                     position: 'absolute',
-                    left: 16,
+                    [isRTL ? 'right' : 'left']: 16,
                     top: '50%',
                     transform: [{ translateY: -10 }],
                     color: errors.email ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -105,6 +110,11 @@ const ForgetPasswordScreen = () => {
                 />
                 <TextInput
                   className={`input-field ${errors.email ? 'input-field-error' : ''}`}
+                  style={{
+                    textAlign: isRTL ? 'right' : 'left',
+                    paddingLeft: isRTL ? 16 : 48,
+                    paddingRight: isRTL ? 48 : 16,
+                  }}
                   placeholder={t('passwordRecovery.forgetPassword.emailPlaceholder')}
                   placeholderTextColor="rgba(0, 0, 0, 0.2)"
                   value={email}
@@ -119,14 +129,13 @@ const ForgetPasswordScreen = () => {
                   autoCorrect={false}
                 />
               </View>
-              {errors.email && <Text className="error-text">{errors.email}</Text>}
+              {errors.email && (
+                <Text className={`error-text ${getTextAlign('left')}`}>{errors.email}</Text>
+              )}
             </View>
 
-            <TouchableOpacity
-              className="btn-primary "
-              onPress={handleSendCode}
-              disabled={isLoading}>
-              <Text className="btn-primary-text">
+            <TouchableOpacity className="btn-primary" onPress={handleSendCode} disabled={isLoading}>
+              <Text className={`btn-primary-text ${getTextAlign('center')}`}>
                 {isLoading
                   ? t('passwordRecovery.forgetPassword.sending')
                   : t('passwordRecovery.forgetPassword.sendButton')}

@@ -13,9 +13,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Logo, SmallLogo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
 import ResetPassword from 'models/auth/ResetPassword';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
+import Header from 'components/Header';
 
 const OTPVerificationScreen = () => {
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getIconDirection } =
+    useRTL(); // Use RTL hook
+
   const [code, setCode] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -36,15 +41,21 @@ const OTPVerificationScreen = () => {
     setCode(newCode);
     setHasError(false);
 
-    // Auto-focus next input
+    // Auto-focus next input - adjust direction for RTL
     if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus();
+      const nextIndex = isRTL ? index - 1 : index + 1;
+      if (nextIndex >= 0 && nextIndex < 4) {
+        inputRefs.current[nextIndex]?.focus();
+      }
     }
   };
 
   const handleKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
+    if (e.nativeEvent.key === 'Backspace' && !code[index]) {
+      const prevIndex = isRTL ? index + 1 : index - 1;
+      if (prevIndex >= 0 && prevIndex < 4) {
+        inputRefs.current[prevIndex]?.focus();
+      }
     }
   };
 
@@ -103,50 +114,45 @@ const OTPVerificationScreen = () => {
     // Add navigation logic here
   };
 
+  // For RTL, we might want to reverse the order of OTP inputs
+  const otpInputs = isRTL ? [3, 2, 1, 0] : [0, 1, 2, 3];
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
-        className="container "
+        className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <View className="relative flex">
           {/* Header with Back Button and Support */}
-          <View className="absolute left-0 top-0 w-full flex-row items-center justify-between">
-            <TouchableOpacity
-              className="h-10 w-10 items-center justify-center rounded-[10px] border border-border-light"
-              onPress={handleGoBack}>
-              <Ionicons name="chevron-back" size={24} color="rgba(0, 0, 0, 0.7)" />
-            </TouchableOpacity>
+          <Header rightIcon={<SmallLogo />} />
 
-            <SmallLogo />
-          </View>
-
-          <View className="mt-16">
+          <View className="mt-8">
             {/* Title and Subtitle */}
-            <View className="">
-              <Text className="title">{t('passwordRecovery.otpVerification.title')}</Text>
-              <Text className="subtitle">
+            <View>
+              <Text className={`title `}>{t('passwordRecovery.otpVerification.title')}</Text>
+              <Text className={`subtitle `}>
                 {t('passwordRecovery.otpVerification.subtitle', { email: 'john.doe@gmail.com' })}
               </Text>
             </View>
 
             {/* Code Input */}
             <View className="mb-4 flex items-center justify-center">
-              <View className="flex-row justify-center gap-6">
-                {code.map((digit, index) => (
+              <View className={`justify-center gap-6 ${getFlexDirection()}`}>
+                {otpInputs.map((actualIndex, displayIndex) => (
                   <TextInput
-                    key={index}
-                    ref={(ref) => (inputRefs.current[index] = ref)}
+                    key={actualIndex}
+                    ref={(ref) => (inputRefs.current[actualIndex] = ref)}
                     className={`h-[72px] w-[64px] rounded-[16px] border text-center text-2xl font-semibold ${
                       hasError
                         ? 'border-error text-error'
-                        : digit
+                        : code[actualIndex]
                           ? 'border-primary text-primary'
                           : 'border-gray-200 text-gray-400'
                     } bg-gray-50`}
-                    value={digit}
-                    onChangeText={(value) => handleCodeChange(value, index)}
-                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    value={code[actualIndex]}
+                    onChangeText={(value) => handleCodeChange(value, actualIndex)}
+                    onKeyPress={(e) => handleKeyPress(e, actualIndex)}
                     keyboardType="numeric"
                     maxLength={1}
                     selectTextOnFocus
@@ -155,21 +161,21 @@ const OTPVerificationScreen = () => {
               </View>
 
               {hasError && (
-                <Text className="mt-4 text-center text-error">
+                <Text className={`mt-4 text-center text-error ${getTextAlign('center')}`}>
                   {t('passwordRecovery.otpVerification.wrongCode')}
                 </Text>
               )}
             </View>
 
             {/* Resend Link */}
-            <View className="mb-8 ">
-              <View className="flex-row items-center justify-center p-0 text-label">
-                <Text className="text-center text-text-secondary">
+            <View className="mb-8">
+              <View className={`items-center justify-center p-0 text-label ${getFlexDirection()}`}>
+                <Text className={`text-center text-text-secondary ${getTextAlign('center')}`}>
                   {t('passwordRecovery.otpVerification.didntReceive')}{' '}
                 </Text>
                 <TouchableOpacity onPress={handleResendCode} disabled={!canResend}>
                   <Text
-                    className={`${canResend ? 'font-medium text-primary' : 'font-medium text-gray-300'}`}>
+                    className={`${canResend ? 'font-medium text-primary' : 'font-medium text-gray-300'} ${getTextAlign('center')}`}>
                     {t('passwordRecovery.otpVerification.resend')}
                   </Text>
                 </TouchableOpacity>
@@ -178,7 +184,7 @@ const OTPVerificationScreen = () => {
 
             {/* Confirm Button */}
             <TouchableOpacity className="btn-primary" onPress={handleConfirm} disabled={isLoading}>
-              <Text className="btn-primary-text">
+              <Text className={`btn-primary-text ${getTextAlign('center')}`}>
                 {isLoading
                   ? t('passwordRecovery.otpVerification.confirming')
                   : t('passwordRecovery.otpVerification.confirmButton')}

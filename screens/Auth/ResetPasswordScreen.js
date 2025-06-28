@@ -13,9 +13,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
 import ResetPassword from 'models/auth/ResetPassword';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
+import Header from 'components/Header';
 
 const ResetPasswordScreen = () => {
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getIconDirection } =
+    useRTL(); // Use RTL hook
+
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -85,20 +90,14 @@ const ResetPasswordScreen = () => {
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="relative ">
+        <View className="relative">
           {/* Header with Back Button */}
-          <View className="absolute left-0 top-0 flex-row items-center">
-            <TouchableOpacity
-              className="h-10 w-10 items-center justify-center rounded-[10px] border border-border-light"
-              onPress={handleGoBack}>
-              <Ionicons name="chevron-back" size={24} color="rgba(0, 0, 0, 0.7)" />
-            </TouchableOpacity>
-          </View>
+          <Header />
 
           {/* Title and Subtitle */}
-          <View className="mt-16">
-            <Text className="title">{t('passwordRecovery.resetPassword.title')}</Text>
-            <Text className="subtitle">{t('passwordRecovery.resetPassword.subtitle')}</Text>
+          <View className="mt-8">
+            <Text className={`title `}>{t('passwordRecovery.resetPassword.title')}</Text>
+            <Text className={`subtitle`}>{t('passwordRecovery.resetPassword.subtitle')}</Text>
           </View>
 
           {/* Form */}
@@ -106,7 +105,7 @@ const ResetPasswordScreen = () => {
             <View className="gap-6">
               {/* New Password Input */}
               <View className="input-group">
-                <Text className="input-label">
+                <Text className={`input-label ${getTextAlign('left')}`}>
                   {t('passwordRecovery.resetPassword.newPassword')}
                 </Text>
                 <View className="input-container">
@@ -115,7 +114,7 @@ const ResetPasswordScreen = () => {
                     size={20}
                     style={{
                       position: 'absolute',
-                      left: 16,
+                      [isRTL ? 'right' : 'left']: 16,
                       top: '50%',
                       transform: [{ translateY: -10 }],
                       color: errors.newPassword ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -124,6 +123,11 @@ const ResetPasswordScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.newPassword ? 'input-field-error' : ''}`}
+                    style={{
+                      textAlign: isRTL ? 'right' : 'left',
+                      paddingLeft: isRTL ? 48 : 48,
+                      paddingRight: isRTL ? 48 : 48,
+                    }}
                     placeholder={t('passwordRecovery.resetPassword.newPasswordPlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={newPassword}
@@ -139,6 +143,12 @@ const ResetPasswordScreen = () => {
                   />
                   <TouchableOpacity
                     className="password-toggle"
+                    style={{
+                      position: 'absolute',
+                      [isRTL ? 'left' : 'right']: 16,
+                      top: '50%',
+                      transform: [{ translateY: -10 }],
+                    }}
                     onPress={() => setShowNewPassword(!showNewPassword)}>
                     <Ionicons
                       name={showNewPassword ? 'eye-outline' : 'eye-off-outline'}
@@ -147,12 +157,14 @@ const ResetPasswordScreen = () => {
                     />
                   </TouchableOpacity>
                 </View>
-                {errors.newPassword && <Text className="error-text">{errors.newPassword}</Text>}
+                {errors.newPassword && (
+                  <Text className={`error-text ${getTextAlign('left')}`}>{errors.newPassword}</Text>
+                )}
               </View>
 
               {/* Confirm Password Input */}
               <View className="input-group">
-                <Text className="input-label">
+                <Text className={`input-label ${getTextAlign('left')}`}>
                   {t('passwordRecovery.resetPassword.confirmPassword')}
                 </Text>
                 <View className="input-container">
@@ -161,7 +173,7 @@ const ResetPasswordScreen = () => {
                     size={20}
                     style={{
                       position: 'absolute',
-                      left: 16,
+                      [isRTL ? 'right' : 'left']: 16,
                       top: '50%',
                       transform: [{ translateY: -10 }],
                       color: errors.confirmPassword ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -170,6 +182,11 @@ const ResetPasswordScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.confirmPassword ? 'input-field-error' : ''}`}
+                    style={{
+                      textAlign: isRTL ? 'right' : 'left',
+                      paddingLeft: isRTL ? 48 : 48,
+                      paddingRight: isRTL ? 48 : 48,
+                    }}
                     placeholder={t('passwordRecovery.resetPassword.confirmPasswordPlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={confirmPassword}
@@ -185,6 +202,12 @@ const ResetPasswordScreen = () => {
                   />
                   <TouchableOpacity
                     className="password-toggle"
+                    style={{
+                      position: 'absolute',
+                      [isRTL ? 'left' : 'right']: 16,
+                      top: '50%',
+                      transform: [{ translateY: -10 }],
+                    }}
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                     <Ionicons
                       name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
@@ -194,14 +217,17 @@ const ResetPasswordScreen = () => {
                   </TouchableOpacity>
                 </View>
                 {errors.confirmPassword && (
-                  <Text className="error-text">{errors.confirmPassword}</Text>
+                  <Text className={`error-text ${getTextAlign('left')}`}>
+                    {errors.confirmPassword}
+                  </Text>
                 )}
               </View>
+
               <TouchableOpacity
-                className="btn-primary "
+                className="btn-primary"
                 onPress={handleSavePassword}
                 disabled={isLoading}>
-                <Text className="btn-primary-text">
+                <Text className={`btn-primary-text ${getTextAlign('center')}`}>
                   {isLoading
                     ? t('passwordRecovery.resetPassword.saving')
                     : t('passwordRecovery.resetPassword.saveButton')}

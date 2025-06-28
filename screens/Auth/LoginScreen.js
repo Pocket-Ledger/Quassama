@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Image,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // or react-native-vector-icons
+import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
@@ -16,10 +16,20 @@ import Login from 'models/auth/Login';
 import { useTranslation } from 'react-i18next';
 import i18n from 'utils/i18n';
 import Header from 'components/Header';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const {
+    isRTL,
+    getFlexDirection,
+    getTextAlign,
+    getMargin,
+    getPadding,
+    getPosition,
+    getIconDirection,
+  } = useRTL(); // Use RTL hook
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,15 +41,15 @@ const LoginScreen = () => {
     const newErrors = {};
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('validation.email_required');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('validation.email_invalid');
     }
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('validation.password_required');
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = t('validation.password_min_length');
     }
 
     setErrors(newErrors);
@@ -74,34 +84,34 @@ const LoginScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white ">
+    <SafeAreaView className="flex-1 bg-white">
       <ScrollView
         className="container"
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header with Back Button */}
         <Header />
-        <View className="login-content relative ">
+        <View className="login-content relative">
           <View className="logo-container">
             <Logo />
           </View>
           {/* Title and Subtitle */}
           <View>
-            <Text className="title">{t('login.title')}</Text>
-            <Text className="subtitle">{t('login.subtitle')}</Text>
+            <Text className={`title `}>{t('login.title')}</Text>
+            <Text className={`subtitle `}>{t('login.subtitle')}</Text>
           </View>
           {/* Form */}
           <View className="form-container">
             <View className="gap-4">
               <View className="input-group">
-                <Text className="input-label">{t('login.email')}</Text>
+                <Text className={`input-label ${getTextAlign('left')}`}>{t('login.email')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="mail-outline"
                     size={20}
                     style={{
                       position: 'absolute',
-                      left: 16,
+                      [isRTL ? 'right' : 'left']: 16,
                       top: '50%',
                       transform: [{ translateY: -10 }],
                       color: errors.email ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -110,6 +120,11 @@ const LoginScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.email ? 'input-field-error' : ''}`}
+                    style={{
+                      textAlign: isRTL ? 'right' : 'left',
+                      paddingLeft: isRTL ? 16 : 48,
+                      paddingRight: isRTL ? 48 : 16,
+                    }}
                     placeholder="John.doe@gmail.com"
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={email}
@@ -124,18 +139,20 @@ const LoginScreen = () => {
                     autoCorrect={false}
                   />
                 </View>
-                {errors.email && <Text className="error-text">{errors.email}</Text>}
+                {errors.email && (
+                  <Text className={`error-text ${getTextAlign('left')}`}>{errors.email}</Text>
+                )}
               </View>
 
               <View className="input-group">
-                <Text className="input-label">{t('login.password')}</Text>
+                <Text className={`input-label ${getTextAlign('left')}`}>{t('login.password')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="lock-closed-outline"
                     size={20}
                     style={{
                       position: 'absolute',
-                      left: 16,
+                      [isRTL ? 'right' : 'left']: 16,
                       top: '50%',
                       transform: [{ translateY: -10 }],
                       color: errors.password ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -144,6 +161,11 @@ const LoginScreen = () => {
                   />
                   <TextInput
                     className={`input-field ${errors.password ? 'input-field-error' : ''}`}
+                    style={{
+                      textAlign: isRTL ? 'right' : 'left',
+                      paddingLeft: isRTL ? 48 : 48, // Both sides need space for icons
+                      paddingRight: isRTL ? 48 : 48,
+                    }}
                     placeholder="••••••••••••••••"
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={password}
@@ -159,6 +181,12 @@ const LoginScreen = () => {
                   />
                   <TouchableOpacity
                     className="password-toggle z-99"
+                    style={{
+                      position: 'absolute',
+                      [isRTL ? 'left' : 'right']: 16,
+                      top: '50%',
+                      transform: [{ translateY: -10 }],
+                    }}
                     onPress={() => setShowPassword(!showPassword)}>
                     <Ionicons
                       name={showPassword ? 'eye-outline' : 'eye-off-outline'}
@@ -167,43 +195,54 @@ const LoginScreen = () => {
                     />
                   </TouchableOpacity>
                 </View>
-                {errors.password && <Text className="error-text">{errors.password}</Text>}
+                {errors.password && (
+                  <Text className={`error-text ${getTextAlign('left')}`}>{errors.password}</Text>
+                )}
               </View>
             </View>
 
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-              <Text className="forgot-password-link">{t('login.forgot_password')}</Text>
+              <Text className={`forgot-password-link ${getTextAlign('right')}`}>
+                {t('login.forgot_password')}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="btn-primary" onPress={handleLogin} disabled={isLoading}>
-              <Text className="btn-primary-text">
+              <Text className={`btn-primary-text ${getTextAlign('center')}`}>
                 {isLoading ? t('login.logging_in') : t('login.login_button')}
               </Text>
             </TouchableOpacity>
           </View>
+
           <View className="divider-container">
             <View className="divider-line" />
-            <Text className="divider-text font-normal">{t('login.or_continue_with')}</Text>
+            <Text className={`divider-text font-normal ${getTextAlign('center')}`}>
+              {t('login.or_continue_with')}
+            </Text>
             <View className="divider-line" />
           </View>
-          <View className="flex w-full flex-row gap-4">
+
+          <View className={`flex w-full gap-4 ${getFlexDirection()}`}>
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Google')}>
               <Image
                 source={require('../../assets/google.png')}
                 className="h-5 w-5"
                 resizeMode="contain"
               />
-              <Text className="text-label">{t('login.google')}</Text>
+              <Text className={`text-label ${getTextAlign('center')}`}>{t('login.google')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Apple')}>
               <Ionicons name="logo-apple" size={20} color="#000000" />
-              <Text className="text-label">{t('login.apple')}</Text>
+              <Text className={`text-label ${getTextAlign('center')}`}>{t('login.apple')}</Text>
             </TouchableOpacity>
           </View>
-          {/* Sign Up Link - UNCOMMENTED */}
-          <View className="signup-container">
-            <Text className="signup-text font-normal">{t('login.no_account')}</Text>
+
+          {/* Sign Up Link */}
+          <View className={`signup-container ${getFlexDirection()} items-center justify-center`}>
+            <Text className={`signup-text font-normal ${getMargin('right', '1')}`}>
+              {t('login.no_account')}
+            </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text className="signup-link">{t('login.sign_up')}</Text>
             </TouchableOpacity>

@@ -20,10 +20,14 @@ import Register from 'models/auth/Register';
 import User from 'models/auth/user';
 import { useTranslation } from 'react-i18next';
 import i18n from 'utils/i18n';
+import { useRTL } from 'hooks/useRTL'; // Import RTL hook
+import Header from 'components/Header';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const { isRTL, getFlexDirection, getTextAlign, getMargin, getPadding, getPosition } = useRTL(); // Use RTL hook
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,21 +40,20 @@ const RegisterScreen = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordRequirements, setPasswordRequirements] = useState({
     length: false,
-    complexity: false, // Combined uppercase, lowercase, number, special
+    complexity: false,
   });
 
   const checkPasswordRequirements = (password) => {
     const requirements = {
-      length: password.length >= 6, // Reduced from 8 to 6
+      length: password.length >= 6,
       complexity:
-        (/[A-Z]/.test(password) ? 1 : 0) + // uppercase
-          (/[a-z]/.test(password) ? 1 : 0) + // lowercase
-          (/\d/.test(password) ? 1 : 0) + // number
+        (/[A-Z]/.test(password) ? 1 : 0) +
+          (/[a-z]/.test(password) ? 1 : 0) +
+          (/\d/.test(password) ? 1 : 0) +
           (/[!@#$%^&*(),.?":{}|<>]/.test(password) ? 1 : 0) >=
-        2, // at least 2 of 4 types
+        2,
     };
 
-    // Calculate password strength (0-100)
     let strength = 0;
     if (password.length >= 6) strength += 30;
     if (password.length >= 8) strength += 20;
@@ -65,51 +68,50 @@ const RegisterScreen = () => {
   };
 
   const getPasswordStrengthColor = () => {
-    if (passwordStrength < 40) return '#ff3b30'; // Red
-    if (passwordStrength < 70) return '#ff9500'; // Orange
-    return '#34C759'; // Green
+    if (passwordStrength < 40) return '#ff3b30';
+    if (passwordStrength < 70) return '#ff9500';
+    return '#34C759';
   };
 
   const getPasswordStrengthText = () => {
-    if (passwordStrength < 40) return 'Weak';
-    if (passwordStrength < 70) return 'Medium';
-    return 'Strong';
+    if (passwordStrength < 40) return t('validation.weak');
+    if (passwordStrength < 70) return t('validation.medium');
+    return t('validation.strong');
   };
 
   const validateForm = () => {
     const newErrors = {};
 
     if (!username) {
-      newErrors.username = 'Username is required';
+      newErrors.username = t('validation.username_required');
     } else if (username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
+      newErrors.username = t('validation.username_min_length');
     } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      newErrors.username = 'Username can only contain letters, numbers, and underscores';
+      newErrors.username = t('validation.username_invalid');
     }
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('validation.email_required');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('validation.email_invalid');
     }
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('validation.password_required');
     } else {
       const requirements = checkPasswordRequirements(password);
 
       if (!requirements.length) {
-        newErrors.password = 'Password must be at least 6 characters';
+        newErrors.password = t('validation.password_min_length');
       } else if (!requirements.complexity) {
-        newErrors.password =
-          'Password needs at least 2 of: uppercase, lowercase, number, or special character';
+        newErrors.password = t('validation.password_complexity');
       }
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = t('validation.confirm_password_required');
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t('validation.passwords_dont_match');
     }
 
     setErrors(newErrors);
@@ -140,17 +142,14 @@ const RegisterScreen = () => {
 
   const handleSocialLogin = (provider) => {
     console.log(`Register with ${provider}`);
-    // Add social registration logic here
   };
 
   const handleLogin = () => {
     console.log('Navigate to Login');
-    // Add navigation to login screen here
   };
 
   const handleGoBack = () => {
     console.log('Navigate back');
-    // Add navigation logic here
   };
 
   return (
@@ -159,20 +158,20 @@ const RegisterScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}>
         <ScrollView
-          className="container "
+          className="container"
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={true}>
           <View className="login-content relative">
             {/* Header with Back Button and Logo */}
-            <BackButton />
+            <Header />
             <View className="logo-container">
               <Logo />
             </View>
 
             {/* Title and Subtitle */}
-            <View className="">
-              <Text className="title">{t('register.title')}</Text>
-              <Text className="subtitle">{t('register.subtitle')}</Text>
+            <View className="w-full">
+              <Text className={`title`}>{t('register.title')}</Text>
+              <Text className={`subtitle `}>{t('register.subtitle')}</Text>
             </View>
 
             {/* Form */}
@@ -180,14 +179,16 @@ const RegisterScreen = () => {
               <View className="gap-4">
                 {/* Username Input */}
                 <View className="input-group">
-                  <Text className="input-label">{t('register.username')}</Text>
+                  <Text className={`input-label ${getTextAlign('left')}`}>
+                    {t('register.username')}
+                  </Text>
                   <View className="input-container">
                     <Ionicons
                       name="person-outline"
                       size={20}
                       style={{
                         position: 'absolute',
-                        left: 16,
+                        [isRTL ? 'right' : 'left']: 16,
                         top: '50%',
                         transform: [{ translateY: -10 }],
                         color: errors.username ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -196,6 +197,11 @@ const RegisterScreen = () => {
                     />
                     <TextInput
                       className={`input-field ${errors.username ? 'input-field-error' : ''}`}
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        paddingLeft: isRTL ? 16 : 48,
+                        paddingRight: isRTL ? 48 : 16,
+                      }}
                       placeholder="johndoe123"
                       placeholderTextColor="rgba(0, 0, 0, 0.2)"
                       value={username}
@@ -209,19 +215,23 @@ const RegisterScreen = () => {
                       autoCorrect={false}
                     />
                   </View>
-                  {errors.username && <Text className="error-text">{errors.username}</Text>}
+                  {errors.username && (
+                    <Text className={`error-text ${getTextAlign('left')}`}>{errors.username}</Text>
+                  )}
                 </View>
 
                 {/* Email Input */}
                 <View className="input-group">
-                  <Text className="input-label">{t('register.email')}</Text>
+                  <Text className={`input-label ${getTextAlign('left')}`}>
+                    {t('register.email')}
+                  </Text>
                   <View className="input-container">
                     <Ionicons
                       name="mail-outline"
                       size={20}
                       style={{
                         position: 'absolute',
-                        left: 16,
+                        [isRTL ? 'right' : 'left']: 16,
                         top: '50%',
                         transform: [{ translateY: -10 }],
                         color: errors.email ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -230,6 +240,11 @@ const RegisterScreen = () => {
                     />
                     <TextInput
                       className={`input-field ${errors.email ? 'input-field-error' : ''}`}
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        paddingLeft: isRTL ? 16 : 48,
+                        paddingRight: isRTL ? 48 : 16,
+                      }}
                       placeholder="John.doe@gmail.com"
                       placeholderTextColor="rgba(0, 0, 0, 0.2)"
                       value={email}
@@ -244,19 +259,23 @@ const RegisterScreen = () => {
                       autoCorrect={false}
                     />
                   </View>
-                  {errors.email && <Text className="error-text">{errors.email}</Text>}
+                  {errors.email && (
+                    <Text className={`error-text ${getTextAlign('left')}`}>{errors.email}</Text>
+                  )}
                 </View>
 
                 {/* Password Input */}
                 <View className="input-group">
-                  <Text className="input-label">{t('register.password')}</Text>
+                  <Text className={`input-label ${getTextAlign('left')}`}>
+                    {t('register.password')}
+                  </Text>
                   <View className="input-container">
                     <Ionicons
                       name="lock-closed-outline"
                       size={20}
                       style={{
                         position: 'absolute',
-                        left: 16,
+                        [isRTL ? 'right' : 'left']: 16,
                         top: '50%',
                         transform: [{ translateY: -10 }],
                         color: errors.password ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -265,6 +284,11 @@ const RegisterScreen = () => {
                     />
                     <TextInput
                       className={`input-field ${errors.password ? 'input-field-error' : ''}`}
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        paddingLeft: isRTL ? 48 : 48,
+                        paddingRight: isRTL ? 48 : 48,
+                      }}
                       placeholder="••••••••••••••••"
                       placeholderTextColor="rgba(0, 0, 0, 0.2)"
                       value={password}
@@ -281,6 +305,12 @@ const RegisterScreen = () => {
                     />
                     <TouchableOpacity
                       className="password-toggle z-99"
+                      style={{
+                        position: 'absolute',
+                        [isRTL ? 'left' : 'right']: 16,
+                        top: '50%',
+                        transform: [{ translateY: -10 }],
+                      }}
                       onPress={() => setShowPassword(!showPassword)}>
                       <Ionicons
                         name={showPassword ? 'eye-outline' : 'eye-off-outline'}
@@ -289,17 +319,20 @@ const RegisterScreen = () => {
                       />
                     </TouchableOpacity>
                   </View>
-                  {errors.password && <Text className="error-text">{errors.password}</Text>}
+                  {errors.password && (
+                    <Text className={`error-text ${getTextAlign('left')}`}>{errors.password}</Text>
+                  )}
 
-                  {/* Simplified Password Strength Indicator */}
+                  {/* Password Strength Indicator */}
                   {password.length > 0 && (
                     <View className="mt-3">
-                      {/* Password Strength Bar */}
                       <View className="mb-2">
-                        <View className="mb-1 flex-row items-center justify-between">
-                          <Text className="text-sm text-gray-600">Password Strength</Text>
+                        <View className={`mb-1 items-center justify-between ${getFlexDirection()}`}>
+                          <Text className={`text-sm text-gray-600 ${getTextAlign('left')}`}>
+                            {t('register.password_strength')}
+                          </Text>
                           <Text
-                            className="text-sm font-medium"
+                            className={`text-sm font-medium ${getTextAlign('right')}`}
                             style={{ color: getPasswordStrengthColor() }}>
                             {getPasswordStrengthText()}
                           </Text>
@@ -315,9 +348,8 @@ const RegisterScreen = () => {
                         </View>
                       </View>
 
-                      {/* Simple Requirements */}
                       <View className="gap-2">
-                        <View className="flex-row items-center">
+                        <View className={`items-center ${getFlexDirection()}`}>
                           <Ionicons
                             name={
                               passwordRequirements.length ? 'checkmark-circle' : 'ellipse-outline'
@@ -326,11 +358,13 @@ const RegisterScreen = () => {
                             color={passwordRequirements.length ? '#34C759' : '#D1D5DB'}
                           />
                           <Text
-                            className={`ml-2 text-sm ${passwordRequirements.length ? 'text-green-600' : 'text-gray-500'}`}>
-                            At least 6 characters
+                            className={`${getMargin('left', '2')} text-sm ${
+                              passwordRequirements.length ? 'text-green-600' : 'text-gray-500'
+                            } ${getTextAlign('left')}`}>
+                            {t('validation.at_least_6_chars')}
                           </Text>
                         </View>
-                        <View className="flex-row items-center">
+                        <View className={`items-center ${getFlexDirection()}`}>
                           <Ionicons
                             name={
                               passwordRequirements.complexity
@@ -341,16 +375,17 @@ const RegisterScreen = () => {
                             color={passwordRequirements.complexity ? '#34C759' : '#D1D5DB'}
                           />
                           <Text
-                            className={`ml-2 text-sm ${passwordRequirements.complexity ? 'text-green-600' : 'text-gray-500'}`}>
-                            Mix of letters, numbers, or symbols
+                            className={`${getMargin('left', '2')} text-sm ${
+                              passwordRequirements.complexity ? 'text-green-600' : 'text-gray-500'
+                            } ${getTextAlign('left')}`}>
+                            {t('validation.mix_chars')}
                           </Text>
                         </View>
                       </View>
 
-                      {/* Helpful Tips */}
-                      {passwordStrength < 70 && (
-                        <View className="mt-2 rounded-lg bg-blue-50 p-2">
-                          <Text className="text-xs text-blue-700">
+                      {/* {passwordStrength < 70 && (
+                        <View className="p-2 mt-2 rounded-lg bg-blue-50">
+                          <Text className={`text-xs text-blue-700 ${getTextAlign('left')}`}>
                             💡 Tip: Try adding {password.length < 8 ? 'more characters, ' : ''}
                             {!/[A-Z]/.test(password) ? 'uppercase letters, ' : ''}
                             {!/\d/.test(password) ? 'numbers, ' : ''}
@@ -358,21 +393,23 @@ const RegisterScreen = () => {
                             for a stronger password
                           </Text>
                         </View>
-                      )}
+                      )} */}
                     </View>
                   )}
                 </View>
 
                 {/* Confirm Password Input */}
                 <View className="input-group">
-                  <Text className="input-label">{t('register.confirm_password')}</Text>
+                  <Text className={`input-label ${getTextAlign('left')}`}>
+                    {t('register.confirm_password')}
+                  </Text>
                   <View className="input-container">
                     <Ionicons
                       name="lock-closed-outline"
                       size={20}
                       style={{
                         position: 'absolute',
-                        left: 16,
+                        [isRTL ? 'right' : 'left']: 16,
                         top: '50%',
                         transform: [{ translateY: -10 }],
                         color: errors.confirmPassword ? 'red' : 'rgba(0, 0, 0, 0.2)',
@@ -381,6 +418,11 @@ const RegisterScreen = () => {
                     />
                     <TextInput
                       className={`input-field ${errors.confirmPassword ? 'input-field-error' : ''}`}
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        paddingLeft: isRTL ? 48 : 48,
+                        paddingRight: isRTL ? 48 : 48,
+                      }}
                       placeholder="••••••••••••••••"
                       placeholderTextColor="rgba(0, 0, 0, 0.2)"
                       value={confirmPassword}
@@ -396,6 +438,12 @@ const RegisterScreen = () => {
                     />
                     <TouchableOpacity
                       className="password-toggle z-99"
+                      style={{
+                        position: 'absolute',
+                        [isRTL ? 'left' : 'right']: 16,
+                        top: '50%',
+                        transform: [{ translateY: -10 }],
+                      }}
                       onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                       <Ionicons
                         name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
@@ -405,22 +453,26 @@ const RegisterScreen = () => {
                     </TouchableOpacity>
                   </View>
                   {errors.confirmPassword && (
-                    <Text className="error-text">{errors.confirmPassword}</Text>
+                    <Text className={`error-text ${getTextAlign('left')}`}>
+                      {errors.confirmPassword}
+                    </Text>
                   )}
 
                   {/* Password Match Indicator */}
                   {confirmPassword.length > 0 && (
-                    <View className="mt-1 flex-row items-center">
+                    <View className={`mt-1 items-center ${getFlexDirection()}`}>
                       <Ionicons
                         name={password === confirmPassword ? 'checkmark-circle' : 'close-circle'}
                         size={16}
                         color={password === confirmPassword ? '#34C759' : '#ff3b30'}
                       />
                       <Text
-                        className={`ml-2 text-sm ${password === confirmPassword ? 'text-green-600' : 'text-red-500'}`}>
+                        className={`${getMargin('left', '2')} text-sm ${
+                          password === confirmPassword ? 'text-green-600' : 'text-red-500'
+                        } ${getTextAlign('left')}`}>
                         {password === confirmPassword
-                          ? 'Passwords match'
-                          : 'Passwords do not match'}
+                          ? t('validation.passwords_match')
+                          : t('validation.passwords_no_match')}
                       </Text>
                     </View>
                   )}
@@ -429,24 +481,24 @@ const RegisterScreen = () => {
 
               {/* Remember Me Checkbox */}
               <TouchableOpacity
-                className="mb-6 mt-4 flex-row items-center"
+                className={`mb-6 mt-4 items-center ${getFlexDirection()}`}
                 onPress={() => setRememberMe(!rememberMe)}>
                 <View
-                  className={`mr-3 h-5 w-5 items-center justify-center rounded border-2 ${
+                  className={`${getMargin('right', '3')} h-5 w-5 items-center justify-center rounded border-2 ${
                     rememberMe ? 'border-primary bg-primary' : 'border-gray-300 bg-white'
                   }`}>
                   {rememberMe && <Ionicons name="checkmark" size={14} color="white" />}
                 </View>
-                <Text className="text-body font-medium text-primary">
+                <Text className={`text-body font-medium text-primary ${getTextAlign('left')}`}>
                   {t('register.remember_me')}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                className="btn-primary btn-primary-text"
+                className="btn-primary"
                 onPress={handleRegister}
                 disabled={isLoading}>
-                <Text className="btn-primary-text font-dmsans-bold">
+                <Text className={`btn-primary-text font-dmsans-bold ${getTextAlign('center')}`}>
                   {isLoading ? t('register.creating_account') : t('register.create_account')}
                 </Text>
               </TouchableOpacity>
@@ -454,12 +506,14 @@ const RegisterScreen = () => {
 
             <View className="divider-container">
               <View className="divider-line" />
-              <Text className="divider-text font-normal">{t('register.or_use')}</Text>
+              <Text className={`divider-text font-normal ${getTextAlign('center')}`}>
+                {t('register.or_use')}
+              </Text>
               <View className="divider-line" />
             </View>
 
             {/* Social Login Buttons */}
-            <View className="flex w-full flex-row gap-4">
+            <View className={`flex w-full gap-4 ${getFlexDirection()}`}>
               <TouchableOpacity
                 className="social-button"
                 onPress={() => handleSocialLogin('Google')}>
@@ -468,20 +522,27 @@ const RegisterScreen = () => {
                   className="h-5 w-5"
                   resizeMode="contain"
                 />
-                <Text className="text-label">{t('register.google')}</Text>
+                <Text className={`text-label ${getTextAlign('center')}`}>
+                  {t('register.google')}
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 className="social-button"
                 onPress={() => handleSocialLogin('Apple')}>
                 <Ionicons name="logo-apple" size={20} color="#000000" />
-                <Text className="text-label">{t('register.apple')}</Text>
+                <Text className={`text-label ${getTextAlign('center')}`}>
+                  {t('register.apple')}
+                </Text>
               </TouchableOpacity>
             </View>
 
             {/* Login Link */}
-            <View className="signup-container mt-6">
-              <Text className="signup-text font-normal">{t('register.already_have_account')}</Text>
+            <View
+              className={`signup-container mt-6 items-center justify-center ${getFlexDirection()}`}>
+              <Text className={`signup-text font-normal ${getMargin('right', '1')}`}>
+                {t('register.already_have_account')}
+              </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <Text className="signup-link">{t('register.login')}</Text>
               </TouchableOpacity>
