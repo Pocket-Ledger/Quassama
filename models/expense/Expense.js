@@ -951,10 +951,26 @@ class Expense {
       if (!expenseDoc.exists()) {
         throw new Error('Expense not found');
       }
-      return {
+      
+      const expenseData = {
         id: expenseDoc.id,
         ...expenseDoc.data(),
       };
+
+      // Fetch the username for the user who created this expense
+      if (expenseData.user_id) {
+        try {
+          const username = await User.getUsernameById(expenseData.user_id);
+          expenseData.user_name = username;
+        } catch (error) {
+          console.warn(`Could not fetch username for user_id: ${expenseData.user_id}`, error);
+          expenseData.user_name = 'Unknown';
+        }
+      } else {
+        expenseData.user_name = 'Unknown';
+      }
+
+      return expenseData;
     } catch (error) {
       console.error('Error fetching expense by ID:', error);
       throw new Error(`Failed to fetch expense: ${error.message}`);
