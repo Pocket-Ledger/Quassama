@@ -9,7 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
-import { CircularProgress } from 'components/CircularProgress';
+import PieChart from 'components/PieChart';
 import Expense from 'models/expense/Expense';
 import { useFocusEffect, useNavigation } from '@react-navigation/core';
 import User from 'models/auth/user';
@@ -323,12 +323,6 @@ const HomeScreen = () => {
     color: ['#2979FF', '#FF9800', '#00BCD4', '#673AB7', '#E91E63'][index % 5],
   }));
 
-  // Calculate the primary percentage for the circular progress
-  const primaryPercentage =
-    overviewData.categoryData.length > 0 ? overviewData.categoryData[0].percentage : 0;
-  const primaryColor =
-    overviewData.categoryData.length > 0 ? overviewData.categoryData[0].color : '#2979FF';
-
   // Get currency based on current language
   const getCurrency = () => {
     return t('common.currency');
@@ -434,7 +428,7 @@ const HomeScreen = () => {
           ) : (
             <View className="flex-row items-center">
               <View className="relative mr-6">
-                <CircularProgress percentage={primaryPercentage} color={primaryColor} />
+                <PieChart data={overviewData.categoryData} size={80} />
               </View>
 
               <View className="flex-1">

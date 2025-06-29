@@ -16,6 +16,7 @@ import { app, db } from '../../firebase';
 import Notification from 'models/notifications/notifications';
 import Group from 'models/group/group';
 import User from 'models/auth/user';
+import { DEFAULT_CATEGORIES } from '../../constants/category';
 
 class Expense {
   user_id;
@@ -397,49 +398,52 @@ class Expense {
         ...doc.data(),
       }));
 
+      // Create category mapping for easy lookup
+      const categoryMap = {};
+      DEFAULT_CATEGORIES.forEach(cat => {
+        categoryMap[cat.id] = cat;
+        categoryMap[cat.name] = cat;
+      });
+
       // Calculate totals by category
       const categoryTotals = {};
       let totalAmount = 0;
 
       expenses.forEach((expense) => {
-        const category = expense.category || 'Others';
+        let categoryKey = expense.category || 'Other';
         const amount = expense.amount || 0;
 
-        if (!categoryTotals[category]) {
-          categoryTotals[category] = 0;
+        // If category is an ID (number), get the name
+        const categoryInfo = categoryMap[categoryKey];
+        if (categoryInfo) {
+          categoryKey = categoryInfo.name;
         }
-        categoryTotals[category] += amount;
+
+        if (!categoryTotals[categoryKey]) {
+          categoryTotals[categoryKey] = 0;
+        }
+        categoryTotals[categoryKey] += amount;
         totalAmount += amount;
       });
 
       // Convert to array with percentages and sort by amount (descending)
       const categoryData = Object.keys(categoryTotals)
-        .map((category) => ({
-          category,
-          amount: categoryTotals[category],
-          percentage:
-            totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
-        }))
+        .map((categoryName) => {
+          // Find the category info from DEFAULT_CATEGORIES
+          const categoryInfo = DEFAULT_CATEGORIES.find(cat => cat.name === categoryName) || 
+                              { name: categoryName, color: '#9CA3AF' }; // fallback color
+          
+          return {
+            category: categoryName,
+            amount: categoryTotals[categoryName],
+            percentage:
+              totalAmount > 0 ? Math.round((categoryTotals[categoryName] / totalAmount) * 100) : 0,
+            color: categoryInfo.color,
+          };
+        })
         .sort((a, b) => b.amount - a.amount);
 
-      // Assign colors to categories
-      const colors = [
-        '#2979FF',
-        '#FF9800',
-        '#00BCD4',
-        '#673AB7',
-        '#E91E63',
-        '#4CAF50',
-        '#FF5722',
-        '#795548',
-        '#607D8B',
-        '#FFC107',
-      ];
-
-      const categoryDataWithColors = categoryData.map((item, index) => ({
-        ...item,
-        color: colors[index % colors.length],
-      }));
+      const categoryDataWithColors = categoryData;
 
       return {
         categoryData: categoryDataWithColors,
@@ -495,49 +499,52 @@ class Expense {
         ...doc.data(),
       }));
 
+      // Create category mapping for easy lookup
+      const categoryMap = {};
+      DEFAULT_CATEGORIES.forEach(cat => {
+        categoryMap[cat.id] = cat;
+        categoryMap[cat.name] = cat;
+      });
+
       // Calculate totals by category
       const categoryTotals = {};
       let totalAmount = 0;
 
       expenses.forEach((expense) => {
-        const category = expense.category || 'Others';
+        let categoryKey = expense.category || 'Other';
         const amount = expense.amount || 0;
 
-        if (!categoryTotals[category]) {
-          categoryTotals[category] = 0;
+        // If category is an ID (number), get the name
+        const categoryInfo = categoryMap[categoryKey];
+        if (categoryInfo) {
+          categoryKey = categoryInfo.name;
         }
-        categoryTotals[category] += amount;
+
+        if (!categoryTotals[categoryKey]) {
+          categoryTotals[categoryKey] = 0;
+        }
+        categoryTotals[categoryKey] += amount;
         totalAmount += amount;
       });
 
       // Convert to array with percentages and sort by amount (descending)
       const categoryData = Object.keys(categoryTotals)
-        .map((category) => ({
-          category,
-          amount: categoryTotals[category],
-          percentage:
-            totalAmount > 0 ? Math.round((categoryTotals[category] / totalAmount) * 100) : 0,
-        }))
+        .map((categoryName) => {
+          // Find the category info from DEFAULT_CATEGORIES
+          const categoryInfo = DEFAULT_CATEGORIES.find(cat => cat.name === categoryName) || 
+                              { name: categoryName, color: '#9CA3AF' }; // fallback color
+          
+          return {
+            category: categoryName,
+            amount: categoryTotals[categoryName],
+            percentage:
+              totalAmount > 0 ? Math.round((categoryTotals[categoryName] / totalAmount) * 100) : 0,
+            color: categoryInfo.color,
+          };
+        })
         .sort((a, b) => b.amount - a.amount);
 
-      // Assign colors to categories
-      const colors = [
-        '#2979FF',
-        '#FF9800',
-        '#00BCD4',
-        '#673AB7',
-        '#E91E63',
-        '#4CAF50',
-        '#FF5722',
-        '#795548',
-        '#607D8B',
-        '#FFC107',
-      ];
-
-      const categoryDataWithColors = categoryData.map((item, index) => ({
-        ...item,
-        color: colors[index % colors.length],
-      }));
+      const categoryDataWithColors = categoryData;
 
       return {
         categoryData: categoryDataWithColors,
