@@ -81,7 +81,7 @@ const ForgetPasswordScreen = () => {
           <Header />
 
           {/* Title and Subtitle */}
-          <View className="mt-16">
+          <View className="mt-8">
             <Text className="title">{t('passwordRecovery.forgetPassword.title')}</Text>
             <Text className="subtitle">{t('passwordRecovery.forgetPassword.subtitle')}</Text>
           </View>

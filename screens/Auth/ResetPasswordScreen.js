@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Logo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
 import ResetPassword from 'models/auth/ResetPassword';
+import Header from 'components/Header';
 
 const ResetPasswordScreen = () => {
   const { t } = useTranslation();
@@ -87,16 +88,10 @@ const ResetPasswordScreen = () => {
         contentContainerStyle={{ flexGrow: 1 }}>
         <View className="relative ">
           {/* Header with Back Button */}
-          <View className="absolute left-0 top-0 flex-row items-center">
-            <TouchableOpacity
-              className="h-10 w-10 items-center justify-center rounded-[10px] border border-border-light"
-              onPress={handleGoBack}>
-              <Ionicons name="chevron-back" size={24} color="rgba(0, 0, 0, 0.7)" />
-            </TouchableOpacity>
-          </View>
+          <Header />
 
           {/* Title and Subtitle */}
-          <View className="mt-16">
+          <View className="mt-8">
             <Text className="title">{t('passwordRecovery.resetPassword.title')}</Text>
             <Text className="subtitle">{t('passwordRecovery.resetPassword.subtitle')}</Text>
           </View>

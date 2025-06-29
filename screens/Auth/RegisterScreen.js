@@ -20,6 +20,7 @@ import Register from 'models/auth/Register';
 import User from 'models/auth/user';
 import { useTranslation } from 'react-i18next';
 import i18n from 'utils/i18n';
+import Header from 'components/Header';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -71,45 +72,44 @@ const RegisterScreen = () => {
   };
 
   const getPasswordStrengthText = () => {
-    if (passwordStrength < 40) return 'Weak';
-    if (passwordStrength < 70) return 'Medium';
-    return 'Strong';
+    if (passwordStrength < 40) return t('validation.weak');
+    if (passwordStrength < 70) return t('validation.medium');
+    return t('validation.strong');
   };
 
   const validateForm = () => {
     const newErrors = {};
 
     if (!username) {
-      newErrors.username = 'Username is required';
+      newErrors.username = t('validation.username_required');
     } else if (username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
+      newErrors.username = t('validation.username_min_length');
     } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      newErrors.username = 'Username can only contain letters, numbers, and underscores';
+      newErrors.username = t('validation.username_invalid');
     }
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('validation.email_required');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('validation.email_invalid');
     }
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      v;
     } else {
       const requirements = checkPasswordRequirements(password);
 
       if (!requirements.length) {
-        newErrors.password = 'Password must be at least 6 characters';
+        v;
       } else if (!requirements.complexity) {
-        newErrors.password =
-          'Password needs at least 2 of: uppercase, lowercase, number, or special character';
+        newErrors.password = t('validation.password_complexity');
       }
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = t('validation.confirm_password_required');
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t('validation.confirm_password_required');
     }
 
     setErrors(newErrors);
@@ -164,7 +164,7 @@ const RegisterScreen = () => {
           showsVerticalScrollIndicator={true}>
           <View className="login-content relative">
             {/* Header with Back Button and Logo */}
-            <BackButton />
+            <Header />
             <View className="logo-container">
               <Logo />
             </View>
@@ -297,7 +297,10 @@ const RegisterScreen = () => {
                       {/* Password Strength Bar */}
                       <View className="mb-2">
                         <View className="mb-1 flex-row items-center justify-between">
-                          <Text className="text-sm text-gray-600">Password Strength</Text>
+                          <Text className="text-sm text-gray-600">
+                            {' '}
+                            {t('register.password_strength')}
+                          </Text>
                           <Text
                             className="text-sm font-medium"
                             style={{ color: getPasswordStrengthColor() }}>
@@ -327,7 +330,7 @@ const RegisterScreen = () => {
                           />
                           <Text
                             className={`ml-2 text-sm ${passwordRequirements.length ? 'text-green-600' : 'text-gray-500'}`}>
-                            At least 6 characters
+                            {t('validation.at_least_6_chars')}
                           </Text>
                         </View>
                         <View className="flex-row items-center">
@@ -342,7 +345,7 @@ const RegisterScreen = () => {
                           />
                           <Text
                             className={`ml-2 text-sm ${passwordRequirements.complexity ? 'text-green-600' : 'text-gray-500'}`}>
-                            Mix of letters, numbers, or symbols
+                            {t('validation.mix_chars')}
                           </Text>
                         </View>
                       </View>
@@ -419,8 +422,8 @@ const RegisterScreen = () => {
                       <Text
                         className={`ml-2 text-sm ${password === confirmPassword ? 'text-green-600' : 'text-red-500'}`}>
                         {password === confirmPassword
-                          ? 'Passwords match'
-                          : 'Passwords do not match'}
+                          ? t('validation.passwords_match')
+                          : t('validation.passwords_no_match')}
                       </Text>
                     </View>
                   )}

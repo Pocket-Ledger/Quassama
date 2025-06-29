@@ -16,12 +16,8 @@ const LogoutModal = ({ visible, onClose, onConfirm, isLoading = false }) => {
           style={{ width: width * 0.85, maxWidth: 340 }}>
           {/* Modal Header */}
           <View className="mb-4 items-center">
-            <Text className={`mb-2 text-xl font-bold text-black ${getTextAlign('center')}`}>
-              Add commentMore actions
-              {t('logoutModal.title')}
-            </Text>
-            <Text
-              className={`text-center text-base font-normal leading-5 text-gray-600 ${getTextAlign('center')}`}>
+            <Text className={`mb-2 text-xl font-bold text-black `}>{t('logoutModal.title')}</Text>
+            <Text className={`text-center text-base font-normal leading-5 text-gray-600 `}>
               {t('logoutModal.message')}
             </Text>
           </View>
