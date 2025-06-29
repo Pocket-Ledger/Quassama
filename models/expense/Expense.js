@@ -8,6 +8,9 @@ import {
   getDocs,
   orderBy,
   limit,
+  doc,
+  getDoc,
+  deleteDoc,
 } from 'firebase/firestore';
 import { app, db } from '../../firebase';
 import Notification from 'models/notifications/notifications';
@@ -944,6 +947,50 @@ class Expense {
     }
   }
 
+  /**
+   * Function to get expense details by id
+   * @param {string} expenseId - The expense ID
+   * @returns {Promise<Object>} - Expense details object
+   */
+  static async getExpenseByID(expenseId) {
+    if (!expenseId || typeof expenseId !== 'string') {
+      throw new Error('A valid expenseId (string) is required');
+    }
+
+    try {
+      const expenseRef = doc(db, 'expenses', expenseId);
+      const expenseDoc = await getDoc(expenseRef);
+      if (!expenseDoc.exists()) {
+        throw new Error('Expense not found');
+      }
+      return {
+        id: expenseDoc.id,
+        ...expenseDoc.data(),
+      };
+    } catch (error) {
+      console.error('Error fetching expense by ID:', error);
+      throw new Error(`Failed to fetch expense: ${error.message}`);
+    }
+  }
+
+  /**
+   * Function to delete an expense by expenseID
+   * @param {string} expenseId -The expense ID
+   * @return {Promise<void>} - Resolves when the expense is deleted
+   */
+  static async deleteExpenseByID(expenseId) {
+    if (!expenseId || typeof expenseId !== 'string') {
+      throw new Error('A valid expenseId (string) is required');
+    }
+
+    try {
+      const expenseRef = doc(db, 'expenses', expenseId);
+      await deleteDoc(expenseRef);
+    } catch (error) {
+      console.error('Error deleting expense by ID:', error);
+      throw new Error(`Failed to delete expense: ${error.message}`);
+    }
+  }
 }
 
 export default Expense;

@@ -76,7 +76,8 @@ const ExpenseDetailsScreen = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // For now, use dummy data
-      const dummyExpense = getDummyExpense();
+      const dummyExpense = await Expense.getExpenseByID(expenseId);
+      console.log('Dummy expense data:', dummyExpense);
       setExpense(dummyExpense);
 
       Logger.log('Expense details loaded:', dummyExpense);
@@ -156,16 +157,7 @@ const ExpenseDetailsScreen = () => {
       Logger.log('Confirming delete for expense ID:', expense.id);
       setDeleting(true);
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // For now, just simulate success
-      Logger.log('Expense deleted successfully:', expense.id);
-
-      /* 
-      // Real API call would be:
-      await Expense.deleteExpense(expense.id);
-      */
+      await Expense.deleteExpenseByID(expense.id);
 
       showSuccess(t('expense.delete.success.title'), t('expense.delete.success.message'), () => {
         hideAlert();
