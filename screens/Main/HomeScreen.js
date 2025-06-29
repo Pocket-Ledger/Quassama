@@ -539,15 +539,19 @@ const HomeScreen = () => {
             refreshing={refreshingGroups}
           />
 
-          <View className="flex-row justify-between">
-            {friends.length === 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 4 }}
+            className="flex-row">
+            {friends?.length === 0 ? (
               <View className="w-full items-center py-8">
                 <Feather name="users" size={48} color="#ccc" />
                 <Text className="mt-2 text-gray-500">{t('home.noGroupMembers')}</Text>
               </View>
             ) : (
-              friends.map((friend, index) => (
-                <View key={index}>
+              friends?.map((friend, index) => (
+                <View key={index} className="mr-4">
                   <Avatar
                     initial={friend.initial}
                     name={friend.name}
@@ -558,7 +562,7 @@ const HomeScreen = () => {
                 </View>
               ))
             )}
-          </View>
+          </ScrollView>
         </View>
       </View>
     </ScrollView>
