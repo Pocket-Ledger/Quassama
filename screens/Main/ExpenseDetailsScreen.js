@@ -237,7 +237,7 @@ const ExpenseDetailsScreen = () => {
 
     return (
       <ScrollView
-        className="container flex-1 "
+        className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}>
         {/* Main Expense Info Card */}
@@ -385,7 +385,7 @@ const ExpenseDetailsScreen = () => {
   };
 
   return (
-    <SafeAreaView className="container flex-1 bg-gray-50">
+    <SafeAreaView className="container flex-1 bg-white ">
       <Header
         title={t('expense.details.title')}
         showBackButton={true}
