@@ -49,11 +49,13 @@ const GroupItem = ({ group, onPress, onStarPress }) => {
             fill={group.isStarred ? '#FFCC00' : 'none'}
           />
         </TouchableOpacity>
-        <View className="items-end">
-          <Text className="text-gray-500">
-            {group.lastExpense} - {group.time}
-          </Text>
-        </View>
+        {(!group.amount || group.amount <= 0) && (
+          <View className="items-end">
+            <Text className="text-gray-500">
+              {group.lastExpense} - {group.time}
+            </Text>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
