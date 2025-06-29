@@ -563,77 +563,52 @@ class Expense {
    * @returns {Promise<Object>} - Object containing expenses array, pagination info, and totals
    */
   static async getExpensesByGroupPaginated(groupId, page = 1, pageSize = 10) {
-    if (!groupId || typeof groupId !== 'string') {
-      throw new Error('A valid groupId (string) is required');
+    if (!groupId) {
+      throw new Error('Group ID is required for paginated fetching.');
     }
 
-    if (typeof page !== 'number' || !Number.isInteger(page) || page <= 0) {
-      throw new Error('Page must be a positive integer starting from 1');
-    }
-    //getExpensesByGroup
-    if (typeof pageSize !== 'number' || !Number.isInteger(pageSize) || pageSize <= 0) {
-      throw new Error('PageSize must be a positive integer');
-    }
+    const expensesCol = collection(db, 'expenses');
+    const q = query(expensesCol, where('group_id', '==', groupId), orderBy('incurred_at', 'desc'));
 
-    try {
-      const expensesCol = collection(db, 'expenses');
+    const snapshot = await getDocs(q);
+    const totalItems = snapshot.size;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalItems);
 
-      // First, get total count for pagination info
-      const countQuery = query(expensesCol, where('group_id', '==', groupId));
-      const countSnapshot = await getDocs(countQuery);
-      const totalItems = countSnapshot.size;
+    const expensesData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-      // Calculate pagination values
-      const totalPages = Math.ceil(totalItems / pageSize);
-      const hasNextPage = page < totalPages;
-      const hasPreviousPage = page > 1;
+    // Fetch usernames for each expense
+    const expensesWithUsernames = await Promise.all(
+      expensesData.map(async (expense) => {
+        try {
+          const username = await User.getUsernameById(expense.user_id);
+          return { ...expense, user_name: username };
+        } catch (error) {
+          console.warn(`Could not fetch username for user_id: ${expense.user_id}`, error);
+          return { ...expense, user_name: 'Unknown' }; // fallback
+        }
+      })
+    );
 
-      // Get paginated data
-      const paginatedQuery = query(
-        expensesCol,
-        where('group_id', '==', groupId),
-        orderBy('incurred_at', 'desc'),
-        limit(pageSize * page) // Get all items up to current page
-      );
+    const paginatedExpenses = expensesWithUsernames.slice(startIndex, endIndex);
 
-      const snapshot = await getDocs(paginatedQuery);
-      const allExpenses = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      // Extract only the current page items
-      const startIndex = (page - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      const expenses = allExpenses.slice(startIndex, endIndex);
-
-      // Calculate total amount for current page
-      const currentPageTotal = expenses.reduce(
-        (total, expense) => total + (expense.amount || 0),
-        0
-      );
-
-      return {
-        expenses,
-        pagination: {
-          currentPage: page,
-          pageSize,
-          totalItems,
-          totalPages,
-          hasNextPage,
-          hasPreviousPage,
-          startIndex: startIndex + 1,
-          endIndex: Math.min(endIndex, totalItems),
-        },
-        totals: {
-          currentPageTotal,
-          itemCount: expenses.length,
-        },
-      };
-    } catch (error) {
-      console.error('Error fetching paginated expenses:', error);
-      throw new Error(`Failed to fetch expenses: ${error.message}`);
-    }
+    return {
+      expenses: paginatedExpenses,
+      pagination: {
+        currentPage: page,
+        pageSize,
+        totalItems,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+        startIndex: startIndex + 1,
+        endIndex: endIndex,
+      },
+    };
   }
 
   /**
