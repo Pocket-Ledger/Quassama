@@ -22,7 +22,7 @@ import SwitchGroupModal from 'components/SwitchGroupModal';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from 'models/notifications/notifications';
-import { capitalizeFirst } from 'utils/text';
+import { capitalizeFirst, getFirstLetterCapitalized } from 'utils/text';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -361,7 +361,9 @@ const HomeScreen = () => {
         <View className="flex-row items-center">
           <TouchableOpacity onPress={handleProfilePress}>
             <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
-              <Text className="font-dmsans-bold text-lg text-white">M</Text>
+              <Text className="font-dmsans-bold text-lg text-white">
+                {getFirstLetterCapitalized(user.username)}
+              </Text>
             </View>
           </TouchableOpacity>
           <View>
