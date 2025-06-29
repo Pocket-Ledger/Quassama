@@ -94,11 +94,16 @@ const NewExpenseScreen = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!expenseName.trim()) newErrors.expenseName = t('expense.validation.expenseNameRequired');
+    else if (expenseName.length > 100) newErrors.expenseName = 'Title cannot exceed 100 characters';
+    
     if (!amount.trim()) newErrors.amount = t('expense.validation.amountRequired');
     else if (isNaN(amount) || parseFloat(amount) <= 0)
       newErrors.amount = t('expense.validation.validAmount');
+    
     if (!selectedCategory) newErrors.category = t('expense.validation.selectCategory');
     if (!selectedGroup) newErrors.group = t('expense.validation.selectGroup');
+    
+    if (note.length > 3000) newErrors.note = 'Description cannot exceed 3000 characters';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -191,9 +196,14 @@ const NewExpenseScreen = () => {
         <View className="flex-1 gap-6 px-4">
           {/* Expense Name */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
-              {t('expense.expenseTitle')}
-            </Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="input-label text-base font-medium text-black">
+                {t('expense.expenseTitle')}
+              </Text>
+              <Text className={`text-sm ${expenseName.length > 100 ? 'text-red-500' : 'text-gray-500'}`}>
+                {expenseName.length}/100
+              </Text>
+            </View>
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4 text-black ${
@@ -207,6 +217,7 @@ const NewExpenseScreen = () => {
                   if (errors.expenseName) setErrors((prev) => ({ ...prev, expenseName: null }));
                 }}
                 autoCapitalize="words"
+                maxLength={100}
               />
             </View>
             {errors.expenseName && (
@@ -286,21 +297,35 @@ const NewExpenseScreen = () => {
 
           {/* Note */}
           <View>
-            <Text className="input-label text-base font-medium text-black">
-              {t('expense.note')}
-            </Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="input-label text-base font-medium text-black">
+                {t('expense.note')}
+              </Text>
+              <Text className={`text-sm ${note.length > 3000 ? 'text-red-500' : 'text-gray-500'}`}>
+                {note.length}/3000
+              </Text>
+            </View>
             <TextInput
-              className="input-field h-24 rounded-lg border border-gray-200 px-4 text-black"
+              className={`input-field h-24 rounded-lg border px-4 text-black ${
+                errors.note ? 'border-red-500' : 'border-gray-200'
+              }`}
               placeholder={t('expense.addNote')}
               placeholderTextColor="rgba(0, 0, 0, 0.4)"
               value={note}
-              onChangeText={setNote}
+              onChangeText={(text) => {
+                setNote(text);
+                if (errors.note) setErrors((prev) => ({ ...prev, note: null }));
+              }}
               multiline
               textAlignVertical="top"
               autoCapitalize="sentences"
               blurOnSubmit={false}
               returnKeyType="done"
+              maxLength={3000}
             />
+            {errors.note && (
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.note}</Text>
+            )}
           </View>
 
           {/* Add Expense Button */}

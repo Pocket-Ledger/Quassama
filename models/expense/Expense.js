@@ -51,6 +51,12 @@ class Expense {
     if (!this.title || !this.amount || !this.category) {
       throw new Error('All fields (name, amount, category) are required');
     }
+    if (this.title.length > 100) {
+      throw new Error('Title cannot exceed 100 characters');
+    }
+    if (this.description && this.description.length > 3000) {
+      throw new Error('Description cannot exceed 3000 characters');
+    }
     if (isNaN(this.amount) || this.amount <= 0) {
       throw new Error('Amount must be a positive number');
     }
