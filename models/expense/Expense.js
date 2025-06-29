@@ -144,6 +144,7 @@ class Expense {
     const expenses = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      amount: doc.data().amount ? parseFloat(doc.data().amount.toFixed(2)) : 0,
     }));
 
     return expenses;
@@ -171,6 +172,7 @@ class Expense {
     const recentExpenses = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      amount: doc.data().amount ? parseFloat(doc.data().amount.toFixed(2)) : 0,
     }));
 
     return recentExpenses;
@@ -193,6 +195,7 @@ class Expense {
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      amount: doc.data().amount ? parseFloat(doc.data().amount.toFixed(2)) : 0,
     }));
   }
 
@@ -222,6 +225,7 @@ class Expense {
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      amount: doc.data().amount ? parseFloat(doc.data().amount.toFixed(2)) : 0,
     }));
   }
 
@@ -232,7 +236,8 @@ class Expense {
     }
 
     const expenses = await this.getExpensesByGroup(groupId);
-    return expenses.reduce((total, expense) => total + expense.amount, 0);
+    const total = expenses.reduce((total, expense) => total + expense.amount, 0);
+    return parseFloat(total.toFixed(2));
   }
 
   // Return an object mapping each user to their total spent in the group
@@ -265,7 +270,8 @@ class Expense {
     const expenses = await this.getExpensesByGroup(groupId);
     const userExpenses = expenses.filter((expense) => expense.user_id === currentUser.uid);
 
-    return userExpenses.reduce((total, expense) => total + expense.amount, 0);
+    const total = userExpenses.reduce((total, expense) => total + expense.amount, 0);
+    return parseFloat(total.toFixed(2));
   }
 
   // function that return the total amount of expenses for the current user he paid in all groups
@@ -278,7 +284,8 @@ class Expense {
     }
 
     const expenses = await this.GetAllExpenseByUser();
-    return expenses.reduce((total, expense) => total + expense.amount, 0);
+    const total = expenses.reduce((total, expense) => total + expense.amount, 0);
+    return parseFloat(total.toFixed(2));
   }
 
   // a function the return if the member is + or - in the group
@@ -301,7 +308,7 @@ class Expense {
     const userExpense = totalExpensesPerUser[currentUser.uid] || 0;
     const balance = userExpense - totalExpenses / Object.keys(totalExpensesPerUser).length;
 
-    return balance;
+    return parseFloat(balance.toFixed(2));
   }
 
   // same function as above but for all members in the group
@@ -316,7 +323,8 @@ class Expense {
     const balances = {};
     for (const userId in totalExpensesPerUser) {
       const userExpense = totalExpensesPerUser[userId] || 0;
-      balances[userId] = userExpense - totalExpenses / Object.keys(totalExpensesPerUser).length;
+      const balance = userExpense - totalExpenses / Object.keys(totalExpensesPerUser).length;
+      balances[userId] = parseFloat(balance.toFixed(2));
     }
 
     return balances;
@@ -334,7 +342,8 @@ class Expense {
     const groups = await Group.getGroupsByUser(currentUser.uid);
     const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
 
-    return balances.filter((b) => b > 0).reduce((sum, b) => sum + b, 0);
+    const total = balances.filter((b) => b > 0).reduce((sum, b) => sum + b, 0);
+    return parseFloat(total.toFixed(2));
   }
 
   // Return the total amount the current user owes to others across all groups
@@ -349,7 +358,8 @@ class Expense {
     const groups = await Group.getGroupsByUser(currentUser.uid);
     const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
 
-    return balances.filter((b) => b < 0).reduce((sum, b) => sum + Math.abs(b), 0);
+    const total = balances.filter((b) => b < 0).reduce((sum, b) => sum + Math.abs(b), 0);
+    return parseFloat(total.toFixed(2));
   }
 
   /**
@@ -956,6 +966,11 @@ class Expense {
         id: expenseDoc.id,
         ...expenseDoc.data(),
       };
+
+      // Format amount to 2 decimal places
+      if (expenseData.amount && typeof expenseData.amount === 'number') {
+        expenseData.amount = parseFloat(expenseData.amount.toFixed(2));
+      }
 
       // Fetch the username for the user who created this expense
       if (expenseData.user_id) {
