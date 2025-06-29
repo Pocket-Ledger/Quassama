@@ -47,10 +47,10 @@ export const formatDateForBackend = (date) => {
 // Convert JavaScript Date to Firebase Timestamp for filtering
 export const dateToTimestamp = (date) => {
   if (!date) return null;
-  
+
   // Handle different types of date inputs
   let dateObj;
-  
+
   if (date instanceof Date) {
     dateObj = date;
   } else if (typeof date === 'string') {
@@ -61,12 +61,44 @@ export const dateToTimestamp = (date) => {
     console.warn('Invalid date format passed to dateToTimestamp:', date);
     return null;
   }
-  
+
   // Check if the date is valid
   if (isNaN(dateObj.getTime())) {
     console.warn('Invalid date passed to dateToTimestamp:', date);
     return null;
   }
-  
+
   return Timestamp.fromDate(dateObj);
+};
+
+export const formatDate = (timestamp) => {
+  if (!timestamp) return t('common.unknown');
+
+  const date =
+    timestamp instanceof Date
+      ? timestamp
+      : timestamp.toDate
+        ? timestamp.toDate()
+        : new Date(timestamp);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+export const formatTime = (timestamp) => {
+  if (!timestamp) return t('common.unknown');
+
+  const date =
+    timestamp instanceof Date
+      ? timestamp
+      : timestamp.toDate
+        ? timestamp.toDate()
+        : new Date(timestamp);
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 };

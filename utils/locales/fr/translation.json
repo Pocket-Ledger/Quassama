@@ -178,22 +178,58 @@
     "noGroupMembers": "Aucun membre du groupe",
     "moreCategoriesCount": "+{{count}} catégories de plus"
   },
+
   "expense": {
     "paidBy": "Payé par {{name}}",
     "amount": "{{amount}} {{currency}}",
-    "expenseDetails": "Détails de la Dépense",
-    "addExpense": "Ajouter une Dépense",
-    "editExpense": "Modifier la Dépense",
-    "deleteExpense": "Supprimer la Dépense",
-    "expenseTitle": "Titre de la Dépense",
+    "expenseDetails": "Détails de la dépense",
+    "addExpense": "Ajouter une dépense",
+    "editExpense": "Modifier la dépense",
+    "deleteExpense": "Supprimer la dépense",
+    "expenseTitle": "Titre de la dépense",
     "expenseAmount": "Montant",
-    "selectCategory": "Sélectionner la Catégorie",
-    "selectDate": "Sélectionner la Date",
-    "addNote": "Ajouter une Note",
-    "splitBetween": "Diviser Entre",
+    "selectCategory": "Sélectionner une catégorie",
+    "selectDate": "Sélectionner une date",
+    "addNote": "Ajouter une note",
+    "splitBetween": "Partager entre",
     "note": "Note",
     "added_success": "Dépense ajoutée avec succès",
-
+    "details": {
+      "title": "Détails de la dépense",
+      "information": "Informations",
+      "description": "Description",
+      "paidBy": "Payé par",
+      "date": "Date",
+      "time": "Heure",
+      "group": "Groupe",
+      "edit": "Modifier la dépense",
+      "share": "Partager la dépense",
+      "delete": "Supprimer la dépense",
+      "deleting": "Suppression en cours..."
+    },
+    "delete": {
+      "title": "Supprimer la dépense",
+      "message": "Êtes-vous sûr de vouloir supprimer cette dépense ? Cette action ne peut pas être annulée.",
+      "success": {
+        "title": "Dépense supprimée",
+        "message": "La dépense a été supprimée avec succès."
+      },
+      "error": {
+        "title": "Échec de la suppression",
+        "message": "Impossible de supprimer la dépense. Veuillez réessayer."
+      }
+    },
+    "share": {
+      "title": "Détails de la dépense",
+      "text": "Dépense : {{title}}\nMontant : {{amount}} {{currency}}\nCatégorie : {{category}}\nPayé par : {{paidBy}}\nDate : {{date}}",
+      "error": {
+        "title": "Échec du partage",
+        "message": "Impossible de partager la dépense. Veuillez réessayer."
+      }
+    },
+    "category": {
+      "unknown": "Catégorie inconnue"
+    },
     "validation": {
       "expenseNameRequired": "Le nom de la dépense est requis",
       "amountRequired": "Le montant est requis",
@@ -201,22 +237,25 @@
       "selectCategory": "Veuillez sélectionner une catégorie",
       "selectGroup": "Veuillez sélectionner un groupe"
     },
-    "title": "Toutes les Dépenses",
+    "title": "Toutes les dépenses",
     "loading": "Chargement des dépenses...",
     "loadingMore": "Chargement de plus de dépenses...",
     "search": {
-      "placeholder": "Ex: \"T9edia\""
+      "placeholder": "Ex : \"Restaurant\""
     },
     "empty": {
-      "title": "Aucune Dépense Encore",
+      "title": "Aucune dépense pour le moment",
       "description": "Commencez par ajouter votre première dépense. Gardez une trace de qui a payé quoi et partagez équitablement entre les membres de votre groupe.",
-      "addFirstExpense": "Ajoutez Votre Première Dépense",
+      "addFirstExpense": "Ajouter votre première dépense",
       "noResults": "Aucun résultat trouvé",
-      "tryDifferentFilters": "Essayez d'ajuster vos critères de recherche ou de filtre pour trouver ce que vous cherchez."
+      "tryDifferentFilters": "Essayez d'ajuster vos critères de recherche ou de filtrage pour trouver ce que vous cherchez."
     },
     "error": {
-      "title": "Oups! Quelque chose s'est mal passé",
-      "tryAgain": "Réessayer"
+      "title": "Oups ! Quelque chose s'est mal passé",
+      "tryAgain": "Réessayer",
+      "notFound": "Dépense introuvable",
+      "loadFailed": "Échec du chargement des détails de la dépense",
+      "invalidId": "ID de dépense invalide"
     },
     "errors": {
       "loadFailed": "Échec du chargement des dépenses"

@@ -4,6 +4,7 @@ import CategoryItem from './CategoryItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import { useTranslation } from 'react-i18next';
 import Logger from 'utils/looger';
+import { useNavigation } from '@react-navigation/native';
 
 const ExpenseListItem = ({
   id,
@@ -19,7 +20,7 @@ const ExpenseListItem = ({
   customStyle = {},
 }) => {
   const { t } = useTranslation();
-
+  const navigation = useNavigation();
   const getCategoryDetails = (categoryId) => {
     const categoryObj = DEFAULT_CATEGORIES.find((cat) => cat.id == categoryId);
     return categoryObj || { icon: 'credit-card', color: '#2979FF' };
@@ -27,9 +28,10 @@ const ExpenseListItem = ({
 
   const categoryDetails = getCategoryDetails(category);
   const handlePress = () => {
-    if (onPress) {
-      onPress({ id, name, amount, category, time, paidBy });
-    }
+    navigation.navigate('ExpenseDetails', {
+      expenseId: id,
+      //groupId: groupId,
+    });
   };
 
   // Get translated currency

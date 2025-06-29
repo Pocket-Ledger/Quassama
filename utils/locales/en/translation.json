@@ -195,6 +195,42 @@
     "splitBetween": "Split Between",
     "note": "Note",
     "added_success": "Expense successfully added",
+    "details": {
+      "title": "Expense Details",
+      "information": "Information",
+      "description": "Description",
+      "paidBy": "Paid by",
+      "date": "Date",
+      "time": "Time",
+      "group": "Group",
+      "edit": "Edit Expense",
+      "share": "Share Expense",
+      "delete": "Delete Expense",
+      "deleting": "Deleting..."
+    },
+    "delete": {
+      "title": "Delete Expense",
+      "message": "Are you sure you want to delete this expense? This action cannot be undone.",
+      "success": {
+        "title": "Expense Deleted",
+        "message": "The expense has been successfully deleted."
+      },
+      "error": {
+        "title": "Delete Failed",
+        "message": "Failed to delete the expense. Please try again."
+      }
+    },
+    "share": {
+      "title": "Expense Details",
+      "text": "Expense: {{title}}\nAmount: {{amount}} {{currency}}\nCategory: {{category}}\nPaid by: {{paidBy}}\nDate: {{date}}",
+      "error": {
+        "title": "Share Failed",
+        "message": "Unable to share the expense. Please try again."
+      }
+    },
+    "category": {
+      "unknown": "Unknown Category"
+    },
 
     "validation": {
       "expenseNameRequired": "Expense name is required",
@@ -218,7 +254,10 @@
     },
     "error": {
       "title": "Oops! Something went wrong",
-      "tryAgain": "Try Again"
+      "tryAgain": "Try Again",
+      "notFound": "Expense not found",
+      "loadFailed": "Failed to load expense details",
+      "invalidId": "Invalid expense ID"
     },
     "errors": {
       "loadFailed": "Failed to load expenses"

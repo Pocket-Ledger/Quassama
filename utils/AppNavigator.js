@@ -17,6 +17,7 @@ import SettingsScreen from 'screens/Main/SettingsScreen';
 import ForgetPasswordScreen from 'screens/Auth/ForgetPasswordScreen ';
 import ResetPasswordScreen from 'screens/Auth/ResetPasswordScreen';
 import EditGroupScreen from 'screens/Main/EditGroupScreen';
+import ExpenseDetailsScreen from 'screens/Main/ExpenseDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,7 @@ function AppNavigator() {
         <>
           <Stack.Screen name="MainTabs" component={TabNavigator} />
           <Stack.Screen name="AddNewGroup" component={AddNewGroupScreen} />
+          <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} />
           <Stack.Screen name="EditGroup" component={EditGroupScreen} />
           <Stack.Screen name="AllExpenses" component={AllExpensesScreen} />
           <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
