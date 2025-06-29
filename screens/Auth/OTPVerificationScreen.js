@@ -14,6 +14,8 @@ import { Logo, SmallLogo } from 'components/Logo';
 import { useTranslation } from 'react-i18next';
 import ResetPassword from 'models/auth/ResetPassword';
 import Header from 'components/Header';
+import { useAlert } from 'hooks/useAlert';
+import CustomAlert from 'components/CustomALert';
 
 const OTPVerificationScreen = () => {
   const { t } = useTranslation();
@@ -22,6 +24,7 @@ const OTPVerificationScreen = () => {
   const [hasError, setHasError] = useState(false);
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef([]);
+  const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
 
   useEffect(() => {
     // Enable resend after 30 seconds (you can adjust this)
@@ -60,22 +63,21 @@ const OTPVerificationScreen = () => {
     try {
       await ResetPassword.verifyCode(enteredCode);
       // Code verified, navigate to ResetPasswordScreen
-      Alert.alert(
+      showSuccess(
         t('customAlert.titles.success'),
         t('passwordRecovery.otpVerification.successMessage'),
-        [
-          {
-            text: t('customAlert.buttons.ok'),
-            onPress: () => console.log('Navigate to ResetPasswordScreen'),
-          },
-        ]
+        () => {
+          console.log('Navigate to ResetPasswordScreen');
+          // TODO: Navigate to ResetPasswordScreen, pass code if needed
+        }
       );
+
       // TODO: Navigate to ResetPasswordScreen, pass code if needed
     } catch (error) {
       setHasError(true);
       setCode(['', '', '', '']);
       inputRefs.current[0]?.focus();
-      Alert.alert(
+      showError(
         t('customAlert.titles.error'),
         error.message || t('passwordRecovery.otpVerification.wrongCode')
       );
@@ -94,8 +96,20 @@ const OTPVerificationScreen = () => {
       setCanResend(false);
       // Reset timer for next resend
       setTimeout(() => setCanResend(true), 30000);
+      showSuccess(
+        t('customAlert.titles.success'),
+        t('passwordRecovery.otpVerification.codeResent', {
+          defaultValue: 'Verification code has been sent to your email.',
+        })
+      );
     } catch (error) {
       console.error('Failed to resend code:', error);
+      showError(
+        t('customAlert.titles.error'),
+        t('passwordRecovery.otpVerification.resendError', {
+          defaultValue: 'Failed to resend code. Please try again.',
+        })
+      );
     }
   };
 
@@ -180,6 +194,17 @@ const OTPVerificationScreen = () => {
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </SafeAreaView>
   );
 };
