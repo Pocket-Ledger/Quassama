@@ -185,6 +185,7 @@
     "expenseDetails": "Détails de la dépense",
     "addExpense": "Ajouter une dépense",
     "editExpense": "Modifier la dépense",
+    "updateExpense": "Mettre à Jour la Dépense",
     "deleteExpense": "Supprimer la dépense",
     "expenseTitle": "Titre de la dépense",
     "expenseAmount": "Montant",

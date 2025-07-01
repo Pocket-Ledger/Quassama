@@ -18,6 +18,7 @@ import ForgetPasswordScreen from 'screens/Auth/ForgetPasswordScreen ';
 import ResetPasswordScreen from 'screens/Auth/ResetPasswordScreen';
 import EditGroupScreen from 'screens/Main/EditGroupScreen';
 import ExpenseDetailsScreen from 'screens/Main/ExpenseDetailsScreen';
+import EditExpenseScreen from 'screens/Main/EditExpense';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,16 +34,15 @@ function AppNavigator() {
         // Authenticated user screens
         <>
           <Stack.Screen name="MainTabs" component={TabNavigator} />
-          <Stack.Screen name="AddNewGroup" component={AddNewGroupScreen} />
           <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} />
           <Stack.Screen name="EditGroup" component={EditGroupScreen} />
+          <Stack.Screen name="EditExpense" component={EditExpenseScreen} />
           <Stack.Screen name="AllExpenses" component={AllExpensesScreen} />
           <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
           <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
           <Stack.Screen name="Languages" component={LanguagesScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
-
           {/* Add other authenticated screens here */}
         </>
       ) : (

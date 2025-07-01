@@ -185,6 +185,7 @@
     "expenseDetails": "تفاصيل المصروف",
     "addExpense": "إضافة مصروف",
     "editExpense": "تعديل المصروف",
+    "updateExpense": "تحديث المصروف",
     "deleteExpense": "حذف المصروف",
     "expenseTitle": "عنوان المصروف",
     "expenseAmount": "المبلغ",

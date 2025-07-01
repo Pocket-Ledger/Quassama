@@ -186,6 +186,8 @@
     "expenseDetails": "Expense Details",
     "addExpense": "Add Expense",
     "editExpense": "Edit Expense",
+    "updateExpense": "Update Expense",
+
     "deleteExpense": "Delete Expense",
     "expenseTitle": "Expense Title",
     "expenseAmount": "Amount",
