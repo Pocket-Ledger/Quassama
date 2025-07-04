@@ -5,12 +5,12 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBg3gFtPkyyyjsEnaI4Q2Wz1TxN4Xlen6w",
-  authDomain: "quassama-a1a15.firebaseapp.com",
-  projectId: "quassama-a1a15",
-  storageBucket: "quassama-a1a15.firebasestorage.app",
-  messagingSenderId: "816220791108",
-  appId: "1:816220791108:web:089525fba4753e13627711"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);

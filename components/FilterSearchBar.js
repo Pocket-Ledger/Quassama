@@ -11,10 +11,10 @@ const SearchBar = ({
 }) => {
   return (
     <View className="flex-row items-center">
-      <View className="mr-3 flex-1 flex-row items-center rounded-lg border border-gray-200 px-4 ">
+      <View className="mr-3 ml-2 flex-1 flex-row items-center rounded-lg border border-gray-200 px-4 ">
         <Feather name="search" size={20} color="#999" />
         <TextInput
-          className="ml-3 flex-1 text-base text-black"
+          className="ml-3 flex-1 text-base text-black p-3"
           placeholder={placeholder}
           placeholderTextColor="rgba(0, 0, 0, 0.4)"
           value={searchText}

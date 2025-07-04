@@ -26,6 +26,7 @@ class Expense {
   description;
   incurred_at;
   group_id;
+  settlement;
 
   constructor(title, amount, category, note, group_id) {
     this.title = title;
@@ -35,6 +36,7 @@ class Expense {
     this.user_id = null;
     this.incurred_at = null;
     this.group_id = group_id; // Optional, can be set later if needed
+    this.settlement = false
 
     console.log('New Expense Created:', {
       title: this.title,

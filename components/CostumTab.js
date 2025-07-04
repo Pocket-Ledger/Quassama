@@ -15,7 +15,7 @@ export function CustomTabBar({ state, descriptors, navigation }) {
 
   return (
     <View
-      className="flex-row justify-between border-t border-gray-200 bg-white px-4 shadow-box"
+      className="flex-row justify-between border-t border-gray-200 bg-white px-4 shadow-sm"
       style={{
         paddingTop: 8,
         paddingBottom: bottomPadding,
