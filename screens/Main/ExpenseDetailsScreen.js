@@ -201,24 +201,28 @@ const ExpenseDetailsScreen = () => {
 
   // Render loading state
   const renderLoading = () => (
-    <View className="items-center justify-center flex-1">
-      <ActivityIndicator size="large" color="#2979FF" />
-      <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="items-center justify-center flex-1">
+        <ActivityIndicator size="large" color="#2979FF" />
+        <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
+      </View>
+    </SafeAreaView>
   );
 
   // Render error state
   const renderError = () => (
-    <View className="items-center px-4 py-12">
-      <View className="items-center justify-center mb-4">
-        <Ionicons name="alert-circle" size={70} color="#FF6B6B" />
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="items-center px-4 py-12">
+        <View className="items-center justify-center mb-4">
+          <Ionicons name="alert-circle" size={70} color="#FF6B6B" />
+        </View>
+        <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.error.title')}</Text>
+        <Text className="mb-6 text-center text-gray-500">{error}</Text>
+        <TouchableOpacity className="px-6 py-3 rounded-lg bg-primary" onPress={loadExpenseDetails}>
+          <Text className="font-semibold text-white">{t('expense.error.tryAgain')}</Text>
+        </TouchableOpacity>
       </View>
-      <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.error.title')}</Text>
-      <Text className="mb-6 text-center text-gray-500">{error}</Text>
-      <TouchableOpacity className="px-6 py-3 rounded-lg bg-primary" onPress={loadExpenseDetails}>
-        <Text className="font-semibold text-white">{t('expense.error.tryAgain')}</Text>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 
   // Render expense details
