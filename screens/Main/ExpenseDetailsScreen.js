@@ -100,15 +100,14 @@ const ExpenseDetailsScreen = () => {
   }, [expenseId, t]);
 
   // Load expense on component mount and when screen is focused
-  useEffect(() => {
-    if (expenseId) {
-      loadExpenseDetails();
-    } else {
-      Logger.error('ExpenseDetailsScreen - No expense ID provided');
-      setError(t('expense.error.invalidId'));
-      setLoading(false);
-    }
-  }, [expenseId, loadExpenseDetails]);
+  useFocusEffect(
+    useCallback(() => {
+      if (expenseId) {
+        Logger.log('Screen focused, reloading expense details');
+        loadExpenseDetails();
+      }
+    }, [expenseId, loadExpenseDetails])
+  );
 
   // Reload when screen comes into focus (useful after editing)
   /*  useFocusEffect(
