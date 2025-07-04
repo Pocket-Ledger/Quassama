@@ -11,6 +11,7 @@ import {
   doc,
   getDoc,
   deleteDoc,
+  updateDoc,
 } from 'firebase/firestore';
 import { app, db } from '../../firebase';
 import Notification from 'models/notifications/notifications';
@@ -36,7 +37,7 @@ class Expense {
     this.user_id = null;
     this.incurred_at = null;
     this.group_id = group_id; // Optional, can be set later if needed
-    this.settlement = false
+    this.settlement = false;
 
     console.log('New Expense Created:', {
       title: this.title,
@@ -130,6 +131,106 @@ class Expense {
     return docRef.id;
   }
 
+  /**
+   * Update an existing expense by ID
+   * @param {string} expenseId - The expense ID to update
+   * @param {Object} updateData - The data to update {title, amount, category, description, group_id}
+   * @returns {Promise<void>} - Resolves when the expense is updated
+   */
+  static async updateExpense(expenseId, updateData) {
+    if (!expenseId || typeof expenseId !== 'string') {
+      throw new Error('A valid expenseId (string) is required');
+    }
+
+    if (!updateData || typeof updateData !== 'object') {
+      throw new Error('Update data is required');
+    }
+
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    try {
+      // Get the existing expense to check ownership
+      const existingExpense = await Expense.getExpenseByID(expenseId);
+
+      if (!existingExpense) {
+        throw new Error('Expense not found');
+      }
+
+      // Check if the current user owns this expense
+      if (existingExpense.user_id !== currentUser.uid) {
+        throw new Error('You do not have permission to edit this expense');
+      }
+
+      // Validate the update data
+      if (updateData.title && updateData.title.length > 100) {
+        throw new Error('Title cannot exceed 100 characters');
+      }
+      if (updateData.description && updateData.description.length > 3000) {
+        throw new Error('Description cannot exceed 3000 characters');
+      }
+      if (updateData.amount && (isNaN(updateData.amount) || parseFloat(updateData.amount) <= 0)) {
+        throw new Error('Amount must be a positive number');
+      }
+
+      const expenseRef = doc(db, 'expenses', expenseId);
+
+      const finalUpdateData = {
+        ...updateData,
+        amount: updateData.amount ? parseFloat(updateData.amount) : existingExpense.amount,
+        updated_at: Timestamp.now(),
+      };
+
+      await updateDoc(expenseRef, finalUpdateData);
+
+      // Create self notification
+      const selfNotification = new Notification(
+        currentUser.uid,
+        currentUser.uid,
+        'expense_updated',
+        `You have updated your expense: ${finalUpdateData.title || existingExpense.title} with amount ${finalUpdateData.amount}`
+      );
+      selfNotification.groupId = finalUpdateData.group_id || existingExpense.group_id;
+      selfNotification.expenseId = expenseId;
+      await selfNotification.save();
+
+      // If this is a group expense, notify other group members
+      const groupId = finalUpdateData.group_id || existingExpense.group_id;
+      if (groupId && groupId !== `personal_${currentUser.uid}`) {
+        try {
+          const group = await Group.getGroupById(groupId);
+          const members = group.members || [];
+          const updaterName = await User.getUsernameById(currentUser.uid).catch(() => 'Someone');
+
+          await Promise.all(
+            members.map(async (m) => {
+              if (m && m.id && m.id !== currentUser.uid) {
+                const notif = new Notification(
+                  currentUser.uid,
+                  m.id,
+                  'group_expense_updated',
+                  `${updaterName} updated an expense "${finalUpdateData.title || existingExpense.title}" with amount ${finalUpdateData.amount}`
+                );
+                notif.groupId = groupId;
+                notif.expenseId = expenseId;
+                await notif.save();
+              }
+            })
+          );
+        } catch (err) {
+          console.error('Error sending group expense update notifications:', err);
+        }
+      }
+
+      console.log('Expense updated successfully with ID:', expenseId);
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      throw error;
+    }
+  }
   static async GetAllExpenseByUser() {
     const auth = getAuth(app);
     const currentUser = auth.currentUser;
@@ -418,7 +519,7 @@ class Expense {
 
       // Create category mapping for easy lookup
       const categoryMap = {};
-      DEFAULT_CATEGORIES.forEach(cat => {
+      DEFAULT_CATEGORIES.forEach((cat) => {
         categoryMap[cat.id] = cat;
         categoryMap[cat.name] = cat;
       });
@@ -448,9 +549,11 @@ class Expense {
       const categoryData = Object.keys(categoryTotals)
         .map((categoryName) => {
           // Find the category info from DEFAULT_CATEGORIES
-          const categoryInfo = DEFAULT_CATEGORIES.find(cat => cat.name === categoryName) || 
-                              { name: categoryName, color: '#9CA3AF' }; // fallback color
-          
+          const categoryInfo = DEFAULT_CATEGORIES.find((cat) => cat.name === categoryName) || {
+            name: categoryName,
+            color: '#9CA3AF',
+          }; // fallback color
+
           return {
             category: categoryName,
             amount: categoryTotals[categoryName],
@@ -519,7 +622,7 @@ class Expense {
 
       // Create category mapping for easy lookup
       const categoryMap = {};
-      DEFAULT_CATEGORIES.forEach(cat => {
+      DEFAULT_CATEGORIES.forEach((cat) => {
         categoryMap[cat.id] = cat;
         categoryMap[cat.name] = cat;
       });
@@ -549,9 +652,11 @@ class Expense {
       const categoryData = Object.keys(categoryTotals)
         .map((categoryName) => {
           // Find the category info from DEFAULT_CATEGORIES
-          const categoryInfo = DEFAULT_CATEGORIES.find(cat => cat.name === categoryName) || 
-                              { name: categoryName, color: '#9CA3AF' }; // fallback color
-          
+          const categoryInfo = DEFAULT_CATEGORIES.find((cat) => cat.name === categoryName) || {
+            name: categoryName,
+            color: '#9CA3AF',
+          }; // fallback color
+
           return {
             category: categoryName,
             amount: categoryTotals[categoryName],
@@ -794,14 +899,14 @@ class Expense {
   /**
    * Function to handle Settle up expenses between users in a group
    * This function creates balancing expenses to make all users have equal share (zero balance)
-   * 
+   *
    * Example:
    * - User A paid 100, balance: +20 (owed 20)
-   * - User B paid 60, balance: -20 (owes 20)  
+   * - User B paid 60, balance: -20 (owes 20)
    * - User C paid 80, balance: 0 (even)
-   * 
+   *
    * Result: Creates expense of 20 for User B to balance everyone to 0
-   * 
+   *
    * @param {string} groupId - The group ID to settle up
    * @returns {Promise<Object>} - Settlement summary and created expenses
    */
@@ -831,20 +936,22 @@ class Expense {
 
       // Get all balances for users in the group
       const balances = await this.getBalanceByAllUsersInGroup(groupId);
-      
+
       if (!balances || Object.keys(balances).length === 0) {
         throw new Error('No expenses found to settle');
       }
 
       // Check if settlement is needed (if any user has non-zero balance)
-      const hasUnbalancedUsers = Object.values(balances).some(balance => Math.abs(balance) > 0.01);
-      
+      const hasUnbalancedUsers = Object.values(balances).some(
+        (balance) => Math.abs(balance) > 0.01
+      );
+
       if (!hasUnbalancedUsers) {
         return {
           success: true,
           message: 'All expenses are already settled',
           expensesCreated: [],
-          totalSettled: 0
+          totalSettled: 0,
         };
       }
 
@@ -853,12 +960,13 @@ class Expense {
 
       // Create balancing expenses for users who owe money (negative balance)
       for (const [userId, balance] of Object.entries(balances)) {
-        if (balance < -0.01) { // User owes money
+        if (balance < -0.01) {
+          // User owes money
           const owedAmount = Math.abs(balance);
-          
+
           // Get username for the expense description
           const userName = await User.getUsernameById(userId).catch(() => 'Unknown User');
-          
+
           // Create a new expense instance for this user to balance their account
           const balancingExpense = new Expense(
             `Settlement - ${userName}`,
@@ -867,7 +975,7 @@ class Expense {
             `Balance settlement expense created by admin`,
             groupId
           );
-          
+
           // Manually set the user_id to the user who owes money
           balancingExpense.user_id = userId;
           balancingExpense.incurred_at = Timestamp.now();
@@ -882,7 +990,7 @@ class Expense {
             incurred_at: balancingExpense.incurred_at,
             group_id: balancingExpense.group_id,
             is_settlement: true, // Mark as settlement expense
-            settled_by: currentUser.uid
+            settled_by: currentUser.uid,
           };
 
           const expensesCollection = collection(db, 'expenses');
@@ -893,7 +1001,7 @@ class Expense {
             userId: userId,
             userName: userName,
             amount: owedAmount,
-            title: balancingExpense.title
+            title: balancingExpense.title,
           });
 
           totalSettled += owedAmount;
@@ -914,7 +1022,7 @@ class Expense {
       // Create notifications for all group members about the settlement
       const groupMembers = group.members || [];
       const adminNotificationPromises = [];
-      
+
       for (const member of groupMembers) {
         if (member && member.id && member.id !== currentUser.uid) {
           const notification = new Notification(
@@ -937,10 +1045,9 @@ class Expense {
         totalSettled: parseFloat(totalSettled.toFixed(2)),
         summary: {
           totalExpenses: expensesCreated.length,
-          usersBalanced: expensesCreated.length
-        }
+          usersBalanced: expensesCreated.length,
+        },
       };
-
     } catch (error) {
       console.error('Error settling up group:', error);
       throw error;
@@ -963,7 +1070,7 @@ class Expense {
       if (!expenseDoc.exists()) {
         throw new Error('Expense not found');
       }
-      
+
       const expenseData = {
         id: expenseDoc.id,
         ...expenseDoc.data(),

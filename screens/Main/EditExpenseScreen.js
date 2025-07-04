@@ -222,42 +222,27 @@ const EditExpenseScreen = () => {
 
     setIsSaving(true);
     try {
-      const iconName = getCategoryIconName(selectedCategory);
       Logger.log('Updating expense with data:', {
         expenseId: originalExpense?.id,
         title: expenseName.trim(),
         amount: amount.trim(),
         category: selectedCategory,
-        note: note.trim(),
+        description: note.trim(),
         group_id: selectedGroup,
       });
 
-      // Update the expense with new data
-      const updatedExpense = {
-        ...originalExpense,
+      // Update the expense using static method
+      await Expense.updateExpense(originalExpense.id, {
         title: expenseName.trim(),
         amount: amount.trim(),
         category: selectedCategory,
-        note: note.trim(),
+        description: note.trim(),
         group_id: selectedGroup,
-        updated_at: new Date().toISOString(),
-      };
+      });
 
-      // Create expense instance and update
-      const expense = new Expense(
-        updatedExpense.title,
-        updatedExpense.amount,
-        updatedExpense.category,
-        updatedExpense.note,
-        updatedExpense.group_id,
-        updatedExpense.id
-      );
+      Logger.success('Expense updated successfully');
 
-      await expense.updateExpense();
-
-      Logger.success('Expense updated successfully:', expense);
-
-      showSuccess(t('customAlert.titles.success'), t('expense.updated_success'), () => {
+      showSuccess(t('customAlert.titles.success'), t('customAlert.messages.update_success'), () => {
         hideAlert();
         navigation.goBack();
       });
