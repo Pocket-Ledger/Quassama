@@ -264,7 +264,7 @@ const ExpenseDetailsScreen = () => {
           </View>
 
           {/* Expense Title */}
-          <View className="pt-4 border-t border-gray-100">
+          <View className="pt-4 mt-4 border-t border-gray-100">
             <Text className="mb-2 text-sm font-medium text-gray-500">
               {t('expense.details.title')}
             </Text>
