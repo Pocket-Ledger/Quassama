@@ -176,14 +176,14 @@ const RegisterScreen = () => {
       console.log('User saved successfully:', user);
 
       // Show success message
-      showSuccess(
+      /* showSuccess(
         t('register.success_title', 'Registration Successful'),
         t('register.success_message', 'Your account has been created successfully!'),
         () => {
           hideAlert();
           navigation.navigate('MainTabs');
         }
-      );
+      ); */
     } catch (error) {
       console.error('Registration error:', error);
 
@@ -210,7 +210,7 @@ const RegisterScreen = () => {
       }
 
       // Show custom error alert
-      showError(t('register.error_title', 'Registration Failed'), errorMessage);
+      showError(t('register.error_title'), errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -569,9 +569,9 @@ const RegisterScreen = () => {
             </View>
           </View>
         </ScrollView>
-
-        {/* Custom Alert */}
       </KeyboardAvoidingView>
+
+      {/* Custom Alert - OUTSIDE KeyboardAvoidingView but INSIDE SafeAreaView */}
       <CustomAlert
         visible={alertConfig.visible}
         type={alertConfig.type}
