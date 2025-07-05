@@ -68,7 +68,10 @@
     "google": "Google",
     "apple": "Apple",
     "already_have_account": "Already have an account? ",
-    "login": "Log In"
+    "login": "Log In",
+    "success_title": "Registration Successful",
+    "success_message": "Your account has been created successfully!",
+    "error_title": "Registration Failed"
   },
   "settings": {
     "title": "Settings",
@@ -559,5 +562,22 @@
     "cancel": "Cancel",
     "logout": "Logout",
     "loggingOut": "Logging out..."
+  },
+  "auth": {
+    "errors": {
+      "email_already_in_use": "This email address is already registered. Please use a different email or try logging in.",
+      "invalid_email": "Please enter a valid email address.",
+      "operation_not_allowed": "Email/password authentication is not enabled. Please contact support.",
+      "weak_password": "Password is too weak. Please choose a stronger password.",
+      "network_error": "Network error. Please check your internet connection and try again.",
+      "too_many_requests": "Too many requests. Please try again later.",
+      "user_disabled": "This account has been disabled. Please contact support.",
+      "requires_recent_login": "Please log in again to complete this action.",
+      "credential_already_in_use": "This credential is already associated with a different account.",
+      "invalid_credentials": "Invalid email or password. Please check your credentials and try again.",
+      "user_not_found": "No account found with this email address.",
+      "wrong_password": "Incorrect password. Please try again.",
+      "general": "An error occurred. Please try again."
+    }
   }
 }

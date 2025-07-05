@@ -21,10 +21,14 @@ import User from 'models/auth/user';
 import { useTranslation } from 'react-i18next';
 import i18n from 'utils/i18n';
 import Header from 'components/Header';
+import CustomAlert from 'components/CustomALert';
+import { useAlert } from 'hooks/useAlert';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const { alertConfig, showError, showSuccess, hideAlert } = useAlert();
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,6 +43,46 @@ const RegisterScreen = () => {
     length: false,
     complexity: false, // Combined uppercase, lowercase, number, special
   });
+
+  // Function to convert Firebase error codes to user-friendly messages
+  const getFirebaseErrorMessage = (errorCode) => {
+    switch (errorCode) {
+      case 'auth/email-already-in-use':
+        return t('auth.errors.email_already_in_use');
+
+      case 'auth/invalid-email':
+        return t('auth.errors.invalid_email');
+
+      case 'auth/operation-not-allowed':
+        return t('auth.errors.operation_not_allowed');
+
+      case 'auth/weak-password':
+        return t('auth.errors.weak_password');
+
+      case 'auth/network-request-failed':
+        return t('auth.errors.network_error');
+
+      case 'auth/too-many-requests':
+        return t('auth.errors.too_many_requests');
+
+      case 'auth/user-disabled':
+        return t('auth.errors.user_disabled');
+
+      case 'auth/requires-recent-login':
+        return t('auth.errors.requires_recent_login');
+
+      case 'auth/credential-already-in-use':
+        return t('auth.errors.credential_already_in_use');
+
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return t('auth.errors.invalid_credentials');
+
+      default:
+        return t('auth.errors.general');
+    }
+  };
 
   const checkPasswordRequirements = (password) => {
     const requirements = {
@@ -95,12 +139,12 @@ const RegisterScreen = () => {
     }
 
     if (!password) {
-      v;
+      newErrors.password = t('validation.password_required');
     } else {
       const requirements = checkPasswordRequirements(password);
 
       if (!requirements.length) {
-        v;
+        newErrors.password = t('validation.password_min_length');
       } else if (!requirements.complexity) {
         newErrors.password = t('validation.password_complexity');
       }
@@ -109,7 +153,7 @@ const RegisterScreen = () => {
     if (!confirmPassword) {
       newErrors.confirmPassword = t('validation.confirm_password_required');
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = t('validation.confirm_password_required');
+      newErrors.confirmPassword = t('validation.passwords_no_match');
     }
 
     setErrors(newErrors);
@@ -120,6 +164,8 @@ const RegisterScreen = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setErrors({}); // Clear any previous errors
+
     try {
       const registerInstance = new Register(email, password, confirmPassword, username);
       const userCredential = await registerInstance.register();
@@ -129,10 +175,42 @@ const RegisterScreen = () => {
       await user.save();
       console.log('User saved successfully:', user);
 
-      navigation.navigate('MainTabs');
+      // Show success message
+      showSuccess(
+        t('register.success_title', 'Registration Successful'),
+        t('register.success_message', 'Your account has been created successfully!'),
+        () => {
+          hideAlert();
+          navigation.navigate('MainTabs');
+        }
+      );
     } catch (error) {
-      console.error('Registration error:', error.message);
-      setErrors({ general: error.message });
+      console.error('Registration error:', error);
+
+      // Extract Firebase error code
+      let errorCode = '';
+      let errorMessage = '';
+
+      if (error.code) {
+        errorCode = error.code;
+        errorMessage = getFirebaseErrorMessage(errorCode);
+      } else if (error.message) {
+        // Handle other error formats
+        if (error.message.includes('auth/email-already-in-use')) {
+          errorCode = 'auth/email-already-in-use';
+          errorMessage = getFirebaseErrorMessage(errorCode);
+        } else if (error.message.includes('auth/weak-password')) {
+          errorCode = 'auth/weak-password';
+          errorMessage = getFirebaseErrorMessage(errorCode);
+        } else {
+          errorMessage = error.message;
+        }
+      } else {
+        errorMessage = getFirebaseErrorMessage('default');
+      }
+
+      // Show custom error alert
+      showError(t('register.error_title', 'Registration Failed'), errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -491,7 +569,20 @@ const RegisterScreen = () => {
             </View>
           </View>
         </ScrollView>
+
+        {/* Custom Alert */}
       </KeyboardAvoidingView>
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </SafeAreaView>
   );
 };

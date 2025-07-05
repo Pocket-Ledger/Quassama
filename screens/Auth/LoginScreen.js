@@ -16,16 +16,47 @@ import Login from 'models/auth/Login';
 import { useTranslation } from 'react-i18next';
 import i18n from 'utils/i18n';
 import Header from 'components/Header';
+import { useAlert } from 'hooks/useAlert';
+import CustomAlert from 'components/CustomALert';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const { alertConfig, showError, hideAlert } = useAlert();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // Function to convert Firebase error codes to user-friendly messages
+  const getFirebaseErrorMessage = (errorCode) => {
+    switch (errorCode) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return t('auth.errors.invalid_credentials');
+
+      case 'auth/invalid-email':
+        return t('auth.errors.invalid_email');
+
+      case 'auth/user-disabled':
+        return t('auth.errors.user_disabled');
+
+      case 'auth/too-many-requests':
+        return t('auth.errors.too_many_requests');
+
+      case 'auth/network-request-failed':
+        return t('auth.errors.network_error');
+
+      case 'auth/operation-not-allowed':
+        return t('auth.errors.operation_not_allowed');
+
+      default:
+        return t('auth.errors.general');
+    }
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -50,14 +81,37 @@ const LoginScreen = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setErrors({}); // Clear any previous errors
+
     try {
       const loginInstance = new Login(email, password);
       const userCredential = await loginInstance.login();
       console.log('Login successful:', userCredential.user);
       /* navigation.navigate('MainTabs'); */
     } catch (error) {
-      console.error('Login failed:', error.message);
-      setErrors({ general: error.message });
+      console.error('Login failed:', error);
+
+      // Extract Firebase error code
+      let errorCode = '';
+      let errorMessage = '';
+
+      if (error.code) {
+        errorCode = error.code;
+        errorMessage = getFirebaseErrorMessage(errorCode);
+      } else if (error.message) {
+        // Handle other error formats
+        if (error.message.includes('auth/invalid-credential')) {
+          errorCode = 'auth/invalid-credential';
+          errorMessage = getFirebaseErrorMessage(errorCode);
+        } else {
+          errorMessage = error.message;
+        }
+      } else {
+        errorMessage = getFirebaseErrorMessage('default');
+      }
+
+      // Show custom error alert
+      showError(t('login.error_title', 'Login Failed'), errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -210,6 +264,19 @@ const LoginScreen = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Custom Alert */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </SafeAreaView>
   );
 };
