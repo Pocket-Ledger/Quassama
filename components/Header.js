@@ -11,7 +11,7 @@ const Header = ({ title, showIcon = false, route, rightIcon }) => {
       className={`items mb-6 flex flex-row items-center ${
         hasRightContent ? 'justify-between' : 'justify-start'
       }`}>
-      <View className="flex-row items-end gap-2">
+      <View className="flex-row items-end gap-2 ml-2">
         <BackButton />
         <Text className="font-dmsans-bold text-xl text-black">{title}</Text>
       </View>

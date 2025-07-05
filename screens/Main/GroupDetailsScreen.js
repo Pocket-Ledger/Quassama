@@ -117,11 +117,17 @@ const GroupDetailsScreen = () => {
           // 5) Compute totals
           const totalAmount = allExpenses.reduce((sum, { amount }) => sum + amount, 0);
 
+          // Get current user's balance to determine what they owe
+          const auth = getAuth();
+          const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+          const userBalance = balanceByAllUsersInGroup[currentUserId] || 0;
+          const actualOwe = userBalance < 0 ? Math.abs(userBalance) : 0;
+
           // 6) Update state in one go
           if (mounted) {
             setTotalExpenses(totalAmount);
             setYouPaid(userPaidAmount);
-            setYouOwe(totalAmount - userPaidAmount);
+            setYouOwe(actualOwe);
             setRecentExpenses(expensesWithUsernames);
             setBalanceByAllUsers(balanceByAllUsersInGroup); // Store the balance data
           }
@@ -227,11 +233,12 @@ const GroupDetailsScreen = () => {
         try {
           const result = await Expense.settleUpGroup(groupId);
           
-          if (result.success) {
+          if (result && result.success) {
             // Show success message with settlement details
-            const message = result.expensesCreated.length > 0 
-              ? `${result.message}\nTotal balanced: ${t('common.currency')} ${result.totalSettled}`
-              : result.message;
+            const settlementsCount = result.settlementsCreated ? result.settlementsCreated.length : 0;
+            const message = settlementsCount > 0 
+              ? `${result.message}\nTotal balanced: ${t('common.currency')} ${result.totalSettled || 0}`
+              : result.message || 'Settlement completed successfully';
               
             showSuccess(
               t('common.success'),
@@ -242,6 +249,8 @@ const GroupDetailsScreen = () => {
                 navigation.replace('GroupDetails', { groupId });
               }
             );
+          } else {
+            showError(t('common.error'), 'Settlement failed - invalid response', hideAlert);
           }
         } catch (error) {
           console.error('Error settling up:', error);
@@ -253,6 +262,8 @@ const GroupDetailsScreen = () => {
             errorMessage = t('groupDetails.noExpensesToSettle');
           } else if (error.message === 'All expenses are already settled') {
             errorMessage = t('groupDetails.alreadySettled');
+          } else if (error.message) {
+            errorMessage = error.message;
           }
           
           showError(t('common.error'), errorMessage, hideAlert);
@@ -355,8 +366,8 @@ const GroupDetailsScreen = () => {
             </View>
           </View>
 
-          {/* Settle Up Button - Only show for group admin */}
-          {isGroupCreator && (
+          {/* Settle Up Button - Only show for group admin and when there are imbalances */}
+          {isGroupCreator && TotalExpenses > 0 && Object.values(balanceByAllUsers).some(balance => Math.abs(balance) > 0.01) && (
             <TouchableOpacity 
               className="mb-6 rounded-lg bg-primary py-4" 
               onPress={handleSettleUp}

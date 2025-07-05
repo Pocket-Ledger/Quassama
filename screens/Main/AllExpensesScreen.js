@@ -368,7 +368,7 @@ const AllExpensesScreen = () => {
       ) : error && expenses.length === 0 ? (
         renderErrorState()
       ) : filteredExpenses.length > 0 ? (
-        <FlatList
+        <FlatList className='mx-2'
           data={filteredExpenses}
           renderItem={renderExpenseItem}
           keyExtractor={(item) => item.id}

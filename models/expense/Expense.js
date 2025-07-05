@@ -12,6 +12,7 @@ import {
   getDoc,
   deleteDoc,
   updateDoc,
+  length
 } from 'firebase/firestore';
 import { app, db } from '../../firebase';
 import Notification from 'models/notifications/notifications';
@@ -86,7 +87,7 @@ class Expense {
       description: this.description,
       incurred_at: this.incurred_at,
       group_id: this.group_id || null,
-      //!add settelement
+      settlement: this.settlement,
     };
 
     const expensesCollection = collection(db, 'expenses');
@@ -340,7 +341,13 @@ class Expense {
     }
 
     const expenses = await this.getExpensesByGroup(groupId);
-    const total = expenses.reduce((total, expense) => total + expense.amount, 0);
+    // Only count regular expenses, not settlement transactions, for fair share calculation
+    const total = expenses.reduce((total, expense) => {
+      if (!expense.is_settlement) {
+        return total + expense.amount;
+      }
+      return total;
+    }, 0);
     return parseFloat(total.toFixed(2));
   }
 
@@ -351,9 +358,25 @@ class Expense {
     }
 
     const expenses = await this.getExpensesByGroup(groupId);
-    return expenses.reduce((totals, { user_id, amount }) => {
+    return expenses.reduce((totals, expense) => {
+      const { user_id, amount, is_settlement, settlement_type } = expense;
+      
       if (!totals[user_id]) totals[user_id] = 0;
-      totals[user_id] += amount;
+      
+      if (is_settlement) {
+        // For settlement transactions, handle them specially
+        if (settlement_type === 'payment') {
+          // Settlement payment increases the payer's total spending
+          totals[user_id] += amount;
+        } else if (settlement_type === 'receipt') {
+          // Settlement receipt acts as a negative expense (reduces total spending)
+          totals[user_id] -= amount;
+        }
+      } else {
+        // Regular expenses
+        totals[user_id] += amount;
+      }
+      
       return totals;
     }, {});
   }
@@ -897,19 +920,20 @@ class Expense {
     }
   }
 
+  
   /**
    * Function to handle Settle up expenses between users in a group
-   * This function creates balancing expenses to make all users have equal share (zero balance)
+   * This function creates settlement transactions to make all users have zero balance
    *
    * Example:
    * - User A paid 100, balance: +20 (owed 20)
    * - User B paid 60, balance: -20 (owes 20)
    * - User C paid 80, balance: 0 (even)
    *
-   * Result: Creates expense of 20 for User B to balance everyone to 0
+   * Result: Creates a settlement transaction where B pays A 20, making all balances 0
    *
    * @param {string} groupId - The group ID to settle up
-   * @returns {Promise<Object>} - Settlement summary and created expenses
+   * @returns {Promise<Object>} - Settlement summary and created transactions
    */
   static async settleUpGroup(groupId) {
     if (!groupId || typeof groupId !== 'string') {
@@ -951,78 +975,141 @@ class Expense {
         return {
           success: true,
           message: 'All expenses are already settled',
-          expensesCreated: [],
+          settlementsCreated: [],
           totalSettled: 0,
         };
       }
 
-      const expensesCreated = [];
+      // Separate users who owe money and users who are owed money
+      const creditors = []; // Users who are owed money (positive balance)
+      const debtors = [];   // Users who owe money (negative balance)
+
+      for (const [userId, balance] of Object.entries(balances)) {
+        if (balance > 0.01) {
+          creditors.push({ userId, amount: balance });
+        } else if (balance < -0.01) {
+          debtors.push({ userId, amount: Math.abs(balance) });
+        }
+      }
+
+      const settlementsCreated = [];
       let totalSettled = 0;
 
-      // Create balancing expenses for users who owe money (negative balance)
-      for (const [userId, balance] of Object.entries(balances)) {
-        if (balance < -0.01) {
-          // User owes money
-          const owedAmount = Math.abs(balance);
+      // Create settlement transactions between debtors and creditors
+      let creditorIndex = 0;
+      let debtorIndex = 0;
 
-          // Get username for the expense description
-          const userName = await User.getUsernameById(userId).catch(() => 'Unknown User');
+      while (creditorIndex < creditors.length && debtorIndex < debtors.length) {
+        const creditor = creditors[creditorIndex];
+        const debtor = debtors[debtorIndex];
 
-          // Create a new expense instance for this user to balance their account
-          const balancingExpense = new Expense(
-            `Settlement - ${userName}`,
-            owedAmount,
-            'Settlement',
-            `Balance settlement expense created by admin`,
-            groupId
-          );
+        // Calculate settlement amount (minimum of what's owed and what's due)
+        const settlementAmount = Math.min(creditor.amount, debtor.amount);
 
-          // Manually set the user_id to the user who owes money
-          balancingExpense.user_id = userId;
-          balancingExpense.incurred_at = Timestamp.now();
+        // Get usernames for the settlement description
+        const creditorName = await User.getUsernameById(creditor.userId).catch(() => 'Unknown User');
+        const debtorName = await User.getUsernameById(debtor.userId).catch(() => 'Unknown User');
 
-          // Save the balancing expense directly to Firestore
-          const expenseData = {
-            user_id: balancingExpense.user_id,
-            title: balancingExpense.title,
-            amount: balancingExpense.amount,
-            category: balancingExpense.category,
-            description: balancingExpense.description,
-            incurred_at: balancingExpense.incurred_at,
-            group_id: balancingExpense.group_id,
-            is_settlement: true, // Mark as settlement expense
-            settled_by: currentUser.uid,
-          };
+        // Create settlement records that balance the users without affecting expense totals
+        // Settlement payment from debtor
+        const settlementPayment = {
+          user_id: debtor.userId,
+          title: `Settlement Payment to ${creditorName}`,
+          amount: settlementAmount,
+          category: 'Settlement',
+          description: `Settlement payment from ${debtorName} to ${creditorName}`,
+          incurred_at: Timestamp.now(),
+          group_id: groupId,
+          is_settlement: true,
+          settlement_type: 'payment',
+          settled_by: currentUser.uid,
+          settlement_from: debtor.userId,
+          settlement_to: creditor.userId,
+        };
 
-          const expensesCollection = collection(db, 'expenses');
-          const docRef = await addDoc(expensesCollection, expenseData);
+        // Settlement receipt for creditor (same amount, different perspective)
+        const settlementReceipt = {
+          user_id: creditor.userId,
+          title: `Settlement Received from ${debtorName}`,
+          amount: settlementAmount,
+          category: 'Settlement',
+          description: `Settlement received from ${debtorName}`,
+          incurred_at: Timestamp.now(),
+          group_id: groupId,
+          is_settlement: true,
+          settlement_type: 'receipt',
+          settled_by: currentUser.uid,
+          settlement_from: debtor.userId,
+          settlement_to: creditor.userId,
+        };
 
-          expensesCreated.push({
-            id: docRef.id,
-            userId: userId,
-            userName: userName,
-            amount: owedAmount,
-            title: balancingExpense.title,
-          });
+        // Save both settlement records to Firestore
+        const expensesCollection = collection(db, 'expenses');
+        const [paymentDocRef, receiptDocRef] = await Promise.all([
+          addDoc(expensesCollection, settlementPayment),
+          addDoc(expensesCollection, settlementReceipt)
+        ]);
 
-          totalSettled += owedAmount;
+        settlementsCreated.push({
+          id: paymentDocRef.id,
+          from: debtorName,
+          to: creditorName,
+          fromUserId: debtor.userId,
+          toUserId: creditor.userId,
+          amount: settlementAmount,
+          title: settlementPayment.title,
+          type: 'payment'
+        }, {
+          id: receiptDocRef.id,
+          from: debtorName,
+          to: creditorName,
+          fromUserId: debtor.userId,
+          toUserId: creditor.userId,
+          amount: settlementAmount,
+          title: settlementReceipt.title,
+          type: 'receipt'
+        });
 
-          // Create notification for the user
-          const userNotification = new Notification(
-            currentUser.uid,
-            userId,
-            'settlement_expense',
-            `Settlement expense of ${owedAmount} has been added to balance your account`
-          );
-          userNotification.groupId = groupId;
-          userNotification.expenseId = docRef.id;
-          await userNotification.save();
+        totalSettled += settlementAmount;
+
+        // Update remaining amounts
+        creditor.amount -= settlementAmount;
+        debtor.amount -= settlementAmount;
+
+        // Move to next creditor/debtor if current one is fully settled
+        if (creditor.amount <= 0.01) {
+          creditorIndex++;
         }
+        if (debtor.amount <= 0.01) {
+          debtorIndex++;
+        }
+
+        // Create notifications for both users involved in the settlement
+        const debtorNotification = new Notification(
+          currentUser.uid,
+          debtor.userId,
+          'settlement_payment',
+          `You have a settlement payment of ${settlementAmount.toFixed(2)} to ${creditorName}`
+        );
+        debtorNotification.groupId = groupId;
+        debtorNotification.expenseId = paymentDocRef.id;
+        await debtorNotification.save();
+
+        const creditorNotification = new Notification(
+          currentUser.uid,
+          creditor.userId,
+          'settlement_received',
+          `You will receive a settlement payment of ${settlementAmount.toFixed(2)} from ${debtorName}`
+        );
+        creditorNotification.groupId = groupId;
+        creditorNotification.expenseId = receiptDocRef.id;
+        await creditorNotification.save();
       }
 
       // Create notifications for all group members about the settlement
       const groupMembers = group.members || [];
       const adminNotificationPromises = [];
+      const actualSettlementCount = settlementsCreated.length / 2; // Since we create 2 records per settlement
 
       for (const member of groupMembers) {
         if (member && member.id && member.id !== currentUser.uid) {
@@ -1030,7 +1117,7 @@ class Expense {
             currentUser.uid,
             member.id,
             'group_settled',
-            `Group expenses have been settled up by admin. ${expensesCreated.length} balancing expenses were created.`
+            `Group expenses have been settled up by admin. ${actualSettlementCount} settlement transactions were created.`
           );
           notification.groupId = groupId;
           adminNotificationPromises.push(notification.save());
@@ -1041,12 +1128,14 @@ class Expense {
 
       return {
         success: true,
-        message: `Successfully created ${expensesCreated.length} balancing expenses`,
-        expensesCreated,
+        message: `Successfully created ${actualSettlementCount} settlement transactions`,
+        settlementsCreated,
         totalSettled: parseFloat(totalSettled.toFixed(2)),
         summary: {
-          totalExpenses: expensesCreated.length,
-          usersBalanced: expensesCreated.length,
+          totalTransactions: actualSettlementCount,
+          creditorCount: creditors.length,
+          debtorCount: debtors.length,
+          groupBalanced: true,
         },
       };
     } catch (error) {
