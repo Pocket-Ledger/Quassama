@@ -240,15 +240,15 @@ const RegisterScreen = () => {
           className="container "
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={true}>
+          {/* Header with Back Button and Logo */}
+          <Header />
           <View className="login-content relative">
-            {/* Header with Back Button and Logo */}
-            <Header />
             <View className="logo-container">
               <Logo />
             </View>
 
             {/* Title and Subtitle */}
-            <View className="">
+            <View className="w-full ">
               <Text className="title">{t('register.title')}</Text>
               <Text className="subtitle">{t('register.subtitle')}</Text>
             </View>
