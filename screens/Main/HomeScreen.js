@@ -533,25 +533,25 @@ const HomeScreen = () => {
             refreshing={refreshingGroups}
           />
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 4 }}
-            className="flex-row">
-            {friends?.length === 0 ? (
-              <View className="w-full items-center gap-4 space-y-4">
-                <Feather name="users" size={48} color="#ccc" />
-                <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
-                <TouchableOpacity
-                  className="btn-primary mb-8 rounded-lg bg-primary "
-                  onPress={() => navigation.navigate('AddNewGroup')}>
-                  <Text className="btn-primary-text text-center text-base font-semibold text-white">
-                    {t('addGroup.title')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              friends?.map((friend, index) => (
+          {friends?.length === 0 ? (
+            <View className="w-full items-center gap-4 space-y-4">
+              <Feather name="users" size={48} color="#ccc" />
+              <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
+              <TouchableOpacity
+                className="btn-primary mb-8 rounded-lg bg-primary "
+                onPress={() => navigation.navigate('AddNewGroup')}>
+                <Text className="btn-primary-text text-center text-base font-semibold text-white">
+                  {t('addGroup.title')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 4 }}
+              className="flex-row">
+              {friends?.map((friend, index) => (
                 <View key={index} className="mr-4">
                   <Avatar
                     initial={friend.initial}
@@ -561,9 +561,9 @@ const HomeScreen = () => {
                     showName={true}
                   />
                 </View>
-              ))
-            )}
-          </ScrollView>
+              ))}
+            </ScrollView>
+          )}
         </View>
       </View>
     </ScrollView>
