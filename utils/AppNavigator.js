@@ -37,6 +37,7 @@ function AppNavigator() {
           <Stack.Screen name="ExpenseDetails" component={ExpenseDetailsScreen} />
           <Stack.Screen name="EditGroup" component={EditGroupScreen} />
           <Stack.Screen name="EditExpense" component={EditExpenseScreen} />
+          <Stack.Screen name="AddNewGroup" component={AddNewGroupScreen} />
           <Stack.Screen name="AllExpenses" component={AllExpensesScreen} />
           <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
