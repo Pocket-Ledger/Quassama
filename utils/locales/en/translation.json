@@ -160,7 +160,8 @@
     "done": "Done",
     "days": "days",
     "confirm": "Confirm",
-    "apply": "Apply"
+    "apply": "Apply",
+    "updating": "Updating..."
   },
   "home": {
     "goodMorning": "Good morning 👋",

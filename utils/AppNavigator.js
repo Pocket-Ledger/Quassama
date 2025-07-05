@@ -18,7 +18,7 @@ import ForgetPasswordScreen from 'screens/Auth/ForgetPasswordScreen ';
 import ResetPasswordScreen from 'screens/Auth/ResetPasswordScreen';
 import EditGroupScreen from 'screens/Main/EditGroupScreen';
 import ExpenseDetailsScreen from 'screens/Main/ExpenseDetailsScreen';
-import EditExpenseScreen from 'screens/Main/EditExpense';
+import EditExpenseScreen from 'screens/Main/EditExpenseScreen';
 
 const Stack = createNativeStackNavigator();
 

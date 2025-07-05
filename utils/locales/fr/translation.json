@@ -158,7 +158,8 @@
     "done": "Terminé",
     "days": "jours",
     "confirm": "Confirmer",
-    "apply": "Appliquer"
+    "apply": "Appliquer",
+    "updating": "Mise à jour..."
   },
   "home": {
     "goodMorning": "Bonjour 👋",

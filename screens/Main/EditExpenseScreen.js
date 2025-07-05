@@ -1,3 +1,5 @@
+// EditExpenseScreen.js
+
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -9,9 +11,11 @@ import {
   FlatList,
   Platform,
   Alert,
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
 import { useTranslation } from 'react-i18next';
@@ -37,55 +41,84 @@ const EditExpenseScreen = () => {
   // Get expense data from navigation params
   const { expenseId, expenseData } = route.params || {};
 
+  // Log the received parameters
+  useEffect(() => {
+    Logger.info('EditExpenseScreen - Route params:', {
+      expenseId,
+      expenseData: expenseData ? 'provided' : 'not provided',
+      allParams: route.params,
+    });
+  }, [expenseId, expenseData, route.params]);
+
+  // State management
   const [expenseName, setExpenseName] = useState('');
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [note, setNote] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState({});
   const [groups, setGroups] = useState([]);
   const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
   const [originalExpense, setOriginalExpense] = useState(null);
 
   // Load expense data
-  useEffect(() => {
-    const loadExpenseData = async () => {
-      try {
-        let expense;
+  const loadExpenseData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        if (expenseData) {
-          // Use provided expense data
-          expense = expenseData;
-        } else if (expenseId) {
-          // Fetch expense by ID
-          expense = await Expense.getExpenseByID(expenseId);
-        }
+      Logger.log('Loading expense data for editing, ID:', expenseId);
 
-        if (expense) {
-          setOriginalExpense(expense);
-          setExpenseName(expense.title || '');
-          setAmount(expense.amount?.toString() || '');
-          setSelectedCategory(expense.category || '');
-          setSelectedGroup(expense.group_id || null);
-          setNote(expense.note || '');
-        } else {
-          showError(t('customAlert.titles.error'), t('expense.error.notFound'));
-          navigation.goBack();
-        }
-      } catch (error) {
-        console.error('Error loading expense:', error);
-        showError(t('customAlert.titles.error'), t('expense.error.loadFailed'));
-        navigation.goBack();
-      } finally {
-        setIsLoading(false);
+      let expense;
+
+      if (expenseData) {
+        // Use provided expense data
+        Logger.log('Using provided expense data');
+        expense = expenseData;
+      } else if (expenseId) {
+        // Fetch expense by ID
+        Logger.log('Fetching expense by ID:', expenseId);
+        expense = await Expense.getExpenseByID(expenseId);
+      } else {
+        Logger.error('EditExpenseScreen - No expense ID or data provided');
+        setError(t('expense.error.invalidId'));
+        return;
       }
-    };
 
-    loadExpenseData();
-  }, [expenseId, expenseData]);
+      if (expense) {
+        Logger.log('Expense data loaded successfully:', expense);
+        setOriginalExpense(expense);
+        setExpenseName(expense.title || '');
+        setAmount(expense.amount?.toString() || '');
+        setSelectedCategory(expense.category || '');
+        setSelectedGroup(expense.group_id || null);
+        setNote(expense.note || '');
+      } else {
+        Logger.error('EditExpenseScreen - Expense not found');
+        setError(t('expense.error.notFound'));
+      }
+    } catch (err) {
+      Logger.error('Error loading expense data:', err);
+      setError(err.message || t('expense.error.loadFailed'));
+    } finally {
+      setLoading(false);
+    }
+  }, [expenseId, expenseData, t]);
+
+  // Load expense on component mount
+  useEffect(() => {
+    if (expenseId || expenseData) {
+      loadExpenseData();
+    } else {
+      Logger.error('EditExpenseScreen - No expense ID or data provided');
+      setError(t('expense.error.invalidId'));
+      setLoading(false);
+    }
+  }, [expenseId, expenseData, loadExpenseData]);
 
   // Fetch the user's groups
   useFocusEffect(
@@ -94,6 +127,7 @@ const EditExpenseScreen = () => {
 
       async function fetchGroups() {
         try {
+          Logger.log('Fetching user groups for user:', userId);
           const fetched = await Group.getGroupsByUser(userId);
           let list = [];
 
@@ -103,6 +137,7 @@ const EditExpenseScreen = () => {
               name: g.name,
               memberCount: g.members?.length ?? 1,
             }));
+            Logger.log('Groups fetched successfully:', list);
           } else {
             // default personal group
             list = [
@@ -112,13 +147,15 @@ const EditExpenseScreen = () => {
                 memberCount: 1,
               },
             ];
+            Logger.log('No groups found, using default personal group');
           }
 
           if (mounted) {
             setGroups(list);
           }
         } catch (err) {
-          console.error('Error loading groups:', err);
+          Logger.error('Error loading groups:', err);
+          // Don't show error alert for groups as it's not critical
         }
       }
 
@@ -130,21 +167,44 @@ const EditExpenseScreen = () => {
   );
 
   const validateForm = () => {
+    Logger.log('Validating form data...');
     const newErrors = {};
-    if (!expenseName.trim()) newErrors.expenseName = t('expense.validation.expenseNameRequired');
-    else if (expenseName.length > 100) newErrors.expenseName = 'Title cannot exceed 100 characters';
 
-    if (!amount.trim()) newErrors.amount = t('expense.validation.amountRequired');
-    else if (isNaN(amount) || parseFloat(amount) <= 0)
+    if (!expenseName.trim()) {
+      newErrors.expenseName = t('expense.validation.expenseNameRequired');
+      Logger.log('Validation error: Expense name is required');
+    } else if (expenseName.length > 100) {
+      newErrors.expenseName = 'Title cannot exceed 100 characters';
+      Logger.log('Validation error: Expense name too long');
+    }
+
+    if (!amount.trim()) {
+      newErrors.amount = t('expense.validation.amountRequired');
+      Logger.log('Validation error: Amount is required');
+    } else if (isNaN(amount) || parseFloat(amount) <= 0) {
       newErrors.amount = t('expense.validation.validAmount');
+      Logger.log('Validation error: Invalid amount');
+    }
 
-    if (!selectedCategory) newErrors.category = t('expense.validation.selectCategory');
-    if (!selectedGroup) newErrors.group = t('expense.validation.selectGroup');
+    if (!selectedCategory) {
+      newErrors.category = t('expense.validation.selectCategory');
+      Logger.log('Validation error: Category not selected');
+    }
 
-    if (note.length > 3000) newErrors.note = 'Description cannot exceed 3000 characters';
+    if (!selectedGroup) {
+      newErrors.group = t('expense.validation.selectGroup');
+      Logger.log('Validation error: Group not selected');
+    }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (note.length > 3000) {
+      newErrors.note = 'Description cannot exceed 3000 characters';
+      Logger.log('Validation error: Note too long');
+    }
+
+    setValidationErrors(newErrors);
+    const isValid = Object.keys(newErrors).length === 0;
+    Logger.log('Form validation result:', { isValid, errors: newErrors });
+    return isValid;
   };
 
   const getCategoryIconName = (categoryId) => {
@@ -153,44 +213,41 @@ const EditExpenseScreen = () => {
   };
 
   const handleUpdateExpense = async () => {
-    if (!validateForm()) return;
+    Logger.log('Update expense requested');
+
+    if (!validateForm()) {
+      Logger.log('Form validation failed, update aborted');
+      return;
+    }
 
     setIsSaving(true);
     try {
-      const iconName = getCategoryIconName(selectedCategory);
-      Logger.info(selectedCategory);
-
-      // Update the expense with new data
-      const updatedExpense = {
-        ...originalExpense,
+      Logger.log('Updating expense with data:', {
+        expenseId: originalExpense?.id,
         title: expenseName.trim(),
         amount: amount.trim(),
         category: selectedCategory,
-        note: note.trim(),
+        description: note.trim(),
         group_id: selectedGroup,
-        updated_at: new Date().toISOString(),
-      };
+      });
 
-      // Create expense instance and update
-      const expense = new Expense(
-        updatedExpense.title,
-        updatedExpense.amount,
-        updatedExpense.category,
-        updatedExpense.note,
-        updatedExpense.group_id,
-        updatedExpense.id
-      );
+      // Update the expense using static method
+      await Expense.updateExpense(originalExpense.id, {
+        title: expenseName.trim(),
+        amount: amount.trim(),
+        category: selectedCategory,
+        description: note.trim(),
+        group_id: selectedGroup,
+      });
 
-      await expense.updateExpense(); // or whatever your update method is called
+      Logger.success('Expense updated successfully');
 
-      console.log('Expense updated successfully:', expense);
-
-      showSuccess(t('customAlert.titles.success'), t('expense.updated_success'), () => {
+      showSuccess(t('customAlert.titles.success'), t('customAlert.messages.update_success'), () => {
         hideAlert();
         navigation.goBack();
       });
     } catch (error) {
-      console.error('Error updating expense:', error);
+      Logger.error('Error updating expense:', error);
       showError(t('customAlert.titles.error'), error.message || t('expense.error.updateFailed'));
     } finally {
       setIsSaving(false);
@@ -198,10 +255,13 @@ const EditExpenseScreen = () => {
   };
 
   const handleDeleteExpense = () => {
+    Logger.log('Delete expense requested for ID:', originalExpense?.id);
+
     Alert.alert(t('expense.delete.title'), t('expense.delete.message'), [
       {
         text: t('common.cancel'),
         style: 'cancel',
+        onPress: () => Logger.log('Delete expense cancelled'),
       },
       {
         text: t('common.delete'),
@@ -212,16 +272,20 @@ const EditExpenseScreen = () => {
   };
 
   const confirmDeleteExpense = async () => {
-    setIsDeleting(true);
     try {
+      Logger.log('Confirming delete for expense ID:', originalExpense?.id);
+      setIsDeleting(true);
+
       await Expense.deleteExpenseByID(originalExpense.id);
+
+      Logger.success('Expense deleted successfully');
 
       showSuccess(t('customAlert.titles.success'), t('expense.deleted_success'), () => {
         hideAlert();
         navigation.goBack();
       });
     } catch (error) {
-      console.error('Error deleting expense:', error);
+      Logger.error('Error deleting expense:', error);
       showError(t('customAlert.titles.error'), error.message || t('expense.error.deleteFailed'));
     } finally {
       setIsDeleting(false);
@@ -229,10 +293,11 @@ const EditExpenseScreen = () => {
   };
 
   const handleGroupSelect = (groupId) => {
+    Logger.log('Group selected:', groupId);
     setSelectedGroup(groupId);
     setIsGroupModalVisible(false);
-    if (errors.group) {
-      setErrors((prev) => ({ ...prev, group: null }));
+    if (validationErrors.group) {
+      setValidationErrors((prev) => ({ ...prev, group: null }));
     }
   };
 
@@ -259,22 +324,37 @@ const EditExpenseScreen = () => {
     return t('common.currency');
   };
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <SafeAreaView className="flex-1 bg-white">
-        <Header title={t('expense.editExpense')} />
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-base text-gray-500">{t('common.loading')}</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  return (
+  // Render loading state
+  const renderLoading = () => (
     <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#2979FF" />
+        <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
+      </View>
+    </SafeAreaView>
+  );
+
+  // Render error state
+  const renderError = () => (
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="items-center px-4 py-12">
+        <View className="mb-4 items-center justify-center">
+          <Ionicons name="alert-circle" size={70} color="#FF6B6B" />
+        </View>
+        <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.error.title')}</Text>
+        <Text className="mb-6 text-center text-gray-500">{error}</Text>
+        <TouchableOpacity className="rounded-lg bg-primary px-6 py-3" onPress={loadExpenseData}>
+          <Text className="font-semibold text-white">{t('expense.error.tryAgain')}</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+
+  // Render edit form-100
+  const renderEditForm = () => (
+    <SafeAreaView className="flex-1 ">
       <KeyboardAwareScrollView
-        className="container"
+        // className="container"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -282,11 +362,12 @@ const EditExpenseScreen = () => {
         enableAutomaticScroll={true}
         extraScrollHeight={Platform.OS === 'ios' ? 50 : 100}
         keyboardOpeningTime={0}>
-        {/* Header with Delete Button */}
-
-        <Header title={t('expense.editExpense')} />
-
-        <View className="mt-6 flex-1 gap-6 px-4">
+        <Header
+          title={t('expense.details.title')}
+          showBackButton={true}
+          onBackPress={() => navigation.goBack()}
+        />
+        <View className="flex-1 ">
           {/* Expense Name */}
           <View className="input-group">
             <View className="flex-row items-center justify-between">
@@ -301,21 +382,24 @@ const EditExpenseScreen = () => {
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4 text-black ${
-                  errors.expenseName ? 'border-red-500' : 'border-gray-200'
+                  validationErrors.expenseName ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder={t('expense.expenseTitle')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={expenseName}
                 onChangeText={(text) => {
                   setExpenseName(text);
-                  if (errors.expenseName) setErrors((prev) => ({ ...prev, expenseName: null }));
+                  if (validationErrors.expenseName)
+                    setValidationErrors((prev) => ({ ...prev, expenseName: null }));
                 }}
                 autoCapitalize="words"
                 maxLength={100}
               />
             </View>
-            {errors.expenseName && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.expenseName}</Text>
+            {validationErrors.expenseName && (
+              <Text className="error-text mt-1 text-sm text-red-500">
+                {validationErrors.expenseName}
+              </Text>
             )}
           </View>
 
@@ -327,21 +411,24 @@ const EditExpenseScreen = () => {
             <View className="input-container relative">
               <TextInput
                 className={`input-field rounded-lg border px-4  pr-16 text-black ${
-                  errors.amount ? 'border-red-500' : 'border-gray-200'
+                  validationErrors.amount ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="100"
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={amount}
                 onChangeText={(text) => {
                   setAmount(text);
-                  if (errors.amount) setErrors((prev) => ({ ...prev, amount: null }));
+                  if (validationErrors.amount)
+                    setValidationErrors((prev) => ({ ...prev, amount: null }));
                 }}
                 keyboardType="numeric"
               />
               <Text className="absolute right-4 top-4 text-base text-black">{getCurrency()}</Text>
             </View>
-            {errors.amount && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.amount}</Text>
+            {validationErrors.amount && (
+              <Text className="error-text mt-1 text-sm text-red-500">
+                {validationErrors.amount}
+              </Text>
             )}
           </View>
 
@@ -352,7 +439,7 @@ const EditExpenseScreen = () => {
             </Text>
             <TouchableOpacity
               className={`input-container rounded-lg border px-4 py-4 ${
-                errors.group ? 'border-red-500' : 'border-gray-200'
+                validationErrors.group ? 'border-red-500' : 'border-gray-200'
               }`}
               onPress={() => setIsGroupModalVisible(true)}>
               <View className="flex-row items-center justify-between">
@@ -371,8 +458,8 @@ const EditExpenseScreen = () => {
                 <Feather name="chevron-down" size={20} color="#666" />
               </View>
             </TouchableOpacity>
-            {errors.group && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.group}</Text>
+            {validationErrors.group && (
+              <Text className="error-text mt-1 text-sm text-red-500">{validationErrors.group}</Text>
             )}
           </View>
 
@@ -385,8 +472,10 @@ const EditExpenseScreen = () => {
             numColumns={5}
             title={t('expense.selectCategory')}
           />
-          {errors.category && (
-            <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
+          {validationErrors.category && (
+            <Text className="error-text mt-2 text-sm text-red-500">
+              {validationErrors.category}
+            </Text>
           )}
 
           {/* Note */}
@@ -401,14 +490,14 @@ const EditExpenseScreen = () => {
             </View>
             <TextInput
               className={`input-field h-24 rounded-lg border px-4 text-black ${
-                errors.note ? 'border-red-500' : 'border-gray-200'
+                validationErrors.note ? 'border-red-500' : 'border-gray-200'
               }`}
               placeholder={t('expense.addNote')}
               placeholderTextColor="rgba(0, 0, 0, 0.4)"
               value={note}
               onChangeText={(text) => {
                 setNote(text);
-                if (errors.note) setErrors((prev) => ({ ...prev, note: null }));
+                if (validationErrors.note) setValidationErrors((prev) => ({ ...prev, note: null }));
               }}
               multiline
               textAlignVertical="top"
@@ -417,14 +506,14 @@ const EditExpenseScreen = () => {
               returnKeyType="done"
               maxLength={3000}
             />
-            {errors.note && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.note}</Text>
+            {validationErrors.note && (
+              <Text className="error-text mt-1 text-sm text-red-500">{validationErrors.note}</Text>
             )}
           </View>
 
           {/* Update Expense Button */}
           <TouchableOpacity
-            className="btn-primary mb-8 rounded-lg bg-primary py-4"
+            className="btn-primary mb-8 mt-6 rounded-lg bg-primary py-4"
             onPress={handleUpdateExpense}
             disabled={isSaving}>
             <Text className="btn-primary-text text-center text-base font-semibold text-white">
@@ -433,6 +522,12 @@ const EditExpenseScreen = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
+    </SafeAreaView>
+  );
+
+  return (
+    <SafeAreaView className="container flex-1 bg-white ">
+      {loading ? renderLoading() : error ? renderError() : renderEditForm()}
 
       {/* Group Selection Modal */}
       <Modal
