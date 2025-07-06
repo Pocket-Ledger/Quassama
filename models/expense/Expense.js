@@ -416,7 +416,7 @@ class Expense {
   }
 
   // a function the return if the member is + or - in the group
-  // by deviding the total amount of expenses by the number of members in the group and then subtracting the total amount of expenses by the current user
+  // by dividing the total amount of expenses by the number of members in the group and then subtracting the total amount of expenses by the current user
   static async getBalanceByUserAndGroup(groupId) {
     if (!groupId || typeof groupId !== 'string') {
       throw new Error('A valid groupId (string) is required');
@@ -424,6 +424,10 @@ class Expense {
 
     const totalExpenses = await this.getTotalExpensesByGroup(groupId);
     const totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+    
+    // Get actual group member count instead of just users who made expenses
+    const group = await Group.getGroupById(groupId);
+    const memberCount = group && group.members ? group.members.length : Object.keys(totalExpensesPerUser).length;
 
     const auth = getAuth(app);
     const currentUser = auth.currentUser;
@@ -433,7 +437,18 @@ class Expense {
     }
 
     const userExpense = totalExpensesPerUser[currentUser.uid] || 0;
-    const balance = userExpense - totalExpenses / Object.keys(totalExpensesPerUser).length;
+    const fairShare = totalExpenses / memberCount;
+    const balance = userExpense - fairShare;
+
+    console.log(`getBalanceByUserAndGroup for group ${groupId}:`, {
+      groupName: group?.name || 'Unknown',
+      totalExpenses,
+      memberCount,
+      fairShare,
+      userExpense,
+      balance,
+      totalExpensesPerUser
+    });
 
     return parseFloat(balance.toFixed(2));
   }
@@ -446,12 +461,31 @@ class Expense {
 
     const totalExpenses = await this.getTotalExpensesByGroup(groupId);
     const totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+    
+    // Get actual group member count instead of just users who made expenses
+    const group = await Group.getGroupById(groupId);
+    const memberCount = group && group.members ? group.members.length : Object.keys(totalExpensesPerUser).length;
+    const fairShare = totalExpenses / memberCount;
 
     const balances = {};
-    for (const userId in totalExpensesPerUser) {
-      const userExpense = totalExpensesPerUser[userId] || 0;
-      const balance = userExpense - totalExpenses / Object.keys(totalExpensesPerUser).length;
-      balances[userId] = parseFloat(balance.toFixed(2));
+    
+    // Include all group members, even those who haven't made expenses
+    if (group && group.members) {
+      for (const member of group.members) {
+        const userId = typeof member === 'string' ? member : member.id;
+        if (userId) {
+          const userExpense = totalExpensesPerUser[userId] || 0;
+          const balance = userExpense - fairShare;
+          balances[userId] = parseFloat(balance.toFixed(2));
+        }
+      }
+    } else {
+      // Fallback to old method if group data is not available
+      for (const userId in totalExpensesPerUser) {
+        const userExpense = totalExpensesPerUser[userId] || 0;
+        const balance = userExpense - fairShare;
+        balances[userId] = parseFloat(balance.toFixed(2));
+      }
     }
 
     return balances;
@@ -469,7 +503,15 @@ class Expense {
     const groups = await Group.getGroupsByUser(currentUser.uid);
     const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
 
-    const total = balances.filter((b) => b > 0).reduce((sum, b) => sum + b, 0);
+    console.log('getTotalOwedToUser - Groups:', groups.map(g => ({ id: g.id, name: g.name })));
+    console.log('getTotalOwedToUser - Balances:', balances);
+
+    const positiveBalances = balances.filter((b) => b > 0);
+    const total = positiveBalances.reduce((sum, b) => sum + b, 0);
+    
+    console.log('getTotalOwedToUser - Positive balances:', positiveBalances);
+    console.log('getTotalOwedToUser - Total owed to user:', total);
+
     return parseFloat(total.toFixed(2));
   }
 
@@ -485,7 +527,15 @@ class Expense {
     const groups = await Group.getGroupsByUser(currentUser.uid);
     const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
 
-    const total = balances.filter((b) => b < 0).reduce((sum, b) => sum + Math.abs(b), 0);
+    console.log('getTotalYouOwe - Groups:', groups.map(g => ({ id: g.id, name: g.name })));
+    console.log('getTotalYouOwe - Balances:', balances);
+
+    const negativeBalances = balances.filter((b) => b < 0);
+    const total = negativeBalances.reduce((sum, b) => sum + Math.abs(b), 0);
+    
+    console.log('getTotalYouOwe - Negative balances:', negativeBalances);
+    console.log('getTotalYouOwe - Total you owe:', total);
+
     return parseFloat(total.toFixed(2));
   }
 
