@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
 import { useTranslation } from 'react-i18next';
 
@@ -29,8 +29,12 @@ import Logger from 'utils/looger';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const { t, i18n } = useTranslation();
   const { alertConfig, hideAlert, showSuccess, showError } = useAlert();
+
+  // Get groupId from route params if it exists
+  const { groupId: routeGroupId } = route.params || {};
 
   const auth = getAuth();
   const userId = auth.currentUser.uid;
@@ -74,9 +78,20 @@ const NewExpenseScreen = () => {
 
           if (mounted) {
             setGroups(list);
-            // default select the first group if none selected yet
-            if (!selectedGroup) {
-              setSelectedGroup(list[0].id);
+
+            // Auto-select group logic
+            if (routeGroupId) {
+              // If groupId was passed from route, check if it exists in the list
+              const groupExists = list.find((g) => g.id === routeGroupId);
+              if (groupExists) {
+                setSelectedGroup(routeGroupId);
+              } else {
+                // If passed groupId doesn't exist, fallback to first group
+                setSelectedGroup(list[0]?.id || null);
+              }
+            } else {
+              // If no groupId was passed in route params, always reset to first group
+              setSelectedGroup(list[0]?.id || null);
             }
           }
         } catch (err) {
@@ -88,7 +103,7 @@ const NewExpenseScreen = () => {
       return () => {
         mounted = false;
       };
-    }, [userId, t])
+    }, [userId, t, routeGroupId])
   );
 
   const validateForm = () => {
@@ -135,7 +150,7 @@ const NewExpenseScreen = () => {
       setAmount('');
       setSelectedCategory('');
       setNote('');
-      setSelectedGroup(null);
+      // Don't reset selectedGroup to maintain the selection for next expense
 
       showSuccess(t('customAlert.titles.success'), t('expense.added_success'), () => {
         hideAlert();
@@ -161,7 +176,7 @@ const NewExpenseScreen = () => {
 
   const renderGroupItem = ({ item }) => (
     <TouchableOpacity
-      className="flex-row items-center justify-between px-4 py-4 border-b border-gray-100"
+      className="flex-row items-center justify-between border-b border-gray-100 px-4 py-4"
       onPress={() => handleGroupSelect(item.id)}>
       <View>
         <Text className="text-base font-medium text-black">{item.name}</Text>
@@ -169,8 +184,8 @@ const NewExpenseScreen = () => {
           {t('group.memberCount', { count: item.memberCount })}
         </Text>
       </View>
-      <View className="items-center justify-center w-5 h-5 border-2 border-gray-300 rounded-full">
-        {selectedGroup === item.id && <View className="w-3 h-3 rounded-full bg-primary" />}
+      <View className="h-5 w-5 items-center justify-center rounded-full border-2 border-gray-300">
+        {selectedGroup === item.id && <View className="h-3 w-3 rounded-full bg-primary" />}
       </View>
     </TouchableOpacity>
   );
@@ -197,7 +212,7 @@ const NewExpenseScreen = () => {
           {/* Expense Name */}
           <View className="input-group">
             <View className="flex-row items-center justify-between">
-              <Text className="text-base font-medium text-black input-label">
+              <Text className="input-label text-base font-medium text-black">
                 {t('expense.expenseTitle')}
               </Text>
               <Text
@@ -222,16 +237,16 @@ const NewExpenseScreen = () => {
               />
             </View>
             {errors.expenseName && (
-              <Text className="mt-1 text-sm text-red-500 error-text">{errors.expenseName}</Text>
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.expenseName}</Text>
             )}
           </View>
 
           {/* Amount */}
           <View className="input-group">
-            <Text className="text-base font-medium text-black input-label">
+            <Text className="input-label text-base font-medium text-black">
               {t('expense.expenseAmount')}
             </Text>
-            <View className="relative input-container">
+            <View className="input-container relative">
               <TextInput
                 className={`input-field rounded-lg border px-4  pr-16 text-black ${
                   errors.amount ? 'border-red-500' : 'border-gray-200'
@@ -245,16 +260,16 @@ const NewExpenseScreen = () => {
                 }}
                 keyboardType="numeric"
               />
-              <Text className="absolute text-base text-black right-4 top-4">{getCurrency()}</Text>
+              <Text className="absolute right-4 top-4 text-base text-black">{getCurrency()}</Text>
             </View>
             {errors.amount && (
-              <Text className="mt-1 text-sm text-red-500 error-text">{errors.amount}</Text>
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.amount}</Text>
             )}
           </View>
 
           {/* Group Selection */}
           <View className="input-group">
-            <Text className="text-base font-medium text-black input-label">
+            <Text className="input-label text-base font-medium text-black">
               {t('group.selectGroup')}
             </Text>
             <TouchableOpacity
@@ -279,7 +294,7 @@ const NewExpenseScreen = () => {
               </View>
             </TouchableOpacity>
             {errors.group && (
-              <Text className="mt-1 text-sm text-red-500 error-text">{errors.group}</Text>
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.group}</Text>
             )}
           </View>
 
@@ -293,13 +308,13 @@ const NewExpenseScreen = () => {
             title={t('expense.selectCategory')}
           />
           {errors.category && (
-            <Text className="mt-2 text-sm text-red-500 error-text">{errors.category}</Text>
+            <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
           )}
 
           {/* Note */}
           <View>
             <View className="flex-row items-center justify-between">
-              <Text className="text-base font-medium text-black input-label">
+              <Text className="input-label text-base font-medium text-black">
                 {t('expense.note')}
               </Text>
               <Text className={`text-sm ${note.length > 3000 ? 'text-red-500' : 'text-gray-500'}`}>
@@ -325,16 +340,16 @@ const NewExpenseScreen = () => {
               maxLength={3000}
             />
             {errors.note && (
-              <Text className="mt-1 text-sm text-red-500 error-text">{errors.note}</Text>
+              <Text className="error-text mt-1 text-sm text-red-500">{errors.note}</Text>
             )}
           </View>
 
           {/* Add Expense Button */}
           <TouchableOpacity
-            className="py-4 mb-8 rounded-lg btn-primary bg-primary"
+            className="btn-primary mb-8 rounded-lg bg-primary py-4"
             onPress={handleAddExpense}
             disabled={isSaving}>
-            <Text className="text-base font-semibold text-center text-white btn-primary-text">
+            <Text className="btn-primary-text text-center text-base font-semibold text-white">
               {isSaving ? t('common.adding') : t('expense.addExpense')}
             </Text>
           </TouchableOpacity>
@@ -349,7 +364,7 @@ const NewExpenseScreen = () => {
         onRequestClose={() => setIsGroupModalVisible(false)}>
         <SafeAreaView className="flex-1 bg-white">
           <View className="flex-1">
-            <View className="flex-row items-center justify-between px-4 py-4 border-b border-gray-200">
+            <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
               <Text className="text-lg font-semibold text-black">{t('group.selectGroup')}</Text>
               <TouchableOpacity onPress={() => setIsGroupModalVisible(false)}>
                 <Feather name="x" size={24} color="#666" />
