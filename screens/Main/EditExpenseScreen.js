@@ -363,7 +363,7 @@ const EditExpenseScreen = () => {
         extraScrollHeight={Platform.OS === 'ios' ? 50 : 100}
         keyboardOpeningTime={0}>
         <Header
-          title={t('expense.details.title')}
+          title={t('expense.editExpense')}
           showBackButton={true}
           onBackPress={() => navigation.goBack()}
         />
