@@ -256,7 +256,7 @@ const GroupsScreen = () => {
         <Header title={t('group.title')} showIcon={true} route="AddNewGroup" />
 
         {/* Tabs */}
-        <View className="mb-6 px-4">
+        {/* <View className="px-4 mb-6">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
             {tabs.map((tab, index) => (
               <TouchableOpacity
@@ -271,7 +271,7 @@ const GroupsScreen = () => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </View>
+        </View> */}
 
         {/* Groups List with Invitation */}
         <ScrollView
