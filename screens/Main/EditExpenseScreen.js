@@ -354,7 +354,7 @@ const EditExpenseScreen = () => {
   const renderEditForm = () => (
     <SafeAreaView className="flex-1 ">
       <KeyboardAwareScrollView
-        // className="container"
+        //className="container"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -367,7 +367,7 @@ const EditExpenseScreen = () => {
           showBackButton={true}
           onBackPress={() => navigation.goBack()}
         />
-        <View className="flex-1 ">
+        <View className="flex-1 gap-6 px-4">
           {/* Expense Name */}
           <View className="input-group">
             <View className="flex-row items-center justify-between">
