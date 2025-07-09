@@ -83,6 +83,7 @@
     "title": "إنشاء مجموعة جديدة",
     "group_name": "اسم المجموعة",
     "group_name_placeholder": "مثل: 'رفقاء السكن'، 'رحلة أغادير'",
+    "currency": "العملة",
     "add_members": "إضافة الأعضاء",
     "search_placeholder": "ابحث باسم المستخدم: 'user02718'",
     "searching": "جارٍ البحث...",

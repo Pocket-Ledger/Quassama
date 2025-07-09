@@ -27,6 +27,8 @@ const AddNewGroupScreen = () => {
 
   const [groupName, setGroupName] = useState('');
   const [memberInput, setMemberInput] = useState('');
+  const [selectedCurrency, setSelectedCurrency] = useState('MAD');
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [allowInviteOthers, setAllowInviteOthers] = useState(true);
   const [notifyForExpenses, setNotifyForExpenses] = useState(true);
   const [errors, setErrors] = useState({});
@@ -62,6 +64,19 @@ const AddNewGroupScreen = () => {
     '#00BCD4', // Cyan
     '#FF5722', // Deep Orange
     '#3F51B5', // Indigo
+  ];
+
+  const currencyOptions = [
+    { code: 'MAD', name: 'Moroccan Dirham', symbol: 'DH' },
+    { code: 'USD', name: 'US Dollar', symbol: '$' },
+    { code: 'EUR', name: 'Euro', symbol: '€' },
+    { code: 'GBP', name: 'British Pound', symbol: '£' },
+    { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+    { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+    { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF' },
+    { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+    { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
   ];
 
   const handleSearch = async () => {
@@ -110,7 +125,7 @@ const AddNewGroupScreen = () => {
       const auth = getAuth();
       const user = auth.currentUser;
       const created_by = user.uid;
-      const currency = 'MAD';
+      const currency = selectedCurrency;
       const description = '';
 
       // Fetch current user's info to include as initial member
@@ -228,6 +243,68 @@ const AddNewGroupScreen = () => {
             {errors.groupName && (
               <Text className="error-text mt-1 text-sm text-red-500">{errors.groupName}</Text>
             )}
+          </View>
+
+          {/* Currency Selection */}
+          <View className="input-group">
+            <Text className="input-label text-base font-medium text-black">
+              {t('addGroup.currency')}
+            </Text>
+            <View className="input-container">
+              <TouchableOpacity
+                className="input-field rounded-lg border border-gray-200 px-4 py-3 flex-row items-center justify-between"
+                onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
+                <View className="flex-row items-center">
+                  <Text className="text-base text-black mr-2">
+                    {currencyOptions.find(c => c.code === selectedCurrency)?.symbol}
+                  </Text>
+                  <Text className="text-base text-black">
+                    {selectedCurrency} - {currencyOptions.find(c => c.code === selectedCurrency)?.name}
+                  </Text>
+                </View>
+                <Feather 
+                  name={showCurrencyDropdown ? "chevron-up" : "chevron-down"} 
+                  size={20} 
+                  color="rgba(0, 0, 0, 0.4)" 
+                />
+              </TouchableOpacity>
+              
+              {/* Currency Options Dropdown */}
+              {showCurrencyDropdown && (
+                <View className="mt-2 rounded-lg border border-gray-100 bg-gray-50 max-h-52">
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    {currencyOptions.map((currency, index) => (
+                      <TouchableOpacity
+                        key={currency.code}
+                        className={`flex-row items-center px-4 py-3 ${
+                          index !== currencyOptions.length - 1 ? 'border-b border-gray-100' : ''
+                        } ${selectedCurrency === currency.code ? 'bg-blue-50' : 'bg-white'}`}
+                        onPress={() => {
+                          setSelectedCurrency(currency.code);
+                          setShowCurrencyDropdown(false);
+                        }}>
+                        <Text className="text-base font-medium text-black mr-3">
+                          {currency.symbol}
+                        </Text>
+                        <View className="flex-1">
+                          <Text className="text-base font-medium text-black">
+                            {currency.code}
+                          </Text>
+                          <Text className="text-sm text-gray-500">
+                            {currency.name}
+                          </Text>
+                        </View>
+                        {selectedCurrency === currency.code && (
+                          <View className="h-6 w-6 items-center justify-center rounded-full bg-primary">
+                            <Feather name="check" size={14} color="white" />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
           </View>
 
           {/* Member Search */}

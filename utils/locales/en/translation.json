@@ -85,6 +85,7 @@
     "title": "Add New Group",
     "group_name": "Group Name",
     "group_name_placeholder": "Eg: 'Roommates', 'Vacation Agadir'",
+    "currency": "Currency",
     "add_members": "Add Members",
     "search_placeholder": "Search by username: 'user02718'",
     "searching": "Searching...",
@@ -578,6 +579,44 @@
       "user_not_found": "No account found with this email address.",
       "wrong_password": "Incorrect password. Please try again.",
       "general": "An error occurred. Please try again."
+    }
+  },
+  "tour": {
+    "skip": "Skip Tour",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish",
+    "welcome": {
+      "title": "Welcome to Qassama!",
+      "description": "Let's take a quick tour to help you get started with managing your shared expenses."
+    },
+    "profile": {
+      "title": "Your Profile",
+      "description": "Tap here to view and edit your profile information."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Stay updated with expense notifications and group activities."
+    },
+    "balance": {
+      "title": "Balance Overview",
+      "description": "See how much you owe and how much others owe you at a glance."
+    },
+    "overview": {
+      "title": "Monthly Overview", 
+      "description": "Track your monthly expenses with visual charts and summaries."
+    },
+    "recent_activity": {
+      "title": "Recent Activity",
+      "description": "View your latest transactions and expense activities."
+    },
+    "see_all": {
+      "title": "See All Expenses",
+      "description": "Tap here to view all your expenses in detail."
+    },
+    "bottom_navigation": {
+      "title": "Navigation",
+      "description": "Use the bottom tabs to navigate between Home, New Expense, Groups, and Profile."
     }
   }
 }

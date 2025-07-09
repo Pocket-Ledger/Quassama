@@ -84,6 +84,7 @@
     "title": "Créer un nouveau groupe",
     "group_name": "Nom du groupe",
     "group_name_placeholder": "Ex: 'Colocataires', 'Vacances Agadir'",
+    "currency": "Devise",
     "add_members": "Ajouter des membres",
     "search_placeholder": "Rechercher par nom d'utilisateur : 'user02718'",
     "searching": "Recherche...",
