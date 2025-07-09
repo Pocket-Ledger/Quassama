@@ -19,6 +19,7 @@ import ResetPasswordScreen from 'screens/Auth/ResetPasswordScreen';
 import EditGroupScreen from 'screens/Main/EditGroupScreen';
 import ExpenseDetailsScreen from 'screens/Main/ExpenseDetailsScreen';
 import EditExpenseScreen from 'screens/Main/EditExpenseScreen';
+import Onboarding from 'screens/Onboarding/Onboarding';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,7 @@ function AppNavigator() {
       ) : (
         // Authentication screens
         <>
+          <Stack.Screen name="Onboarding" component={Onboarding} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgetPasswordScreen} />
