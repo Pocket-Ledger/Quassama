@@ -1,48 +1,47 @@
-import { useNavigation } from '@react-navigation/core'
-import React from 'react'
-import { View, SafeAreaView, Text, TouchableOpacity, Image, StatusBar } from 'react-native'
+import { useNavigation } from '@react-navigation/core';
+import React from 'react';
+import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Onboarding = () => {
-    const navigation = useNavigation()
-    
-    // Function to navigate to a specified screen
-    const navigateTo = (screenName) => {
-        navigation.navigate(screenName)
-    }
-    
+  const navigation = useNavigation();
+
+  // Function to navigate to a specified screen
+  const navigateTo = (screenName) => {
+    navigation.navigate(screenName);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 px-6 justify-end items-center pb-16">
-
+      <View className="flex-1 items-center justify-end px-6 pb-16">
         {/* Title and Description */}
-        <View className="w-full mb-16">
-          <Text className="text-blue-500 text-4xl font-bold mb-3 text-left">
+        <View className="mb-16 w-full">
+          <Text className="mb-3 text-left font-dmsans-bold text-4xl text-blue-500">
             Easily Share & Track Expenses with Qassama
           </Text>
-          <Text className="text-gray-500 text-left text-base">
-            Qassama helps you and your roommates split bills, track purchases, and settle up — all in one place. Simple, smart, and in Darija-friendly style.
+          <Text className="text-left font-dmsans text-base text-gray-500 ">
+            Qassama helps you and your roommates split bills, track purchases, and settle up — all
+            in one place. Simple, smart, and in Darija-friendly style.
           </Text>
         </View>
 
         {/* Buttons */}
         <View className="w-full space-y-4">
           <TouchableOpacity
-            className="bg-blue-500 py-4 rounded-md items-center mb-2"
-            onPress={() => navigateTo('Register')}
-          >
-            <Text className="text-white font-semibold text-base">Create My Account</Text>
+            className="mb-2 items-center rounded-md bg-blue-500 py-4"
+            onPress={() => navigateTo('Register')}>
+            <Text className="font-dmsans-medium text-base text-white">Create My Account</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
-            className="border border-blue-500 py-4 rounded-md items-center"
-            onPress={() => navigateTo('Login')}
-          >
-            <Text className="text-blue-500 font-semibold text-base">Login</Text>
+            className="items-center rounded-md border border-blue-500 py-4"
+            onPress={() => navigateTo('Login')}>
+            <Text className="font-dmsans-medium text-base text-blue-500">Login</Text>
           </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Onboarding
+export default Onboarding;
