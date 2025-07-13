@@ -3,35 +3,45 @@
     "name": "quassama",
     "slug": "quassama",
     "version": "1.0.0",
-
+    "scheme": "quassama",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "web": {
       "favicon": "./assets/icon.png"
     },
-
     "experiments": {
       "tsconfigPaths": true
     },
-
-    "plugins": [],
-
+    "plugins": [
+      "expo-splash-screen"
+    ],
     "orientation": "portrait",
-    "icon": "./assets/ion.png",
-
+    "icon": "./assets/adaptive-icon.png",
     "userInterfaceStyle": "light",
-
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.quassama.app"
     },
     "android": {
+      "package": "com.quassama.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2a0ef4d1-7e1b-4fe3-a5f3-d4c6bda1c67a"
       }
     }
   }

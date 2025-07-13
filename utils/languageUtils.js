@@ -37,7 +37,8 @@ export const languageUtils = {
       return savedLanguage || i18n.language;
     } catch (error) {
       console.error('Failed to initialize language:', error);
-      return i18n.language;
+      // Return default language instead of throwing
+      return 'en';
     }
   },
 
