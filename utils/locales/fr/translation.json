@@ -578,5 +578,43 @@
       "wrong_password": "Mot de passe incorrect. Veuillez réessayer.",
       "general": "Une erreur s'est produite. Veuillez réessayer."
     }
+  },
+  "tour": {
+    "skip": "Passer le tour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "finish": "Terminer",
+    "welcome": {
+      "title": "Bienvenue sur Qassama !",
+      "description": "Faisons un tour rapide pour vous aider à commencer à gérer vos dépenses partagées."
+    },
+    "profile": {
+      "title": "Votre profil",
+      "description": "Appuyez ici pour voir et modifier vos informations de profil."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Restez informé des notifications de dépenses et des activités de groupe."
+    },
+    "balance": {
+      "title": "Aperçu du solde",
+      "description": "Voyez combien vous devez et combien les autres vous doivent en un coup d'œil."
+    },
+    "overview": {
+      "title": "Aperçu mensuel",
+      "description": "Suivez vos dépenses mensuelles avec des graphiques visuels et des résumés."
+    },
+    "recent_activity": {
+      "title": "Activité récente",
+      "description": "Consultez vos dernières transactions et activités de dépenses."
+    },
+    "see_all": {
+      "title": "Voir toutes les dépenses",
+      "description": "Appuyez ici pour voir toutes vos dépenses en détail."
+    },
+    "bottom_navigation": {
+      "title": "Navigation",
+      "description": "Utilisez les onglets du bas pour naviguer entre Accueil, Nouvelle dépense, Groupes et Profil."
+    }
   }
 }
