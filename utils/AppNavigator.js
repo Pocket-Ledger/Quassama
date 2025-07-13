@@ -20,6 +20,9 @@ import EditGroupScreen from 'screens/Main/EditGroupScreen';
 import ExpenseDetailsScreen from 'screens/Main/ExpenseDetailsScreen';
 import EditExpenseScreen from 'screens/Main/EditExpenseScreen';
 import Onboarding from 'screens/Onboarding/Onboarding';
+import splash1 from 'screens/Onboarding/splash1';
+import splash2 from 'screens/Onboarding/splash2';
+import splash3 from 'screens/Onboarding/splash3';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +53,9 @@ function AppNavigator() {
       ) : (
         // Authentication screens
         <>
+          <Stack.Screen name="Splash1" component={splash1} />
+          <Stack.Screen name="Splash2" component={splash2} />
+          <Stack.Screen name="Splash3" component={splash3} />
           <Stack.Screen name="Onboarding" component={Onboarding} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
