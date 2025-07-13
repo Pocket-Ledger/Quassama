@@ -235,16 +235,16 @@ const LoginScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View className="divider-container">
+          {/* <View className="divider-container">
             <View className="divider-line" />
-            <Text className="divider-text font-normal">{t('login.or_continue_with')}</Text>
+            <Text className="font-normal divider-text">{t('login.or_continue_with')}</Text>
             <View className="divider-line" />
           </View>
-          <View className="flex w-full flex-row gap-4">
+          <View className="flex flex-row w-full gap-4">
             <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Google')}>
               <Image
                 source={require('../../assets/google.png')}
-                className="h-5 w-5"
+                className="w-5 h-5"
                 resizeMode="contain"
               />
               <Text className="text-label">{t('login.google')}</Text>
@@ -254,7 +254,7 @@ const LoginScreen = () => {
               <Ionicons name="logo-apple" size={20} color="#000000" />
               <Text className="text-label">{t('login.apple')}</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
           {/* Sign Up Link - UNCOMMENTED */}
           <View className="signup-container">
             <Text className="signup-text font-normal">{t('login.no_account')}</Text>

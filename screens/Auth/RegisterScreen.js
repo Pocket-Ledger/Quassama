@@ -533,20 +533,19 @@ const RegisterScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <View className="divider-container">
+            {/* <View className="divider-container">
               <View className="divider-line" />
-              <Text className="divider-text font-normal">{t('register.or_use')}</Text>
+              <Text className="font-normal divider-text">{t('register.or_use')}</Text>
               <View className="divider-line" />
             </View>
 
-            {/* Social Login Buttons */}
-            <View className="flex w-full flex-row gap-4">
+            <View className="flex flex-row w-full gap-4">
               <TouchableOpacity
                 className="social-button"
                 onPress={() => handleSocialLogin('Google')}>
                 <Image
                   source={require('../../assets/google.png')}
-                  className="h-5 w-5"
+                  className="w-5 h-5"
                   resizeMode="contain"
                 />
                 <Text className="text-label">{t('register.google')}</Text>
@@ -558,7 +557,7 @@ const RegisterScreen = () => {
                 <Ionicons name="logo-apple" size={20} color="#000000" />
                 <Text className="text-label">{t('register.apple')}</Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
 
             {/* Login Link */}
             <View className="signup-container mt-6">
