@@ -216,11 +216,7 @@ const GroupDetailsScreen = () => {
   const handleSettleUp = async () => {
     // Check if user is group admin
     if (!isGroupCreator) {
-      showError(
-        t('common.error'), 
-        t('groupDetails.onlyAdminCanSettle'), 
-        hideAlert
-      );
+      showError(t('common.error'), t('groupDetails.onlyAdminCanSettle'), hideAlert);
       return;
     }
 
@@ -232,30 +228,29 @@ const GroupDetailsScreen = () => {
         setLoading(true);
         try {
           const result = await Expense.settleUpGroup(groupId);
-          
+
           if (result && result.success) {
             // Show success message with settlement details
-            const settlementsCount = result.settlementsCreated ? result.settlementsCreated.length : 0;
-            const message = settlementsCount > 0 
-              ? `${result.message}\nTotal balanced: ${t('common.currency')} ${result.totalSettled || 0}`
-              : result.message || 'Settlement completed successfully';
-              
-            showSuccess(
-              t('common.success'),
-              message,
-              () => {
-                hideAlert();
-                // Refresh the screen data
-                navigation.replace('GroupDetails', { groupId });
-              }
-            );
+            const settlementsCount = result.settlementsCreated
+              ? result.settlementsCreated.length
+              : 0;
+            const message =
+              settlementsCount > 0
+                ? `${result.message}\nTotal balanced: ${t('common.currency')} ${result.totalSettled || 0}`
+                : result.message || 'Settlement completed successfully';
+
+            showSuccess(t('common.success'), message, () => {
+              hideAlert();
+              // Refresh the screen data
+              navigation.replace('GroupDetails', { groupId });
+            });
           } else {
             showError(t('common.error'), 'Settlement failed - invalid response', hideAlert);
           }
         } catch (error) {
           console.error('Error settling up:', error);
           let errorMessage = t('groupDetails.settleUpError');
-          
+
           if (error.message === 'Only group admin can settle up expenses') {
             errorMessage = t('groupDetails.onlyAdminCanSettle');
           } else if (error.message === 'No expenses found to settle') {
@@ -265,7 +260,7 @@ const GroupDetailsScreen = () => {
           } else if (error.message) {
             errorMessage = error.message;
           }
-          
+
           showError(t('common.error'), errorMessage, hideAlert);
         } finally {
           setLoading(false);
@@ -309,7 +304,7 @@ const GroupDetailsScreen = () => {
                       onPress={handleEditGroup}
                       className="flex-row items-center border-b border-gray-100 px-4 py-3">
                       <Feather name="settings" size={18} color="#374151" />
-                      <Text className="ml-3 text-base text-gray-700">
+                      <Text className="ml-3 font-dmsans-medium text-base text-gray-700">
                         {t('groupDetails.editGroup')}
                       </Text>
                     </TouchableOpacity>
@@ -317,7 +312,7 @@ const GroupDetailsScreen = () => {
                       onPress={handleDeletePress}
                       className="flex-row items-center px-4 py-3">
                       <Feather name="trash-2" size={18} color="#EF4444" />
-                      <Text className="ml-3 text-base text-red-500">
+                      <Text className="ml-3 font-dmsans-medium text-base text-red-500">
                         {t('groupDetails.deleteGroup')}
                       </Text>
                     </TouchableOpacity>
@@ -343,45 +338,50 @@ const GroupDetailsScreen = () => {
           contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Group Summary Card */}
           <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-            <Text className="text-center text-base text-black/75">
+            <Text className="text-center font-dmsans-medium text-base text-black/75">
               {t('groupDetails.totalGroupExpenses')}
             </Text>
-            <Text className="text-center text-2xl font-medium text-black">
+            <Text className="text-center font-dmsans-medium text-2xl text-black">
               {t('common.currency')} {TotalExpenses}
             </Text>
 
-            <View className="mt-6 flex-row justify-between">
+            <View className="mt-6 flex-row justify-between ">
               <View className="flex-1">
-                <Text className="text-sm text-black/75">{t('groupDetails.youPaid')}</Text>
-                <Text className="text-xl text-black">
-                  {t('common.currency')} {youPaid}
+                <Text className="font-dmsans-medium text-sm text-black/75">
+                  {t('groupDetails.youPaid')}
+                </Text>
+                <Text className="font-dmsans-medium text-lg text-black">
+                  {youPaid} {t('common.currency')}
                 </Text>
               </View>
               <View className="flex-1 items-end">
-                <Text className="text-sm text-black/75">{t('groupDetails.youOwe')}</Text>
-                <Text className="text-xl text-red-500">
-                  -{t('common.currency')} {youOwe}
+                <Text className="font-dmsans-medium text-sm text-black/75">
+                  {t('groupDetails.youOwe')}
+                </Text>
+                <Text className="font-dmsans-medium text-lg text-red-500">
+                  -{youOwe} {t('common.currency')}
                 </Text>
               </View>
             </View>
           </View>
 
           {/* Settle Up Button - Only show for group admin and when there are imbalances */}
-          {isGroupCreator && TotalExpenses > 0 && Object.values(balanceByAllUsers).some(balance => Math.abs(balance) > 0.01) && (
-            <TouchableOpacity 
-              className="mb-6 rounded-lg bg-primary py-4" 
-              onPress={handleSettleUp}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text className="text-center text-base font-semibold text-white">
-                  {t('groupDetails.settleUp')}
-                </Text>
-              )}
-            </TouchableOpacity>
-          )}
+          {isGroupCreator &&
+            TotalExpenses > 0 &&
+            Object.values(balanceByAllUsers).some((balance) => Math.abs(balance) > 0.01) && (
+              <TouchableOpacity
+                className="mb-6 rounded-lg bg-primary py-4"
+                onPress={handleSettleUp}
+                disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text className="text-center text-base font-semibold text-white">
+                    {t('groupDetails.settleUp')}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            )}
 
           {/* Members List with Horizontal Scroll */}
           <View className="mb-6">
