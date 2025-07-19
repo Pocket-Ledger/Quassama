@@ -32,21 +32,6 @@ const HomeScreen = () => {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   console.log('User', user);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      setIsLoadingUser(true);
-      try {
-        const userDetails = await User.getUserDetails();
-        setUser(userDetails);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoadingUser(false);
-      }
-    };
-    fetchUser();
-  }, []);
-
   const [RecentlyActivity, setRecentlyActivity] = useState([]);
   const [transformedRecentActivity, setTransformedRecentActivity] = useState([]);
   const [oweYou, setOweYou] = useState(0);
@@ -71,10 +56,26 @@ const HomeScreen = () => {
   // State for pull-to-refresh
   const [refreshing, setRefreshing] = useState(false);
   const [refreshingGroups, setRefreshingGroups] = useState(false);
+  const [isLoadingActivity, setIsLoadingActivity] = useState(true);
+  const [isLoadingGroupMembers, setIsLoadingGroupMembers] = useState(true);
 
   // State for unread notifications count
   const [unreadCount, setUnreadCount] = useState(0);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoadingUser(true);
+      try {
+        const userDetails = await User.getUserDetails();
+        setUser(userDetails);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+    fetchUser();
+  }, []);
   // Function to fetch expense overview
   const fetchExpenseOverview = useCallback(async () => {
     setIsLoadingOverview(true);
@@ -120,6 +121,8 @@ const HomeScreen = () => {
 
   // Function to fetch recent activity for selected group
   const fetchRecentlyActivity = useCallback(async () => {
+    setIsLoadingActivity(true);
+
     try {
       if (selectedGroup) {
         // Fetch recent activity for the selected group (limit to 3)
@@ -144,6 +147,8 @@ const HomeScreen = () => {
       }
     } catch (error) {
       console.error('Error fetching recent activity:', error);
+    } finally {
+      setIsLoadingActivity(false);
     }
   }, [selectedGroup]);
 
@@ -208,6 +213,7 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchUserAndGroups = async () => {
       setIsLoadingUser(true);
+      setIsLoadingGroupMembers(true);
       try {
         const userId = auth.currentUser.uid;
         // Use the new model method to fetch user and groups
@@ -246,6 +252,7 @@ const HomeScreen = () => {
         console.error(error);
       } finally {
         setIsLoadingUser(false);
+        setIsLoadingGroupMembers(false);
       }
     };
     fetchUserAndGroups();
@@ -253,6 +260,8 @@ const HomeScreen = () => {
 
   // When user switches group, store it in AsyncStorage
   const handleGroupSelection = async (groupId, groupName) => {
+    setIsLoadingGroupMembers(true);
+
     try {
       setSelectedGroup(groupId);
       setGroupName(groupName);
@@ -283,6 +292,8 @@ const HomeScreen = () => {
       console.log('Group Recent Activity:', recentActivity);
     } catch (error) {
       console.error('Error fetching group data:', error);
+    } finally {
+      setIsLoadingGroupMembers(false);
     }
   };
 
@@ -487,7 +498,21 @@ const HomeScreen = () => {
           </View>
 
           <View>
-            {transformedRecentActivity.length === 0 ? (
+            {isLoadingActivity ? (
+              [...Array(3)].map((_, index) => (
+                <View key={index} className="mb-4 flex-row items-center rounded-lg bg-gray-50 p-4">
+                  <View className="mr-4 h-12 w-12 rounded-full bg-gray-200" />
+                  <View className="flex-1">
+                    <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
+                    <View className="h-3 w-24 rounded bg-gray-200" />
+                  </View>
+                  <View className="items-end">
+                    <View className="mb-2 h-4 w-16 rounded bg-gray-200" />
+                    <View className="h-3 w-12 rounded bg-gray-200" />
+                  </View>
+                </View>
+              ))
+            ) : transformedRecentActivity.length === 0 ? (
               <View className="items-center py-8">
                 <Feather name="activity" size={48} color="#ccc" />
                 <Text className="mt-2 text-gray-500">{t('home.noRecentActivity')}</Text>
@@ -535,7 +560,20 @@ const HomeScreen = () => {
             refreshing={refreshingGroups}
           />
 
-          {friends?.length === 0 ? (
+          {isLoadingGroupMembers ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 4 }}
+              className="flex-row">
+              {[...Array(4)].map((_, index) => (
+                <View key={index} className="mr-4 items-center">
+                  <View className="mb-2 h-16 w-16 rounded-full bg-gray-200" />
+                  <View className="h-3 w-12 rounded bg-gray-200" />
+                </View>
+              ))}
+            </ScrollView>
+          ) : friends?.length === 0 ? (
             <View className="w-full items-center gap-4 space-y-4">
               <Feather name="users" size={48} color="#ccc" />
               <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
