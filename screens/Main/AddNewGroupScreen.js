@@ -106,6 +106,8 @@ const AddNewGroupScreen = () => {
     const newErrors = {};
     if (!groupName.trim()) {
       newErrors.groupName = t('addGroup.errors.group_name_required');
+    } else if (groupName.length > 50) {
+      newErrors.groupName = t('addGroup.errors.maxLength');
     }
     /*     if (selectedMembers.length === 0) {
       newErrors.members = t('addGroup.errors.members_required');
@@ -220,9 +222,15 @@ const AddNewGroupScreen = () => {
         <View className="flex-1 gap-6">
           {/* Group Name */}
           <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
-              {t('addGroup.group_name')}
-            </Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="input-label text-base font-medium text-black">
+                {t('addGroup.group_name')}
+              </Text>
+              <Text
+                className={`text-sm ${groupName.length > 50 ? 'text-red-500' : 'text-gray-500'}`}>
+                {groupName.length}/50
+              </Text>
+            </View>
             <View className="input-container">
               <TextInput
                 className={`input-field rounded-lg border px-4  text-black ${
@@ -238,6 +246,7 @@ const AddNewGroupScreen = () => {
                   }
                 }}
                 autoCapitalize="words"
+                maxLength={50}
               />
             </View>
             {errors.groupName && (
@@ -252,26 +261,27 @@ const AddNewGroupScreen = () => {
             </Text>
             <View className="input-container">
               <TouchableOpacity
-                className="input-field rounded-lg border border-gray-200 px-4 py-3 flex-row items-center justify-between"
+                className="input-field flex-row items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
                 onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
                 <View className="flex-row items-center">
-                  <Text className="text-base text-black mr-2">
-                    {currencyOptions.find(c => c.code === selectedCurrency)?.symbol}
+                  <Text className="mr-2 text-base text-black">
+                    {currencyOptions.find((c) => c.code === selectedCurrency)?.symbol}
                   </Text>
                   <Text className="text-base text-black">
-                    {selectedCurrency} - {currencyOptions.find(c => c.code === selectedCurrency)?.name}
+                    {selectedCurrency} -{' '}
+                    {currencyOptions.find((c) => c.code === selectedCurrency)?.name}
                   </Text>
                 </View>
-                <Feather 
-                  name={showCurrencyDropdown ? "chevron-up" : "chevron-down"} 
-                  size={20} 
-                  color="rgba(0, 0, 0, 0.4)" 
+                <Feather
+                  name={showCurrencyDropdown ? 'chevron-up' : 'chevron-down'}
+                  size={20}
+                  color="rgba(0, 0, 0, 0.4)"
                 />
               </TouchableOpacity>
-              
+
               {/* Currency Options Dropdown */}
               {showCurrencyDropdown && (
-                <View className="mt-2 rounded-lg border border-gray-100 bg-gray-50 max-h-52">
+                <View className="mt-2 max-h-52 rounded-lg border border-gray-100 bg-gray-50">
                   <ScrollView showsVerticalScrollIndicator={false}>
                     {currencyOptions.map((currency, index) => (
                       <TouchableOpacity
@@ -283,16 +293,12 @@ const AddNewGroupScreen = () => {
                           setSelectedCurrency(currency.code);
                           setShowCurrencyDropdown(false);
                         }}>
-                        <Text className="text-base font-medium text-black mr-3">
+                        <Text className="mr-3 text-base font-medium text-black">
                           {currency.symbol}
                         </Text>
                         <View className="flex-1">
-                          <Text className="text-base font-medium text-black">
-                            {currency.code}
-                          </Text>
-                          <Text className="text-sm text-gray-500">
-                            {currency.name}
-                          </Text>
+                          <Text className="text-base font-medium text-black">{currency.code}</Text>
+                          <Text className="text-sm text-gray-500">{currency.name}</Text>
                         </View>
                         {selectedCurrency === currency.code && (
                           <View className="h-6 w-6 items-center justify-center rounded-full bg-primary">

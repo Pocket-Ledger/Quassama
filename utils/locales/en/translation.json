@@ -104,7 +104,8 @@
     "search_error_message": "Failed to search for users. Please try again.",
     "errors": {
       "group_name_required": "Group name is required",
-      "members_required": "Please add at least one member"
+      "members_required": "Please add at least one member",
+      "maxLength": "Group name cannot exceed 50 characters"
     }
   },
   "customAlert": {
@@ -244,7 +245,8 @@
       "amountRequired": "Amount is required",
       "validAmount": "Please enter a valid amount greater than 0",
       "selectCategory": "Please select a category",
-      "selectGroup": "Please select a group"
+      "selectGroup": "Please select a group",
+      "maxCharacter": "Amount cannot exceed 100,000"
     },
     "title": "All Expenses",
     "loading": "Loading expenses...",
@@ -603,7 +605,7 @@
       "description": "See how much you owe and how much others owe you at a glance."
     },
     "overview": {
-      "title": "Monthly Overview", 
+      "title": "Monthly Overview",
       "description": "Track your monthly expenses with visual charts and summaries."
     },
     "recent_activity": {

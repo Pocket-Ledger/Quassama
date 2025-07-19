@@ -102,7 +102,8 @@
     "search_error_message": "فشل البحث عن المستخدمين. حاول مرة أخرى.",
     "errors": {
       "group_name_required": "اسم المجموعة مطلوب",
-      "members_required": "يرجى إضافة عضو واحد على الأقل"
+      "members_required": "يرجى إضافة عضو واحد على الأقل",
+      "maxLength": "اسم المجموعة لا يمكن أن يتجاوز 50 حرفاً"
     }
   },
   "customAlert": {
@@ -241,7 +242,8 @@
       "amountRequired": "المبلغ مطلوب",
       "validAmount": "يرجى إدخال مبلغ صحيح أكبر من 0",
       "selectCategory": "يرجى اختيار فئة",
-      "selectGroup": "يرجى اختيار مجموعة"
+      "selectGroup": "يرجى اختيار مجموعة",
+      "maxCharacter": "المبلغ لا يمكن أن يتجاوز 100,000"
     },
     "title": "جميع المصروفات",
     "loading": "جاري تحميل المصروفات...",

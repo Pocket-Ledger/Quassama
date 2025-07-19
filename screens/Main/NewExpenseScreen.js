@@ -114,7 +114,7 @@ const NewExpenseScreen = () => {
     if (!amount.trim()) newErrors.amount = t('expense.validation.amountRequired');
     else if (isNaN(amount) || parseFloat(amount) <= 0)
       newErrors.amount = t('expense.validation.validAmount');
-
+    else if (parseFloat(amount) > 100000) newErrors.amount = t('expense.validation.maxCharacter');
     if (!selectedCategory) newErrors.category = t('expense.validation.selectCategory');
     if (!selectedGroup) newErrors.group = t('expense.validation.selectGroup');
 

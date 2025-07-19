@@ -103,7 +103,8 @@
     "search_error_message": "Échec de la recherche d'utilisateurs. Veuillez réessayer.",
     "errors": {
       "group_name_required": "Le nom du groupe est obligatoire",
-      "members_required": "Veuillez ajouter au moins un membre"
+      "members_required": "Veuillez ajouter au moins un membre",
+      "maxLength": "Le nom du groupe ne peut pas dépasser 50 caractères"
     }
   },
   "customAlert": {
@@ -241,7 +242,8 @@
       "amountRequired": "Le montant est requis",
       "validAmount": "Veuillez saisir un montant valide supérieur à 0",
       "selectCategory": "Veuillez sélectionner une catégorie",
-      "selectGroup": "Veuillez sélectionner un groupe"
+      "selectGroup": "Veuillez sélectionner un groupe",
+      "maxCharacter": "Le montant ne peut pas dépasser 100 000"
     },
     "title": "Toutes les dépenses",
     "loading": "Chargement des dépenses...",
