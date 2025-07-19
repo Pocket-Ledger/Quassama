@@ -2,7 +2,7 @@
   "expo": {
     "name": "quassama",
     "slug": "quassama",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "scheme": "quassama",
     "platforms": [
       "ios",
@@ -34,6 +34,7 @@
     },
     "android": {
       "package": "com.quassama.app",
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/Icon/icon.png",
         "backgroundColor": "#ffffff"
