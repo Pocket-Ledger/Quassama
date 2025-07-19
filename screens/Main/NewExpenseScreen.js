@@ -6,10 +6,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   Modal,
   FlatList,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
@@ -196,7 +196,7 @@ const NewExpenseScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white ">
       <KeyboardAwareScrollView
         className="container"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}

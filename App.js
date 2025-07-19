@@ -16,8 +16,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { languageUtils } from 'utils/languageUtils';
-import { View, Text } from 'react-native';
+import { View, Text, I18nManager } from 'react-native';
 import ErrorBoundary from 'components/ErrorBoundary';
+import { StatusBar } from 'expo-status-bar';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -25,7 +26,7 @@ SplashScreen.preventAutoHideAsync();
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [error, setError] = useState(null);
-  
+
   let [fontsLoaded] = useFonts({
     'DM Sans': DMSans_400Regular,
     'DM Sans Medium': DMSans_500Medium,
@@ -33,12 +34,15 @@ export default function App() {
     'DM Sans SemiBold': DMSans_600SemiBold,
   });
 
+  I18nManager.allowRTL(false);
+  I18nManager.forceRTL(false);
+
   useEffect(() => {
     async function prepare() {
       try {
         // Initialize language
         await languageUtils.initializeLanguage();
-        
+
         // Wait for fonts to load
         if (fontsLoaded) {
           setAppIsReady(true);
@@ -74,6 +78,8 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+      <StatusBar barStyle="dark" backgroundColor="white" translucent={false} />
+
       <SafeAreaProvider>
         <AuthProvider>
           <GestureHandlerRootView style={{ flex: 1 }}>
