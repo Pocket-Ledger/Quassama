@@ -39,7 +39,7 @@ const Avatar = ({
         </Text>
       </View>
       {showName && name && (
-        <Text className="text-center text-sm text-black/50" style={nameStyle}>
+        <Text className="text-center font-dmsans-medium text-sm text-black/50" style={nameStyle}>
           {name}
         </Text>
       )}

@@ -461,13 +461,15 @@ const HomeScreen = () => {
           {!isLoadingOverview && overviewData.totalAmount > 0 && (
             <View className="mt-4 border-t border-gray-100 pt-4">
               <View className="flex-row justify-between">
-                <Text className="text-gray-500">{t('home.totalExpenses')}</Text>
+                <Text className="font-dmsans-medium text-gray-500">{t('home.totalExpenses')}</Text>
                 <Text className="font-dmsans-bold text-black">
                   {overviewData.totalAmount.toFixed(2)} {getCurrency()}
                 </Text>
               </View>
               <View className="mt-1 flex-row justify-between">
-                <Text className="text-gray-500">{t('home.totalTransactions')}</Text>
+                <Text className="font-dmsans-medium text-gray-500">
+                  {t('home.totalTransactions')}
+                </Text>
                 <Text className="text-black">{overviewData.expenseCount}</Text>
               </View>
             </View>
@@ -509,7 +511,7 @@ const HomeScreen = () => {
           <View className="mb-4 flex-row items-start justify-between">
             <View>
               <Text className="text-lg font-medium text-black ">{capitalizeFirst(groupName)}</Text>
-              <Text className="text-xs font-light text-black">{t('group.groupMembers')}</Text>
+              <Text className="font-dmsans text-xs text-black">{t('group.groupMembers')}</Text>
             </View>
             <TouchableOpacity onPress={openGroupModal}>
               <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
