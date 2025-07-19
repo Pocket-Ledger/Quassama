@@ -1195,6 +1195,464 @@ class Expense {
   }
 
   /**
+   * Create a recurring expense that repeats monthly
+   * @param {Object} expenseData - The base expense data {title, amount, category, description, group_id}
+   * @param {Date} startDate - The date when the recurring expense should start
+   * @param {number} monthsToCreate - Number of months to create recurring expenses for (default: 12)
+   * @returns {Promise<Array<string>>} - Array of created expense IDs
+   */
+  static async createRecurringExpense(expenseData, startDate, monthsToCreate = 12) {
+    if (!expenseData || typeof expenseData !== 'object') {
+      throw new Error('Expense data is required');
+    }
+
+    if (!startDate || !(startDate instanceof Date)) {
+      throw new Error('Start date must be a valid Date object');
+    }
+
+    if (!monthsToCreate || typeof monthsToCreate !== 'number' || monthsToCreate <= 0) {
+      throw new Error('monthsToCreate must be a positive number');
+    }
+
+    // Validate required expense fields
+    if (!expenseData.title || !expenseData.amount || !expenseData.category) {
+      throw new Error('Expense data must include title, amount, and category');
+    }
+
+    if (expenseData.title.length > 100) {
+      throw new Error('Title cannot exceed 100 characters');
+    }
+
+    if (expenseData.description && expenseData.description.length > 3000) {
+      throw new Error('Description cannot exceed 3000 characters');
+    }
+
+    if (isNaN(expenseData.amount) || parseFloat(expenseData.amount) <= 0) {
+      throw new Error('Amount must be a positive number');
+    }
+
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    try {
+      const createdExpenseIds = [];
+      const baseExpenseData = {
+        user_id: currentUser.uid,
+        title: expenseData.title,
+        amount: parseFloat(expenseData.amount),
+        category: expenseData.category,
+        description: expenseData.description || '',
+        group_id: expenseData.group_id || null,
+        settlement: false,
+        is_recurring: true,
+        recurring_type: 'monthly',
+      };
+
+      // Get creator name for notifications
+      const creatorName = await User.getUsernameById(currentUser.uid).catch(() => 'Someone');
+
+      // Create expenses for each month
+      for (let i = 0; i < monthsToCreate; i++) {
+        // Calculate the date for this recurring expense
+        const recurringDate = new Date(startDate);
+        recurringDate.setMonth(recurringDate.getMonth() + i);
+        
+        // Set the day to the same day as the start date, handling month-end edge cases
+        const startDay = startDate.getDate();
+        const daysInRecurringMonth = new Date(recurringDate.getFullYear(), recurringDate.getMonth() + 1, 0).getDate();
+        recurringDate.setDate(Math.min(startDay, daysInRecurringMonth));
+
+        const expenseForMonth = {
+          ...baseExpenseData,
+          incurred_at: Timestamp.fromDate(recurringDate),
+          recurring_sequence: i + 1,
+          recurring_start_date: Timestamp.fromDate(startDate),
+          recurring_month: recurringDate.getMonth() + 1,
+          recurring_year: recurringDate.getFullYear(),
+        };
+
+        // Save to Firestore
+        const expensesCollection = collection(db, 'expenses');
+        const docRef = await addDoc(expensesCollection, expenseForMonth);
+        createdExpenseIds.push(docRef.id);
+
+        // Create self notification for the first expense only
+        if (i === 0) {
+          const selfNotification = new Notification(
+            currentUser.uid,
+            currentUser.uid,
+            'recurring_expense_created',
+            `You have created a recurring expense: ${expenseData.title} of amount ${expenseData.amount} for ${monthsToCreate} months`
+          );
+          selfNotification.groupId = expenseData.group_id;
+          selfNotification.expenseId = docRef.id;
+          await selfNotification.save();
+        }
+
+        // Send group notifications only for the first expense
+        if (i === 0 && expenseData.group_id) {
+          try {
+            const group = await Group.getGroupById(expenseData.group_id);
+            const members = group.members || [];
+            await Promise.all(
+              members.map(async (m) => {
+                if (m && m.id && m.id !== currentUser.uid) {
+                  const notif = new Notification(
+                    currentUser.uid,
+                    m.id,
+                    'group_recurring_expense',
+                    `${creatorName} added a recurring expense "${expenseData.title}" of ${expenseData.amount} for ${monthsToCreate} months`
+                  );
+                  notif.groupId = expenseData.group_id;
+                  notif.expenseId = docRef.id;
+                  await notif.save();
+                }
+              })
+            );
+          } catch (err) {
+            console.error('Error sending group recurring expense notifications:', err);
+          }
+        }
+      }
+
+      console.log(`Created ${createdExpenseIds.length} recurring expenses starting from ${startDate.toDateString()}`);
+      return {
+        success: true,
+        createdExpenseIds,
+        totalExpensesCreated: createdExpenseIds.length,
+        startDate: startDate.toDateString(),
+        monthsCreated: monthsToCreate,
+        totalAmount: parseFloat(expenseData.amount) * monthsToCreate,
+      };
+    } catch (error) {
+      console.error('Error creating recurring expense:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all recurring expenses for a user or group
+   * @param {string} groupId - Optional group ID to filter by
+   * @returns {Promise<Object>} - Object containing recurring expense groups
+   */
+  static async getRecurringExpenses(groupId = null) {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    try {
+      const expensesCollection = collection(db, 'expenses');
+      let q;
+
+      if (groupId) {
+        q = query(
+          expensesCollection,
+          where('group_id', '==', groupId),
+          where('is_recurring', '==', true),
+          orderBy('recurring_start_date', 'desc')
+        );
+      } else {
+        q = query(
+          expensesCollection,
+          where('user_id', '==', currentUser.uid),
+          where('is_recurring', '==', true),
+          orderBy('recurring_start_date', 'desc')
+        );
+      }
+
+      const snapshot = await getDocs(q);
+      const recurringExpenses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        amount: doc.data().amount ? parseFloat(doc.data().amount.toFixed(2)) : 0,
+      }));
+
+      // Group recurring expenses by their recurring_start_date and title
+      const recurringGroups = {};
+      recurringExpenses.forEach((expense) => {
+        const key = `${expense.title}_${expense.recurring_start_date?.toDate?.()?.getTime() || 'unknown'}`;
+        if (!recurringGroups[key]) {
+          recurringGroups[key] = {
+            title: expense.title,
+            amount: expense.amount,
+            category: expense.category,
+            description: expense.description,
+            group_id: expense.group_id,
+            recurring_start_date: expense.recurring_start_date,
+            recurring_type: expense.recurring_type,
+            expenses: [],
+            totalAmount: 0,
+            totalCount: 0,
+          };
+        }
+        recurringGroups[key].expenses.push(expense);
+        recurringGroups[key].totalAmount += expense.amount;
+        recurringGroups[key].totalCount += 1;
+      });
+
+      // Convert to array and sort by start date
+      const recurringGroupsArray = Object.values(recurringGroups).sort((a, b) => {
+        const dateA = a.recurring_start_date?.toDate?.() || new Date(0);
+        const dateB = b.recurring_start_date?.toDate?.() || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+
+      return {
+        recurringGroups: recurringGroupsArray,
+        totalGroups: recurringGroupsArray.length,
+        totalExpenses: recurringExpenses.length,
+      };
+    } catch (error) {
+      console.error('Error fetching recurring expenses:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete all recurring expenses in a series
+   * @param {string} title - The title of the recurring expense
+   * @param {Date} startDate - The start date of the recurring series
+   * @returns {Promise<Object>} - Deletion summary
+   */
+  static async deleteRecurringExpenseSeries(title, startDate) {
+    if (!title || typeof title !== 'string') {
+      throw new Error('A valid title is required');
+    }
+
+    if (!startDate || !(startDate instanceof Date)) {
+      throw new Error('A valid start date is required');
+    }
+
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+
+    try {
+      const expensesCollection = collection(db, 'expenses');
+      const q = query(
+        expensesCollection,
+        where('user_id', '==', currentUser.uid),
+        where('title', '==', title),
+        where('is_recurring', '==', true),
+        where('recurring_start_date', '==', Timestamp.fromDate(startDate))
+      );
+
+      const snapshot = await getDocs(q);
+      const expensesToDelete = snapshot.docs;
+
+      if (expensesToDelete.length === 0) {
+        throw new Error('No recurring expenses found with the specified criteria');
+      }
+
+      // Delete all expenses in the series
+      const deletePromises = expensesToDelete.map((doc) => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+
+      console.log(`Deleted ${expensesToDelete.length} recurring expenses for "${title}"`);
+      
+      return {
+        success: true,
+        deletedCount: expensesToDelete.length,
+        title,
+        startDate: startDate.toDateString(),
+      };
+    } catch (error) {
+      console.error('Error deleting recurring expense series:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get expense details by category for a specific month/year
+   * @param {string} groupId - Group ID (optional, if null gets user's personal expenses)
+   * @param {number} month - Month (1-12)
+   * @param {number} year - Year
+   * @returns {Promise<Object>} - Object containing category breakdown and total
+   */
+  static async getExpenseDetailsByCategory(groupId = null, month = null, year = null) {
+    try {
+      const auth = getAuth(app);
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
+      }
+
+      // If no month/year provided, use current month/year
+      const now = new Date();
+      const targetMonth = month || now.getMonth() + 1; // getMonth() returns 0-11
+      const targetYear = year || now.getFullYear();
+
+      // Create start and end dates for the month
+      const startOfMonth = new Date(targetYear, targetMonth - 1, 1);
+      const endOfMonth = new Date(targetYear, targetMonth, 0, 23, 59, 59);
+
+      const expensesCollection = collection(db, 'expenses');
+      let q;
+
+      if (groupId) {
+        // Get expenses for specific group
+        q = query(
+          expensesCollection,
+          where('group_id', '==', groupId),
+          where('incurred_at', '>=', Timestamp.fromDate(startOfMonth)),
+          where('incurred_at', '<=', Timestamp.fromDate(endOfMonth))
+        );
+      } else {
+        // Get user's personal expenses
+        q = query(
+          expensesCollection,
+          where('user_id', '==', currentUser.uid),
+          where('incurred_at', '>=', Timestamp.fromDate(startOfMonth)),
+          where('incurred_at', '<=', Timestamp.fromDate(endOfMonth))
+        );
+      }
+
+      const snapshot = await getDocs(q);
+      const expenses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Create category mapping for easy lookup
+      const categoryMap = {};
+      DEFAULT_CATEGORIES.forEach((cat) => {
+        categoryMap[cat.id] = cat;
+        categoryMap[cat.name] = cat;
+      });
+
+      // Calculate totals by category
+      const categoryTotals = {};
+      let totalAmount = 0;
+
+      expenses.forEach((expense) => {
+        let categoryKey = expense.category || 'Other';
+        const amount = expense.amount || 0;
+
+        // If category is an ID (number), get the name
+        const categoryInfo = categoryMap[categoryKey];
+        if (categoryInfo) {
+          categoryKey = categoryInfo.name;
+        }
+
+        if (!categoryTotals[categoryKey]) {
+          categoryTotals[categoryKey] = 0;
+        }
+        categoryTotals[categoryKey] += amount;
+        totalAmount += amount;
+      });
+
+      // Convert to array with percentages and sort by amount (descending)
+      const categoryData = Object.keys(categoryTotals)
+        .map((categoryName) => {
+          // Find the category info from DEFAULT_CATEGORIES
+          const categoryInfo = DEFAULT_CATEGORIES.find((cat) => cat.name === categoryName) || {
+            name: categoryName,
+            color: '#9CA3AF',
+          }; // fallback color
+
+          return {
+            category: categoryName,
+            amount: categoryTotals[categoryName],
+            percentage:
+              totalAmount > 0 ? Math.round((categoryTotals[categoryName] / totalAmount) * 100) : 0,
+            color: categoryInfo.color,
+          };
+        })
+        .sort((a, b) => b.amount - a.amount);
+
+      const categoryDataWithColors = categoryData;
+
+      return {
+        categoryData: categoryDataWithColors,
+        totalAmount,
+        month: targetMonth,
+        year: targetYear,
+        monthName: new Date(targetYear, targetMonth - 1).toLocaleDateString('en-US', {
+          month: 'long',
+        }),
+        expenseCount: expenses.length,
+      };
+    } catch (error) {
+      console.error('Error getting expense details by category:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get detailed expense report for a specific month/year
+   * @param {string} groupId - Group ID (optional, if null gets user's personal expenses)
+   * @param {number} month - Month (1-12)
+   * @param {number} year - Year
+   * @returns {Promise<Object>} - Object containing detailed expense report
+   */
+  static async getExpenseReport(groupId = null, month = null, year = null) {
+    try {
+      const auth = getAuth(app);
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
+      }
+
+      // If no month/year provided, use current month/year
+      const now = new Date();
+      const targetMonth = month || now.getMonth() + 1; // getMonth() returns 0-11
+      const targetYear = year || now.getFullYear();
+
+      // Create start and end dates for the month
+      const startOfMonth = new Date(targetYear, targetMonth - 1, 1);
+      const endOfMonth = new Date(targetYear, targetMonth, 0, 23, 59, 59);
+
+      const expensesCollection = collection(db, 'expenses');
+      let q;
+
+      if (groupId) {
+        // Get expenses for specific group
+        q = query(
+          expensesCollection,
+          where('group_id', '==', groupId),
+          where('incurred_at', '>=', Timestamp.fromDate(startOfMonth)),
+          where('incurred_at', '<=', Timestamp.fromDate(endOfMonth))
+        );
+      } else {
+        // Get user's personal expenses
+        q = query(
+          expensesCollection,
+          where('user_id', '==', currentUser.uid),
+          where('incurred_at', '>=', Timestamp.fromDate(startOfMonth)),
+          where('incurred_at', '<=', Timestamp.fromDate(endOfMonth))
+        );
+      }
+
+      const snapshot = await getDocs(q);
+      const expenses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      return {
+        success: true,
+        data: expenses,
+        totalExpenses: expenses.length,
+        totalAmount: expenses.reduce((sum, e) => sum + (e.amount || 0), 0),
+      };
+    } catch (error) {
+      console.error('Error generating expense report:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Function to get expense details by id
    * @param {string} expenseId - The expense ID
    * @returns {Promise<Object>} - Expense details object
@@ -1259,6 +1717,7 @@ class Expense {
       throw new Error(`Failed to delete expense: ${error.message}`);
     }
   }
+
 }
 
 export default Expense;
