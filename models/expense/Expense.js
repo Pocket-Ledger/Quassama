@@ -415,15 +415,96 @@ class Expense {
     return parseFloat(total.toFixed(2));
   }
 
-  // a function the return if the member is + or - in the group
-  // by dividing the total amount of expenses by the number of members in the group and then subtracting the total amount of expenses by the current user
-  static async getBalanceByUserAndGroup(groupId) {
+  // Helper method to get total expenses by group in date range
+  static async getTotalExpensesByGroupInRange(groupId, startDate, endDate) {
     if (!groupId || typeof groupId !== 'string') {
       throw new Error('A valid groupId (string) is required');
     }
 
-    const totalExpenses = await this.getTotalExpensesByGroup(groupId);
-    const totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+    const expensesCol = collection(db, 'expenses');
+    const q = query(
+      expensesCol,
+      where('group_id', '==', groupId),
+      where('incurred_at', '>=', Timestamp.fromDate(startDate)),
+      where('incurred_at', '<=', Timestamp.fromDate(endDate))
+    );
+
+    const snapshot = await getDocs(q);
+    const expenses = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      amount: doc.data().amount ? parseFloat(doc.data().amount.toFixed(2)) : 0,
+    }));
+
+    const total = expenses.reduce((total, expense) => {
+      if (!expense.is_settlement) {
+        return total + expense.amount;
+      }
+      return total;
+    }, 0);
+    
+    return parseFloat(total.toFixed(2));
+  }
+
+  // Helper method to get total expenses per user by group in date range
+  static async getTotalExpensesPerUserByGroupInRange(groupId, startDate, endDate) {
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+
+    const expensesCol = collection(db, 'expenses');
+    const q = query(
+      expensesCol,
+      where('group_id', '==', groupId),
+      where('incurred_at', '>=', Timestamp.fromDate(startDate)),
+      where('incurred_at', '<=', Timestamp.fromDate(endDate))
+    );
+
+    const snapshot = await getDocs(q);
+    const expenses = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      amount: doc.data().amount ? parseFloat(doc.data().amount.toFixed(2)) : 0,
+    }));
+
+    return expenses.reduce((totals, expense) => {
+      const { user_id, amount, is_settlement, settlement_type } = expense;
+      
+      if (!totals[user_id]) totals[user_id] = 0;
+      
+      if (is_settlement) {
+        if (settlement_type === 'payment') {
+          totals[user_id] += amount;
+        } else if (settlement_type === 'receipt') {
+          totals[user_id] -= amount;
+        }
+      } else {
+        totals[user_id] += amount;
+      }
+      
+      return totals;
+    }, {});
+  }
+
+  // a function the return if the member is + or - in the group
+  // by dividing the total amount of expenses by the number of members in the group and then subtracting the total amount of expenses by the current user
+  static async getBalanceByUserAndGroup(groupId, startDate = null, endDate = null) {
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+
+    // If no dates provided, use all-time calculation (existing behavior)
+    let totalExpenses, totalExpensesPerUser;
+    
+    if (startDate && endDate) {
+      // Calculate for specific date range
+      totalExpenses = await this.getTotalExpensesByGroupInRange(groupId, startDate, endDate);
+      totalExpensesPerUser = await this.getTotalExpensesPerUserByGroupInRange(groupId, startDate, endDate);
+    } else {
+      // Use existing methods for all-time calculation
+      totalExpenses = await this.getTotalExpensesByGroup(groupId);
+      totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+    }
     
     // Get actual group member count instead of just users who made expenses
     const group = await Group.getGroupById(groupId);
@@ -447,20 +528,31 @@ class Expense {
       fairShare,
       userExpense,
       balance,
-      totalExpensesPerUser
+      totalExpensesPerUser,
+      dateRange: startDate && endDate ? `${startDate.toDateString()} to ${endDate.toDateString()}` : 'All time'
     });
 
     return parseFloat(balance.toFixed(2));
   }
 
   // same function as above but for all members in the group
-  static async getBalanceByAllUsersInGroup(groupId) {
+  static async getBalanceByAllUsersInGroup(groupId, startDate = null, endDate = null) {
     if (!groupId || typeof groupId !== 'string') {
       throw new Error('A valid groupId (string) is required');
     }
 
-    const totalExpenses = await this.getTotalExpensesByGroup(groupId);
-    const totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+    // If no dates provided, use all-time calculation (existing behavior)
+    let totalExpenses, totalExpensesPerUser;
+    
+    if (startDate && endDate) {
+      // Calculate for specific date range
+      totalExpenses = await this.getTotalExpensesByGroupInRange(groupId, startDate, endDate);
+      totalExpensesPerUser = await this.getTotalExpensesPerUserByGroupInRange(groupId, startDate, endDate);
+    } else {
+      // Use existing methods for all-time calculation
+      totalExpenses = await this.getTotalExpensesByGroup(groupId);
+      totalExpensesPerUser = await this.getTotalExpensesPerUserByGroup(groupId);
+    }
     
     // Get actual group member count instead of just users who made expenses
     const group = await Group.getGroupById(groupId);
@@ -488,6 +580,15 @@ class Expense {
       }
     }
 
+    console.log(`getBalanceByAllUsersInGroup for group ${groupId}:`, {
+      groupName: group?.name || 'Unknown',
+      totalExpenses,
+      memberCount,
+      fairShare,
+      balances,
+      dateRange: startDate && endDate ? `${startDate.toDateString()} to ${endDate.toDateString()}` : 'All time'
+    });
+
     return balances;
   }
 
@@ -500,17 +601,29 @@ class Expense {
       throw new Error('No authenticated user found');
     }
 
-    const groups = await Group.getGroupsByUser(currentUser.uid);
-    const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
+    // Get current month date range
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
-    console.log('getTotalOwedToUser - Groups:', groups.map(g => ({ id: g.id, name: g.name })));
-    console.log('getTotalOwedToUser - Balances:', balances);
+    const groups = await Group.getGroupsByUser(currentUser.uid);
+    const balances = await Promise.all(
+      groups.map((g) => this.getBalanceByUserAndGroup(g.id, startOfMonth, endOfMonth))
+    );
+
+    console.log('getTotalOwedToUser - Current Month:', {
+      month: now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      groups: groups.map(g => ({ id: g.id, name: g.name })),
+      balances
+    });
 
     const positiveBalances = balances.filter((b) => b > 0);
     const total = positiveBalances.reduce((sum, b) => sum + b, 0);
     
-    console.log('getTotalOwedToUser - Positive balances:', positiveBalances);
-    console.log('getTotalOwedToUser - Total owed to user:', total);
+    console.log('getTotalOwedToUser - Current Month Results:', {
+      positiveBalances,
+      total
+    });
 
     return parseFloat(total.toFixed(2));
   }
@@ -524,17 +637,29 @@ class Expense {
       throw new Error('No authenticated user found');
     }
 
-    const groups = await Group.getGroupsByUser(currentUser.uid);
-    const balances = await Promise.all(groups.map((g) => this.getBalanceByUserAndGroup(g.id)));
+    // Get current month date range
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
-    console.log('getTotalYouOwe - Groups:', groups.map(g => ({ id: g.id, name: g.name })));
-    console.log('getTotalYouOwe - Balances:', balances);
+    const groups = await Group.getGroupsByUser(currentUser.uid);
+    const balances = await Promise.all(
+      groups.map((g) => this.getBalanceByUserAndGroup(g.id, startOfMonth, endOfMonth))
+    );
+
+    console.log('getTotalYouOwe - Current Month:', {
+      month: now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      groups: groups.map(g => ({ id: g.id, name: g.name })),
+      balances
+    });
 
     const negativeBalances = balances.filter((b) => b < 0);
     const total = negativeBalances.reduce((sum, b) => sum + Math.abs(b), 0);
     
-    console.log('getTotalYouOwe - Negative balances:', negativeBalances);
-    console.log('getTotalYouOwe - Total you owe:', total);
+    console.log('getTotalYouOwe - Current Month Results:', {
+      negativeBalances,
+      total
+    });
 
     return parseFloat(total.toFixed(2));
   }
