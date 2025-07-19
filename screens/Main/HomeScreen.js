@@ -358,11 +358,8 @@ const HomeScreen = () => {
   };
 
   return (
-    <ScrollView
-      className="container flex flex-1 gap-6 bg-white pb-6 pt-2 "
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-4 pb-4 pt-12">
+    <>
+      <View className="flex-row items-center justify-between bg-white px-4 pb-4 pt-12">
         <View className="flex-row items-center">
           <TouchableOpacity onPress={handleProfilePress}>
             <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
@@ -393,220 +390,233 @@ const HomeScreen = () => {
           )}
         </TouchableOpacity>
       </View>
+      <ScrollView
+        className="container flex flex-1 gap-6 bg-white pb-6 pt-2 "
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        {/* Header */}
 
-      {/* Balance Cards */}
-      <View className="flex gap-8 pb-4">
-        <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
-          <View className="mr-2 flex-1">
-            <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.oweYou')}</Text>
-            <Text className="font-dmsans-bold text-2xl text-error">
-              {oweYou.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
+        {/* Balance Cards */}
+        <View className="flex gap-8 pb-4">
+          <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
+            <View className="mr-2 flex-1">
+              <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.oweYou')}</Text>
+              <Text className="font-dmsans-bold text-2xl text-error">
+                {oweYou.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
+              </Text>
+            </View>
+            <View className="ml-2 flex-1">
+              <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.youOwe')}</Text>
+              <Text className="font-dmsans-bold text-2xl text-green-500">
+                {youOwe.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
+              </Text>
+            </View>
+          </View>
+
+          {/* Overview Section */}
+          <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+            <Text className="mb-4 text-lg font-medium text-black">
+              {t('home.monthlyOverview', {
+                month: overviewData.monthName,
+                year: overviewData.year,
+              })}
             </Text>
-          </View>
-          <View className="ml-2 flex-1">
-            <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.youOwe')}</Text>
-            <Text className="font-dmsans-bold text-2xl text-green-500">
-              {youOwe.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
-            </Text>
-          </View>
-        </View>
 
-        {/* Overview Section */}
-        <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <Text className="mb-4 text-lg font-medium text-black">
-            {t('home.monthlyOverview', {
-              month: overviewData.monthName,
-              year: overviewData.year,
-            })}
-          </Text>
-
-          {isLoadingOverview ? (
-            <View className="flex-row items-center">
-              <View className="relative mr-6">
-                <View className="h-20 w-20 rounded-full bg-gray-200" />
-              </View>
-              <View className="flex-1">
-                <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
-                <View className="mb-2 h-4 w-24 rounded bg-gray-200" />
-                <View className="mb-2 h-4 w-28 rounded bg-gray-200" />
-              </View>
-            </View>
-          ) : overviewData.categoryData.length === 0 ? (
-            <View className="items-center py-8">
-              <Feather name="pie-chart" size={48} color="#ccc" />
-              <Text className="mt-2 text-gray-500">{t('home.noExpensesThisMonth')}</Text>
-            </View>
-          ) : (
-            <View className="flex-row items-center">
-              <View className="relative mr-6">
-                <PieChart data={overviewData.categoryData} size={80} />
-              </View>
-
-              <View className="flex-1">
-                {overviewData.categoryData.slice(0, 4).map((item, index) => (
-                  <View key={index} className="mb-2 flex-row items-center justify-between">
-                    <View className="flex-row items-center">
-                      <View
-                        className="mr-2 h-3 w-3 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <Text className="text-lg font-normal text-gray-500">
-                        {t(`categories.${item.category.toLowerCase()}`, {
-                          defaultValue: item.category,
-                        })}
-                      </Text>
-                    </View>
-                    <Text className="text-lg font-medium text-black">{item.percentage}%</Text>
-                  </View>
-                ))}
-                {overviewData.categoryData.length > 4 && (
-                  <Text className="text-sm text-gray-400">
-                    {t('home.moreCategoriesCount', { count: overviewData.categoryData.length - 4 })}
-                  </Text>
-                )}
-              </View>
-            </View>
-          )}
-
-          {/* Total amount display */}
-          {!isLoadingOverview && overviewData.totalAmount > 0 && (
-            <View className="mt-4 border-t border-gray-100 pt-4">
-              <View className="flex-row justify-between">
-                <Text className="font-dmsans-medium text-gray-500">{t('home.totalExpenses')}</Text>
-                <Text className="font-dmsans-bold text-black">
-                  {overviewData.totalAmount.toFixed(2)} {getCurrency()}
-                </Text>
-              </View>
-              <View className="mt-1 flex-row justify-between">
-                <Text className="font-dmsans-medium text-gray-500">
-                  {t('home.totalTransactions')}
-                </Text>
-                <Text className="text-black">{overviewData.expenseCount}</Text>
-              </View>
-            </View>
-          )}
-        </View>
-
-        {/* Recent Activity */}
-        <View className="mx-4 ">
-          <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">{t('home.recentActivity')}</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('AllExpenses', { groupId: selectedGroup })}>
-              <Text className="font-medium text-primary">{t('common.seeAll')}</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View>
-            {isLoadingActivity ? (
-              [...Array(3)].map((_, index) => (
-                <View key={index} className="mb-4 flex-row items-center rounded-lg bg-gray-50 p-4">
-                  <View className="mr-4 h-12 w-12 rounded-full bg-gray-200" />
-                  <View className="flex-1">
-                    <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
-                    <View className="h-3 w-24 rounded bg-gray-200" />
-                  </View>
-                  <View className="items-end">
-                    <View className="mb-2 h-4 w-16 rounded bg-gray-200" />
-                    <View className="h-3 w-12 rounded bg-gray-200" />
-                  </View>
+            {isLoadingOverview ? (
+              <View className="flex-row items-center">
+                <View className="relative mr-6">
+                  <View className="h-20 w-20 rounded-full bg-gray-200" />
                 </View>
-              ))
-            ) : transformedRecentActivity.length === 0 ? (
+                <View className="flex-1">
+                  <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
+                  <View className="mb-2 h-4 w-24 rounded bg-gray-200" />
+                  <View className="mb-2 h-4 w-28 rounded bg-gray-200" />
+                </View>
+              </View>
+            ) : overviewData.categoryData.length === 0 ? (
               <View className="items-center py-8">
-                <Feather name="activity" size={48} color="#ccc" />
-                <Text className="mt-2 text-gray-500">{t('home.noRecentActivity')}</Text>
+                <Feather name="pie-chart" size={48} color="#ccc" />
+                <Text className="mt-2 text-gray-500">{t('home.noExpensesThisMonth')}</Text>
               </View>
             ) : (
-              transformedRecentActivity.map((item) => (
-                <ExpenseListItem
-                  key={item.id}
-                  {...item}
-                  onPress={handleExpensePress}
-                  showBorder={false}
-                  currency={getCurrency()}
-                />
-              ))
+              <View className="flex-row items-center">
+                <View className="relative mr-6">
+                  <PieChart data={overviewData.categoryData} size={80} />
+                </View>
+
+                <View className="flex-1">
+                  {overviewData.categoryData.slice(0, 4).map((item, index) => (
+                    <View key={index} className="mb-2 flex-row items-center justify-between">
+                      <View className="flex-row items-center">
+                        <View
+                          className="mr-2 h-3 w-3 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <Text className="text-lg font-normal text-gray-500">
+                          {t(`categories.${item.category.toLowerCase()}`, {
+                            defaultValue: item.category,
+                          })}
+                        </Text>
+                      </View>
+                      <Text className="text-lg font-medium text-black">{item.percentage}%</Text>
+                    </View>
+                  ))}
+                  {overviewData.categoryData.length > 4 && (
+                    <Text className="text-sm text-gray-400">
+                      {t('home.moreCategoriesCount', {
+                        count: overviewData.categoryData.length - 4,
+                      })}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            )}
+
+            {/* Total amount display */}
+            {!isLoadingOverview && overviewData.totalAmount > 0 && (
+              <View className="mt-4 border-t border-gray-100 pt-4">
+                <View className="flex-row justify-between">
+                  <Text className="font-dmsans-medium text-gray-500">
+                    {t('home.totalExpenses')}
+                  </Text>
+                  <Text className="font-dmsans-bold text-black">
+                    {overviewData.totalAmount.toFixed(2)} {getCurrency()}
+                  </Text>
+                </View>
+                <View className="mt-1 flex-row justify-between">
+                  <Text className="font-dmsans-medium text-gray-500">
+                    {t('home.totalTransactions')}
+                  </Text>
+                  <Text className="text-black">{overviewData.expenseCount}</Text>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Recent Activity */}
+          <View className="mx-4 ">
+            <View className="mb-4 flex-row items-center justify-between">
+              <Text className="text-lg font-medium text-black">{t('home.recentActivity')}</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AllExpenses', { groupId: selectedGroup })}>
+                <Text className="font-medium text-primary">{t('common.seeAll')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View>
+              {isLoadingActivity ? (
+                [...Array(3)].map((_, index) => (
+                  <View
+                    key={index}
+                    className="mb-4 flex-row items-center rounded-lg bg-gray-50 p-4">
+                    <View className="mr-4 h-12 w-12 rounded-full bg-gray-200" />
+                    <View className="flex-1">
+                      <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
+                      <View className="h-3 w-24 rounded bg-gray-200" />
+                    </View>
+                    <View className="items-end">
+                      <View className="mb-2 h-4 w-16 rounded bg-gray-200" />
+                      <View className="h-3 w-12 rounded bg-gray-200" />
+                    </View>
+                  </View>
+                ))
+              ) : transformedRecentActivity.length === 0 ? (
+                <View className="items-center py-8">
+                  <Feather name="activity" size={48} color="#ccc" />
+                  <Text className="mt-2 text-gray-500">{t('home.noRecentActivity')}</Text>
+                </View>
+              ) : (
+                transformedRecentActivity.map((item) => (
+                  <ExpenseListItem
+                    key={item.id}
+                    {...item}
+                    onPress={handleExpensePress}
+                    showBorder={false}
+                    currency={getCurrency()}
+                  />
+                ))
+              )}
+            </View>
+          </View>
+
+          {/* Group Members */}
+          <View className="mx-4 ">
+            <View className="mb-4 flex-row items-start justify-between">
+              <View>
+                <Text className="text-lg font-medium text-black ">
+                  {capitalizeFirst(groupName)}
+                </Text>
+                <Text className="font-dmsans text-xs text-black">{t('group.groupMembers')}</Text>
+              </View>
+              <TouchableOpacity onPress={openGroupModal}>
+                <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Group selection modal */}
+            <SwitchGroupModal
+              visible={showGroupModal}
+              onClose={() => setShowGroupModal(false)}
+              groups={groups}
+              selectedGroupId={selectedGroup}
+              onGroupSelect={handleGroupSelection}
+              title={t('group.switchGroup')}
+              showCreateNewOption={true}
+              onCreateNew={() => {
+                // Handle navigation to create new group screen
+                navigation.navigate('AddNewGroup');
+              }}
+              onRefresh={refreshGroups}
+              refreshing={refreshingGroups}
+            />
+
+            {isLoadingGroupMembers ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 4 }}
+                className="flex-row">
+                {[...Array(4)].map((_, index) => (
+                  <View key={index} className="mr-4 items-center">
+                    <View className="mb-2 h-16 w-16 rounded-full bg-gray-200" />
+                    <View className="h-3 w-12 rounded bg-gray-200" />
+                  </View>
+                ))}
+              </ScrollView>
+            ) : friends?.length === 0 ? (
+              <View className="w-full items-center gap-4 space-y-4">
+                <Feather name="users" size={48} color="#ccc" />
+                <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
+                <TouchableOpacity
+                  className="btn-primary mb-8 rounded-lg bg-primary "
+                  onPress={() => navigation.navigate('AddNewGroup')}>
+                  <Text className="btn-primary-text text-center text-base font-semibold text-white">
+                    {t('addGroup.title')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 4 }}
+                className="flex-row">
+                {friends?.map((friend, index) => (
+                  <View key={index} className="mr-4">
+                    <Avatar
+                      initial={friend.initial}
+                      name={friend.name}
+                      color={friend.color}
+                      size="medium"
+                      showName={true}
+                    />
+                  </View>
+                ))}
+              </ScrollView>
             )}
           </View>
         </View>
-
-        {/* Group Members */}
-        <View className="mx-4 ">
-          <View className="mb-4 flex-row items-start justify-between">
-            <View>
-              <Text className="text-lg font-medium text-black ">{capitalizeFirst(groupName)}</Text>
-              <Text className="font-dmsans text-xs text-black">{t('group.groupMembers')}</Text>
-            </View>
-            <TouchableOpacity onPress={openGroupModal}>
-              <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Group selection modal */}
-          <SwitchGroupModal
-            visible={showGroupModal}
-            onClose={() => setShowGroupModal(false)}
-            groups={groups}
-            selectedGroupId={selectedGroup}
-            onGroupSelect={handleGroupSelection}
-            title={t('group.switchGroup')}
-            showCreateNewOption={true}
-            onCreateNew={() => {
-              // Handle navigation to create new group screen
-              navigation.navigate('AddNewGroup');
-            }}
-            onRefresh={refreshGroups}
-            refreshing={refreshingGroups}
-          />
-
-          {isLoadingGroupMembers ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 4 }}
-              className="flex-row">
-              {[...Array(4)].map((_, index) => (
-                <View key={index} className="mr-4 items-center">
-                  <View className="mb-2 h-16 w-16 rounded-full bg-gray-200" />
-                  <View className="h-3 w-12 rounded bg-gray-200" />
-                </View>
-              ))}
-            </ScrollView>
-          ) : friends?.length === 0 ? (
-            <View className="w-full items-center gap-4 space-y-4">
-              <Feather name="users" size={48} color="#ccc" />
-              <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
-              <TouchableOpacity
-                className="btn-primary mb-8 rounded-lg bg-primary "
-                onPress={() => navigation.navigate('AddNewGroup')}>
-                <Text className="btn-primary-text text-center text-base font-semibold text-white">
-                  {t('addGroup.title')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 4 }}
-              className="flex-row">
-              {friends?.map((friend, index) => (
-                <View key={index} className="mr-4">
-                  <Avatar
-                    initial={friend.initial}
-                    name={friend.name}
-                    color={friend.color}
-                    size="medium"
-                    showName={true}
-                  />
-                </View>
-              ))}
-            </ScrollView>
-          )}
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 

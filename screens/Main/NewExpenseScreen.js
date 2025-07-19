@@ -197,164 +197,166 @@ const NewExpenseScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white ">
-      <KeyboardAwareScrollView
-        className="container"
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        enableOnAndroid={true}
-        enableAutomaticScroll={true}
-        extraScrollHeight={Platform.OS === 'ios' ? 50 : 100}
-        keyboardOpeningTime={0}>
+      <View className="container">
         <Header title={t('expense.addExpense')} />
 
-        <View className="flex-1 gap-6 px-4">
-          {/* Expense Name */}
-          <View className="input-group">
-            <View className="flex-row items-center justify-between">
-              <Text className="input-label text-base font-medium text-black">
-                {t('expense.expenseTitle')}
-              </Text>
-              <Text
-                className={`text-sm ${expenseName.length > 100 ? 'text-red-500' : 'text-gray-500'}`}>
-                {expenseName.length}/100
-              </Text>
-            </View>
-            <View className="input-container">
-              <TextInput
-                className={`input-field rounded-lg border px-4 text-black ${
-                  errors.expenseName ? 'border-red-500' : 'border-gray-200'
-                }`}
-                placeholder={t('expense.expenseTitle')}
-                placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                value={expenseName}
-                onChangeText={(text) => {
-                  setExpenseName(text);
-                  if (errors.expenseName) setErrors((prev) => ({ ...prev, expenseName: null }));
-                }}
-                autoCapitalize="words"
-                maxLength={100}
-              />
-            </View>
-            {errors.expenseName && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.expenseName}</Text>
-            )}
-          </View>
-
-          {/* Amount */}
-          <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
-              {t('expense.expenseAmount')}
-            </Text>
-            <View className="input-container relative">
-              <TextInput
-                className={`input-field rounded-lg border px-4  pr-16 text-black ${
-                  errors.amount ? 'border-red-500' : 'border-gray-200'
-                }`}
-                placeholder="100"
-                placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                value={amount}
-                onChangeText={(text) => {
-                  setAmount(text);
-                  if (errors.amount) setErrors((prev) => ({ ...prev, amount: null }));
-                }}
-                keyboardType="numeric"
-              />
-              <Text className="absolute right-4 top-4 text-base text-black">{getCurrency()}</Text>
-            </View>
-            {errors.amount && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.amount}</Text>
-            )}
-          </View>
-
-          {/* Group Selection */}
-          <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
-              {t('group.selectGroup')}
-            </Text>
-            <TouchableOpacity
-              className={`input-container rounded-lg border px-4 py-4 ${
-                errors.group ? 'border-red-500' : 'border-gray-200'
-              }`}
-              onPress={() => setIsGroupModalVisible(true)}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid={true}
+          enableAutomaticScroll={true}
+          extraScrollHeight={Platform.OS === 'ios' ? 50 : 100}
+          keyboardOpeningTime={0}>
+          <View className="flex-1 gap-6 px-4">
+            {/* Expense Name */}
+            <View className="input-group">
               <View className="flex-row items-center justify-between">
-                <View className="flex-1">
-                  {selectedGroupData ? (
-                    <View className="flex flex-row justify-between pr-2">
-                      <Text className="text-base text-black">{selectedGroupData.name}</Text>
-                      <Text className="text-sm text-gray-500">
-                        {t('group.memberCount', { count: selectedGroupData.memberCount })}
-                      </Text>
-                    </View>
-                  ) : (
-                    <Text className="text-base text-gray-400">{t('expense.selectGroup')}</Text>
-                  )}
-                </View>
-                <Feather name="chevron-down" size={20} color="#666" />
+                <Text className="input-label text-base font-medium text-black">
+                  {t('expense.expenseTitle')}
+                </Text>
+                <Text
+                  className={`text-sm ${expenseName.length > 100 ? 'text-red-500' : 'text-gray-500'}`}>
+                  {expenseName.length}/100
+                </Text>
               </View>
-            </TouchableOpacity>
-            {errors.group && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.group}</Text>
-            )}
-          </View>
-
-          {/* Category */}
-          <CategoryList
-            categories={DEFAULT_CATEGORIES}
-            selectedCategories={selectedCategory}
-            onCategorySelect={setSelectedCategory}
-            layout="grid"
-            numColumns={5}
-            title={t('expense.selectCategory')}
-          />
-          {errors.category && (
-            <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
-          )}
-
-          {/* Note */}
-          <View>
-            <View className="flex-row items-center justify-between">
-              <Text className="input-label text-base font-medium text-black">
-                {t('expense.note')}
-              </Text>
-              <Text className={`text-sm ${note.length > 3000 ? 'text-red-500' : 'text-gray-500'}`}>
-                {note.length}/3000
-              </Text>
+              <View className="input-container">
+                <TextInput
+                  className={`input-field rounded-lg border px-4 text-black ${
+                    errors.expenseName ? 'border-red-500' : 'border-gray-200'
+                  }`}
+                  placeholder={t('expense.expenseTitle')}
+                  placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                  value={expenseName}
+                  onChangeText={(text) => {
+                    setExpenseName(text);
+                    if (errors.expenseName) setErrors((prev) => ({ ...prev, expenseName: null }));
+                  }}
+                  autoCapitalize="words"
+                  maxLength={100}
+                />
+              </View>
+              {errors.expenseName && (
+                <Text className="error-text mt-1 text-sm text-red-500">{errors.expenseName}</Text>
+              )}
             </View>
-            <TextInput
-              className={`input-field h-24 rounded-lg border px-4 text-black ${
-                errors.note ? 'border-red-500' : 'border-gray-200'
-              }`}
-              placeholder={t('expense.addNote')}
-              placeholderTextColor="rgba(0, 0, 0, 0.4)"
-              value={note}
-              onChangeText={(text) => {
-                setNote(text);
-                if (errors.note) setErrors((prev) => ({ ...prev, note: null }));
-              }}
-              multiline
-              textAlignVertical="top"
-              autoCapitalize="sentences"
-              blurOnSubmit={false}
-              returnKeyType="done"
-              maxLength={3000}
-            />
-            {errors.note && (
-              <Text className="error-text mt-1 text-sm text-red-500">{errors.note}</Text>
-            )}
-          </View>
 
-          {/* Add Expense Button */}
-          <TouchableOpacity
-            className="btn-primary mb-8 rounded-lg bg-primary py-4"
-            onPress={handleAddExpense}
-            disabled={isSaving}>
-            <Text className="btn-primary-text text-center text-base font-semibold text-white">
-              {isSaving ? t('common.adding') : t('expense.addExpense')}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAwareScrollView>
+            {/* Amount */}
+            <View className="input-group">
+              <Text className="input-label text-base font-medium text-black">
+                {t('expense.expenseAmount')}
+              </Text>
+              <View className="input-container relative">
+                <TextInput
+                  className={`input-field rounded-lg border px-4  pr-16 text-black ${
+                    errors.amount ? 'border-red-500' : 'border-gray-200'
+                  }`}
+                  placeholder="100"
+                  placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                  value={amount}
+                  onChangeText={(text) => {
+                    setAmount(text);
+                    if (errors.amount) setErrors((prev) => ({ ...prev, amount: null }));
+                  }}
+                  keyboardType="numeric"
+                />
+                <Text className="absolute right-4 top-4 text-base text-black">{getCurrency()}</Text>
+              </View>
+              {errors.amount && (
+                <Text className="error-text mt-1 text-sm text-red-500">{errors.amount}</Text>
+              )}
+            </View>
+
+            {/* Group Selection */}
+            <View className="input-group">
+              <Text className="input-label text-base font-medium text-black">
+                {t('group.selectGroup')}
+              </Text>
+              <TouchableOpacity
+                className={`input-container rounded-lg border px-4 py-4 ${
+                  errors.group ? 'border-red-500' : 'border-gray-200'
+                }`}
+                onPress={() => setIsGroupModalVisible(true)}>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-1">
+                    {selectedGroupData ? (
+                      <View className="flex flex-row justify-between pr-2">
+                        <Text className="text-base text-black">{selectedGroupData.name}</Text>
+                        <Text className="text-sm text-gray-500">
+                          {t('group.memberCount', { count: selectedGroupData.memberCount })}
+                        </Text>
+                      </View>
+                    ) : (
+                      <Text className="text-base text-gray-400">{t('expense.selectGroup')}</Text>
+                    )}
+                  </View>
+                  <Feather name="chevron-down" size={20} color="#666" />
+                </View>
+              </TouchableOpacity>
+              {errors.group && (
+                <Text className="error-text mt-1 text-sm text-red-500">{errors.group}</Text>
+              )}
+            </View>
+
+            {/* Category */}
+            <CategoryList
+              categories={DEFAULT_CATEGORIES}
+              selectedCategories={selectedCategory}
+              onCategorySelect={setSelectedCategory}
+              layout="grid"
+              numColumns={5}
+              title={t('expense.selectCategory')}
+            />
+            {errors.category && (
+              <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
+            )}
+
+            {/* Note */}
+            <View>
+              <View className="flex-row items-center justify-between">
+                <Text className="input-label text-base font-medium text-black">
+                  {t('expense.note')}
+                </Text>
+                <Text
+                  className={`text-sm ${note.length > 3000 ? 'text-red-500' : 'text-gray-500'}`}>
+                  {note.length}/3000
+                </Text>
+              </View>
+              <TextInput
+                className={`input-field h-24 rounded-lg border px-4 text-black ${
+                  errors.note ? 'border-red-500' : 'border-gray-200'
+                }`}
+                placeholder={t('expense.addNote')}
+                placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                value={note}
+                onChangeText={(text) => {
+                  setNote(text);
+                  if (errors.note) setErrors((prev) => ({ ...prev, note: null }));
+                }}
+                multiline
+                textAlignVertical="top"
+                autoCapitalize="sentences"
+                blurOnSubmit={false}
+                returnKeyType="done"
+                maxLength={3000}
+              />
+              {errors.note && (
+                <Text className="error-text mt-1 text-sm text-red-500">{errors.note}</Text>
+              )}
+            </View>
+
+            {/* Add Expense Button */}
+            <TouchableOpacity
+              className="btn-primary mb-8 rounded-lg bg-primary py-4"
+              onPress={handleAddExpense}
+              disabled={isSaving}>
+              <Text className="btn-primary-text text-center text-base font-semibold text-white">
+                {isSaving ? t('common.adding') : t('expense.addExpense')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAwareScrollView>
+      </View>
 
       {/* Group Selection Modal */}
       <Modal
