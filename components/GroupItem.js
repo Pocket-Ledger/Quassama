@@ -10,7 +10,7 @@ const GroupItem = ({ group, onPress, onStarPress }) => {
       <View className="flex-1 flex-row items-center">
         {/* Group Members */}
         <View className="h-full flex-1 justify-between">
-          <Text className="text-[20px] font-medium text-black">{group.name}</Text>
+          <Text className="text-[20px] font-medium text-black">{group.name || 'Unnamed Group'}</Text>
 
           {/* Members Avatars */}
           <View className="mr-4 flex-row">
@@ -23,7 +23,7 @@ const GroupItem = ({ group, onPress, onStarPress }) => {
                     index > 0 ? '-ml-2' : ''
                   }`}
                   style={{ backgroundColor: member.color }}>
-                  <Text className="font-dmsans-bold text-sm text-white">{member.initial}</Text>
+                  <Text className="font-dmsans-bold text-sm text-white">{member.initial || '?'}</Text>
                 </View>
               ))}
             {group.additionalMembers > 0 && (
@@ -35,7 +35,7 @@ const GroupItem = ({ group, onPress, onStarPress }) => {
             )}
           </View>
 
-          <Text className="font-dmsans-bold text-red-500">{group.amount}</Text>
+          <Text className="font-dmsans-bold text-red-500">{group.amount || '0'}</Text>
         </View>
       </View>
 
@@ -52,7 +52,7 @@ const GroupItem = ({ group, onPress, onStarPress }) => {
         {(!group.amount || group.amount <= 0) && (
           <View className="items-end">
             <Text className="text-gray-500">
-              {group.lastExpense} - {group.time}
+              {group.lastExpense || ''}{group.lastExpense && group.time ? ' - ' : ''}{group.time || ''}
             </Text>
           </View>
         )}

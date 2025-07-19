@@ -115,7 +115,7 @@ const GroupsScreen = () => {
     }, [user])
   );
 
-  console.log('Groups:', groups[0]);
+  console.log('Groups:', groups.length > 0 ? groups[0] : 'No groups found');
 
   useFocusEffect(
     useCallback(() => {
@@ -293,11 +293,11 @@ const GroupsScreen = () => {
             <GroupsList
               groups={sortedGroups.map((g) => ({
                 id: g.id,
-                name: g.name,
+                name: g.name || '',
                 members: g.members || [],
                 additionalMembers: g.additionalMembers || 0,
                 amount: g.amount || `0 ${t('common.currency')}`,
-                lastExpense: g.lastExpense || t('group.noExpensesYet'),
+                lastExpense: g.lastExpense || '',
                 time: g.time || '',
                 isStarred: favoriteGroupIds.includes(g.id),
               }))}
@@ -308,7 +308,7 @@ const GroupsScreen = () => {
             // Empty state
             <View className="items-center px-4 py-12">
               <View className="mb-4 items-center justify-center">
-                <Ionicons name="people" size={70} color="#2979FF" />{' '}
+                <Ionicons name="people" size={70} color="#2979FF" />
               </View>
               <Text className="mb-2 font-dmsans-bold text-[24px] ">{t('group.noGroupsYet')}</Text>
               <Text className="mb-6 text-center text-gray-500">{t('group.startByCreating')}</Text>
