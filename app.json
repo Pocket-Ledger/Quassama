@@ -9,7 +9,7 @@
       "android"
     ],
     "web": {
-      "favicon": "./assets/Icon/icon.png"
+      "favicon": "./assets/Icon/logo1.png"
     },
     "experiments": {
       "tsconfigPaths": true
@@ -18,7 +18,7 @@
       "expo-splash-screen"
     ],
     "orientation": "portrait",
-    "icon": "./assets/Icon/icon.png",
+    "icon": "./assets/Icon/logo1.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -34,9 +34,9 @@
     },
     "android": {
       "package": "com.quassama.app",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Icon/icon.png",
+        "foregroundImage": "./assets/Icon/logo1.png",
         "backgroundColor": "#ffffff"
       }
     },
