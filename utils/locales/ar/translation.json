@@ -237,13 +237,39 @@
     "category": {
       "unknown": "فئة غير معروفة"
     },
+    "repeat": {
+      "title": "تكرار",
+      "oneTime": "مرة واحدة",
+      "weekly": "أسبوعي",
+      "monthly": "شهري",
+      "custom": "مخصص",
+      "repeatedEvery": "يتكرر كل",
+      "selectInterval": "اختر الفترة",
+      "intervals": {
+        "days": "أيام",
+        "weeks": "أسابيع",
+        "months": "شهور"
+      }
+    },
+    "split": {
+      "title": "مشاركة مع",
+      "you": "أنت",
+      "addPerson": "إضافة أشخاص",
+      "personName": "اسم الشخص",
+      "enterPersonName": "أدخل اسم الشخص",
+      "selectGroupFirst": "اختر مجموعة أولاً",
+      "equalSplit": "تقسيم متساوي",
+      "noMembers": "لا يوجد أعضاء للمشاركة معهم"
+    },
     "validation": {
       "expenseNameRequired": "اسم المصروف مطلوب",
       "amountRequired": "المبلغ مطلوب",
       "validAmount": "يرجى إدخال مبلغ صحيح أكبر من 0",
       "selectCategory": "يرجى اختيار فئة",
       "selectGroup": "يرجى اختيار مجموعة",
-      "maxCharacter": "المبلغ لا يمكن أن يتجاوز 100,000"
+      "maxCharacter": "المبلغ لا يمكن أن يتجاوز 100,000",
+      "validCustomDays": "يرجى إدخال عدد أيام صحيح",
+      "splitAmountMismatch": "مبالغ التقسيم لا تتطابق مع إجمالي المصروف"
     },
     "title": "جميع المصروفات",
     "loading": "جاري تحميل المصروفات...",

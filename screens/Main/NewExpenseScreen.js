@@ -26,6 +26,8 @@ import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import FloatingPlusButton from 'components/FloatingPlusButton';
 import Logger from 'utils/looger';
+import RepeatSection from 'components/RepeatSection';
+import SplitWithSection from 'components/SplitWithSection';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -48,6 +50,11 @@ const NewExpenseScreen = () => {
   const [errors, setErrors] = useState({});
   const [groups, setGroups] = useState([]);
   const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
+
+  const [selectedRepeat, setSelectedRepeat] = useState('oneTime');
+  const [customDays, setCustomDays] = useState('');
+  const [customInterval, setCustomInterval] = useState('days');
+  const [splits, setSplits] = useState({});
 
   // Fetch the user's groups (or fall back to Personal)
   useFocusEffect(
@@ -118,6 +125,24 @@ const NewExpenseScreen = () => {
     if (!selectedCategory) newErrors.category = t('expense.validation.selectCategory');
     if (!selectedGroup) newErrors.group = t('expense.validation.selectGroup');
 
+    // Repeat validation
+    if (selectedRepeat === 'custom') {
+      if (!customDays.trim() || isNaN(customDays) || parseInt(customDays) <= 0) {
+        newErrors.repeat = t('expense.validation.validCustomDays');
+      }
+    }
+
+    // Split validation
+    if (splits && Object.keys(splits).length > 0) {
+      const totalSplitAmount = Object.values(splits).reduce((sum, split) => {
+        return sum + (parseFloat(split.amount) || 0);
+      }, 0);
+      const expenseAmount = parseFloat(amount) || 0;
+
+      if (Math.abs(totalSplitAmount - expenseAmount) > 0.01) {
+        newErrors.splits = t('expense.validation.splitAmountMismatch');
+      }
+    }
     if (note.length > 3000) newErrors.note = 'Description cannot exceed 3000 characters';
 
     setErrors(newErrors);
@@ -135,6 +160,17 @@ const NewExpenseScreen = () => {
     setIsSaving(true);
     try {
       const iconName = getCategoryIconName(selectedCategory);
+      const repeatData = {
+        type: selectedRepeat,
+        customDays: selectedRepeat === 'custom' ? parseInt(customDays) : null,
+        customInterval: selectedRepeat === 'custom' ? customInterval : null,
+      };
+
+      // Prepare splits data
+      const splitsData = splits && Object.keys(splits).length > 0 ? splits : null;
+
+      Logger.info(repeatData);
+      Logger.info(splitsData);
       Logger.info(selectedCategory);
       const expense = new Expense(
         expenseName.trim(), // title
@@ -150,6 +186,10 @@ const NewExpenseScreen = () => {
       setAmount('');
       setSelectedCategory('');
       setNote('');
+      setSelectedRepeat('oneTime');
+      setCustomDays('');
+      setCustomInterval('days');
+      setSplits({});
       // Don't reset selectedGroup to maintain the selection for next expense
 
       showSuccess(t('customAlert.titles.success'), t('expense.added_success'), () => {
@@ -170,6 +210,151 @@ const NewExpenseScreen = () => {
     if (errors.group) {
       setErrors((prev) => ({ ...prev, group: null }));
     }
+  };
+
+  const getGroupMembers = (groupId) => {
+    if (!groupId || groupId.startsWith('personal_')) {
+      return [
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+      ];
+    }
+
+    // Dummy data for different groups
+    const dummyGroupMembers = {
+      '6d22x8q7JEcWuefoiUX1': [
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+        {
+          user_id: 'user_sara',
+          username: 'Sara',
+          email: 'sara@example.com',
+        },
+        {
+          user_id: 'user_ahmad',
+          username: 'Ahmad',
+          email: 'ahmad@example.com',
+        },
+        {
+          user_id: 'user_yassin',
+          username: 'yassin',
+          email: 'yassin@example.com',
+        },
+        {
+          user_id: 'user_3abdo',
+          username: '3abdo',
+          email: '3abdo@example.com',
+        },
+      ],
+      vacation_group: [
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+        {
+          user_id: 'user_sara',
+          username: 'Sara',
+          email: 'sara@example.com',
+        },
+        {
+          user_id: 'user_ahmad',
+          username: 'Ahmad',
+          email: 'ahmad@example.com',
+        },
+        {
+          user_id: 'user_maria',
+          username: 'Maria',
+          email: 'maria@example.com',
+        },
+        {
+          user_id: 'user_john',
+          username: 'John',
+          email: 'john@example.com',
+        },
+      ],
+      family_group: [
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+        {
+          user_id: 'user_mom',
+          username: 'Mom',
+          email: 'mom@family.com',
+        },
+        {
+          user_id: 'user_dad',
+          username: 'Dad',
+          email: 'dad@family.com',
+        },
+        {
+          user_id: 'user_sister',
+          username: 'Sister',
+          email: 'sister@family.com',
+        },
+      ],
+      work_team: [
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+        {
+          user_id: 'user_alex',
+          username: 'Alex',
+          email: 'alex@company.com',
+        },
+        {
+          user_id: 'user_priya',
+          username: 'Priya',
+          email: 'priya@company.com',
+        },
+        {
+          user_id: 'user_mike',
+          username: 'Mike',
+          email: 'mike@company.com',
+        },
+        {
+          user_id: 'user_emma',
+          username: 'Emma',
+          email: 'emma@company.com',
+        },
+        {
+          user_id: 'user_david',
+          username: 'David',
+          email: 'david@company.com',
+        },
+      ],
+    };
+
+    // Return dummy data for the selected group, or default group if not found
+    return (
+      dummyGroupMembers[groupId] || [
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+        {
+          user_id: 'user_friend1',
+          username: 'Friend 1',
+          email: 'friend1@example.com',
+        },
+        {
+          user_id: 'user_friend2',
+          username: 'Friend 2',
+          email: 'friend2@example.com',
+        },
+      ]
+    );
   };
 
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
@@ -267,6 +452,16 @@ const NewExpenseScreen = () => {
               )}
             </View>
 
+            <RepeatSection
+              selectedRepeat={selectedRepeat}
+              onRepeatChange={setSelectedRepeat}
+              customDays={customDays}
+              onCustomDaysChange={setCustomDays}
+              customInterval={customInterval}
+              onCustomIntervalChange={setCustomInterval}
+              error={errors.repeat}
+            />
+
             {/* Group Selection */}
             <View className="input-group">
               <Text className="input-label text-base font-medium text-black">
@@ -297,6 +492,16 @@ const NewExpenseScreen = () => {
                 <Text className="error-text mt-1 text-sm text-red-500">{errors.group}</Text>
               )}
             </View>
+
+            <SplitWithSection
+              selectedGroup={selectedGroup}
+              groupMembers={getGroupMembers(selectedGroup)}
+              splits={splits}
+              onSplitsChange={setSplits}
+              totalAmount={amount}
+              currentUserId={userId}
+              error={errors.splits}
+            />
 
             {/* Category */}
             <CategoryList

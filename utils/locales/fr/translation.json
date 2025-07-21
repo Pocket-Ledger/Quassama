@@ -237,13 +237,39 @@
     "category": {
       "unknown": "Catégorie inconnue"
     },
+    "repeat": {
+      "title": "Répéter",
+      "oneTime": "Une fois",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuel",
+      "custom": "Personnalisé",
+      "repeatedEvery": "Répété tous les",
+      "selectInterval": "Sélectionner l'intervalle",
+      "intervals": {
+        "days": "jours",
+        "weeks": "semaines",
+        "months": "mois"
+      }
+    },
+    "split": {
+      "title": "Partager avec",
+      "you": "Vous",
+      "addPerson": "Ajouter des personnes",
+      "personName": "Nom de la personne",
+      "enterPersonName": "Entrez le nom de la personne",
+      "selectGroupFirst": "Sélectionnez d'abord un groupe",
+      "equalSplit": "Partage égal",
+      "noMembers": "Aucun membre avec qui partager"
+    },
     "validation": {
       "expenseNameRequired": "Le nom de la dépense est requis",
       "amountRequired": "Le montant est requis",
       "validAmount": "Veuillez saisir un montant valide supérieur à 0",
       "selectCategory": "Veuillez sélectionner une catégorie",
       "selectGroup": "Veuillez sélectionner un groupe",
-      "maxCharacter": "Le montant ne peut pas dépasser 100 000"
+      "maxCharacter": "Le montant ne peut pas dépasser 100 000",
+      "validCustomDays": "Veuillez entrer un nombre de jours valide",
+      "splitAmountMismatch": "Les montants partagés ne correspondent pas au total"
     },
     "title": "Toutes les dépenses",
     "loading": "Chargement des dépenses...",

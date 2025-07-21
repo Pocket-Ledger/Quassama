@@ -239,14 +239,39 @@
     "category": {
       "unknown": "Unknown Category"
     },
-
+    "repeat": {
+      "title": "Repeat",
+      "oneTime": "One Time",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "custom": "Custom",
+      "repeatedEvery": "Repeated every",
+      "selectInterval": "Select Interval",
+      "intervals": {
+        "days": "days",
+        "weeks": "weeks",
+        "months": "months"
+      }
+    },
+    "split": {
+      "title": "Split with",
+      "you": "You",
+      "addPerson": "Add People",
+      "personName": "Person Name",
+      "enterPersonName": "Enter person name",
+      "selectGroupFirst": "Select a group first",
+      "equalSplit": "Equal Split",
+      "noMembers": "No members to split with"
+    },
     "validation": {
       "expenseNameRequired": "Expense name is required",
       "amountRequired": "Amount is required",
       "validAmount": "Please enter a valid amount greater than 0",
       "selectCategory": "Please select a category",
       "selectGroup": "Please select a group",
-      "maxCharacter": "Amount cannot exceed 100,000"
+      "maxCharacter": "Amount cannot exceed 100,000",
+      "validCustomDays": "Please enter a valid number of days",
+      "splitAmountMismatch": "Split amounts don't match total expense"
     },
     "title": "All Expenses",
     "loading": "Loading expenses...",
