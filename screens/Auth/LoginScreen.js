@@ -7,6 +7,7 @@ import {
   ScrollView,
   SafeAreaView,
   Image,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // or react-native-vector-icons
 import { Logo } from 'components/Logo';
@@ -18,6 +19,7 @@ import i18n from 'utils/i18n';
 import Header from 'components/Header';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -129,11 +131,15 @@ const LoginScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white ">
-      <ScrollView
+      <KeyboardAwareScrollView
         className="container"
-        showsVerticalScrollIndicator={true}
-        contentContainerStyle={{ flexGrow: 1 }}>
-        {/* Header with Back Button */}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 50 : 100}
+        keyboardOpeningTime={0}>
         <Header />
         <View className="login-content relative ">
           <View className="logo-container">
@@ -263,7 +269,7 @@ const LoginScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Custom Alert */}
       <CustomAlert
