@@ -255,13 +255,13 @@ const AddNewGroupScreen = () => {
           </View>
 
           {/* Currency Selection */}
-          <View className="input-group">
-            <Text className="input-label text-base font-medium text-black">
+          {/*  <View className="input-group">
+            <Text className="text-base font-medium text-black input-label">
               {t('addGroup.currency')}
             </Text>
             <View className="input-container">
               <TouchableOpacity
-                className="input-field flex-row items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
+                className="flex-row items-center justify-between px-4 py-3 border border-gray-200 rounded-lg input-field"
                 onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
                 <View className="flex-row items-center">
                   <Text className="mr-2 text-base text-black">
@@ -279,9 +279,8 @@ const AddNewGroupScreen = () => {
                 />
               </TouchableOpacity>
 
-              {/* Currency Options Dropdown */}
               {showCurrencyDropdown && (
-                <View className="mt-2 max-h-52 rounded-lg border border-gray-100 bg-gray-50">
+                <View className="mt-2 border border-gray-100 rounded-lg max-h-52 bg-gray-50">
                   <ScrollView showsVerticalScrollIndicator={false}>
                     {currencyOptions.map((currency, index) => (
                       <TouchableOpacity
@@ -301,7 +300,7 @@ const AddNewGroupScreen = () => {
                           <Text className="text-sm text-gray-500">{currency.name}</Text>
                         </View>
                         {selectedCurrency === currency.code && (
-                          <View className="h-6 w-6 items-center justify-center rounded-full bg-primary">
+                          <View className="items-center justify-center w-6 h-6 rounded-full bg-primary">
                             <Feather name="check" size={14} color="white" />
                           </View>
                         )}
@@ -311,7 +310,7 @@ const AddNewGroupScreen = () => {
                 </View>
               )}
             </View>
-          </View>
+          </View> */}
 
           {/* Member Search */}
           <View>
