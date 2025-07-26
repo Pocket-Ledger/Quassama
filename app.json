@@ -4,19 +4,14 @@
     "slug": "quassama",
     "version": "1.0.2",
     "scheme": "quassama",
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "platforms": ["ios", "android"],
     "web": {
       "favicon": "./assets/Icon/logo1.png"
     },
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": [
-      "expo-splash-screen"
-    ],
+    "plugins": ["expo-splash-screen"],
     "orientation": "portrait",
     "icon": "./assets/Icon/logo1.png",
     "userInterfaceStyle": "light",
@@ -25,9 +20,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#ffffff",
+      "translucent": false
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.quassama.app"
