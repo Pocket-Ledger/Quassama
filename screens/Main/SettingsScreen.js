@@ -79,42 +79,42 @@ const SettingsScreen = () => {
             {/* Currency Setting */}
             <View className="mb-6">
               <Text className="mb-2 input-label">{t('settings.currency')}</Text>
-              <TouchableOpacity
-                className="input-container"
-                onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
-                <View className="flex-row items-center justify-between input-field">
+              <View className="input-container">
+                <TouchableOpacity
+                  className="h-14 w-full rounded-input border border-border-light bg-white px-4 flex-row items-center justify-between"
+                  onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
                   <Text className="text-base text-black">{selectedCurrency}</Text>
                   <Ionicons
                     name={showCurrencyDropdown ? 'chevron-up' : 'chevron-down'}
                     size={20}
                     color="#666"
                   />
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
 
-              {/* Currency Dropdown */}
-              {showCurrencyDropdown && (
-                <View className="mt-2 bg-white border border-gray-200 rounded-lg">
-                  {currencies.map((currency) => (
-                    <TouchableOpacity
-                      key={currency.code}
-                      className={`border-b border-gray-100 p-4 ${
-                        selectedCurrency === currency.code ? 'bg-blue-50' : ''
-                      }`}
-                      onPress={() => handleCurrencySelect(currency)}>
-                      <View className="flex-row items-center justify-between">
-                        <View>
-                          <Text className="font-medium text-black">{currency.code}</Text>
-                          <Text className="text-sm text-gray-500">{currency.name}</Text>
+                {/* Currency Dropdown */}
+                {showCurrencyDropdown && (
+                  <View className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-sm z-50" style={{ zIndex: 1000 }}>
+                    {currencies.map((currency, index) => (
+                      <TouchableOpacity
+                        key={currency.code}
+                        className={`p-4 ${
+                          index < currencies.length - 1 ? 'border-b border-gray-100' : ''
+                        } ${selectedCurrency === currency.code ? 'bg-blue-50' : ''}`}
+                        onPress={() => handleCurrencySelect(currency)}>
+                        <View className="flex-row items-center justify-between">
+                          <View>
+                            <Text className="font-medium text-black">{currency.code}</Text>
+                            <Text className="text-sm text-gray-500">{currency.name}</Text>
+                          </View>
+                          {selectedCurrency === currency.code && (
+                            <Ionicons name="checkmark" size={20} color="#2979FF" />
+                          )}
                         </View>
-                        {selectedCurrency === currency.code && (
-                          <Ionicons name="checkmark" size={20} color="#2979FF" />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
             </View>
 
             <TouchableOpacity
