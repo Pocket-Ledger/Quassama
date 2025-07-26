@@ -452,7 +452,7 @@ const NewExpenseScreen = () => {
               )}
             </View>
 
-            <RepeatSection
+            {/* <RepeatSection
               selectedRepeat={selectedRepeat}
               onRepeatChange={setSelectedRepeat}
               customDays={customDays}
@@ -460,7 +460,7 @@ const NewExpenseScreen = () => {
               customInterval={customInterval}
               onCustomIntervalChange={setCustomInterval}
               error={errors.repeat}
-            />
+            /> */}
 
             {/* Group Selection */}
             <View className="input-group">
@@ -493,7 +493,7 @@ const NewExpenseScreen = () => {
               )}
             </View>
 
-            <SplitWithSection
+           {/*  <SplitWithSection
               selectedGroup={selectedGroup}
               groupMembers={getGroupMembers(selectedGroup)}
               splits={splits}
@@ -501,7 +501,7 @@ const NewExpenseScreen = () => {
               totalAmount={amount}
               currentUserId={userId}
               error={errors.splits}
-            />
+            /> */}
 
             {/* Category */}
             <CategoryList
