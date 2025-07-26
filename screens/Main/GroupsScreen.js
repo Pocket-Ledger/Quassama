@@ -184,25 +184,14 @@ const GroupsScreen = () => {
   }; */
   const handleAcceptInvitation = async (invId, groupId) => {
     try {
-      // 1) build member object for the current user
-      const username = await User.getUsernameById(userId);
-      const memberObj = {
-        id: userId,
-        name: username,
-        initial: username ? username[0].toUpperCase() : '',
-        color: '#2979FF',
-      };
-
-      // 2) add to group
-      await Group.addMemberToGroup(groupId, memberObj);
-
-      // 3) mark invitation accepted
+      // The Invitation.accept method will handle adding the member to the group
+      // so we don't need to do it manually here
       await Invitation.accept(invId);
 
-      // 4) AUTO UPDATE UI - Remove invitation from the list
+      // AUTO UPDATE UI - Remove invitation from the list
       setInvitations((prev) => prev.filter((inv) => inv.id !== invId));
 
-      // 5) AUTO UPDATE UI - Refresh groups to show the new group
+      // AUTO UPDATE UI - Refresh groups to show the new group
       const groupsData = await Group.getGroupsByUser(user);
       setGroups(groupsData);
     } catch (err) {

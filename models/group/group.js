@@ -73,10 +73,55 @@ class Group{
 
     static async addMemberToGroup(groupId, member) {
         const groupRef = doc(db, "groups", groupId);
-        const memberId = typeof member === 'string' ? member : member.id;
+        
+        // If member is just a string (user ID), we need to construct a proper member object
+        let memberObject;
+        let memberId;
+        
+        if (typeof member === 'string') {
+            // Fetch user details to create proper member object
+            try {
+                const username = await User.getUsernameById(member);
+                memberObject = {
+                    id: member,
+                    name: username,
+                    initial: username ? username[0].toUpperCase() : 'U',
+                    color: '#2979FF'
+                };
+                memberId = member;
+            } catch (error) {
+                console.error('Error fetching user details for member:', error);
+                // Fallback - create basic member object
+                memberObject = {
+                    id: member,
+                    name: 'Unknown User',
+                    initial: 'U',
+                    color: '#2979FF'
+                };
+                memberId = member;
+            }
+        } else {
+            // Member is already an object
+            memberObject = member;
+            memberId = member.id;
+        }
+
+        // Check if member already exists in the group
+        const groupSnap = await getDoc(groupRef);
+        if (groupSnap.exists()) {
+            const groupData = groupSnap.data();
+            const existingMemberIds = (groupData.memberIds || []);
+            
+            // Don't add if member already exists
+            if (existingMemberIds.includes(memberId)) {
+                console.log(`Member ${memberId} already exists in group ${groupId}`);
+                return;
+            }
+        }
+
         await updateDoc(groupRef, {
-        members: arrayUnion(member),
-        memberIds: arrayUnion(memberId),
+            members: arrayUnion(memberObject),
+            memberIds: arrayUnion(memberId),
         });
     }
 
