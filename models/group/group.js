@@ -22,9 +22,18 @@ class Group{
 
     // function to create the group and save it to firebase collection groups
     async creatGroup(name, created_by, currency, members = [], description) {
-        // If no members provided, only add the creator as a member
-        let finalMembers = members && members.length > 0 ? members : [created_by];
-        const memberIds = finalMembers.map(m => (typeof m === 'string' ? m : m.id || m.user_id || m));
+        // When creating a group, only add the creator as a member
+        // Invited members will be added when they accept invitations
+        const currentUserDetails = await User.getUserDetails();
+        const creatorMember = {
+            id: created_by,
+            name: currentUserDetails.username,
+            initial: currentUserDetails.username ? currentUserDetails.username[0].toUpperCase() : '',
+            color: '#2979FF',
+        };
+        
+        const finalMembers = [creatorMember];
+        const memberIds = [created_by];
 
         const groupData = {
             name,
@@ -247,6 +256,82 @@ class Group{
             console.log(`Group ${groupId} deleted successfully`);
         } catch (error) {
             console.error("Error deleting group:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Clean up duplicate members in a group
+     * This method removes duplicate member entries (both objects and strings)
+     * @param {string} groupId - The ID of the group to clean up
+     * @returns {Promise<void>}
+     */
+    static async cleanupGroupMembers(groupId) {
+        try {
+            const groupRef = doc(db, "groups", groupId);
+            const groupSnap = await getDoc(groupRef);
+            
+            if (!groupSnap.exists()) {
+                throw new Error('Group not found');
+            }
+            
+            const groupData = groupSnap.data();
+            const members = groupData.members || [];
+            
+            // Create a map to track unique members by ID
+            const uniqueMembers = new Map();
+            const uniqueMemberIds = new Set();
+            
+            for (const member of members) {
+                let memberId, memberObject;
+                
+                if (typeof member === 'string') {
+                    // String member ID - convert to object if not already exists
+                    memberId = member;
+                    if (!uniqueMembers.has(memberId)) {
+                        try {
+                            const username = await User.getUsernameById(memberId);
+                            memberObject = {
+                                id: memberId,
+                                name: username,
+                                initial: username ? username[0].toUpperCase() : 'U',
+                                color: '#2979FF'
+                            };
+                        } catch (error) {
+                            memberObject = {
+                                id: memberId,
+                                name: 'Unknown User',
+                                initial: 'U',
+                                color: '#2979FF'
+                            };
+                        }
+                        uniqueMembers.set(memberId, memberObject);
+                        uniqueMemberIds.add(memberId);
+                    }
+                } else if (member && typeof member === 'object' && member.id) {
+                    // Object member
+                    memberId = member.id;
+                    if (!uniqueMembers.has(memberId)) {
+                        uniqueMembers.set(memberId, member);
+                        uniqueMemberIds.add(memberId);
+                    }
+                }
+            }
+            
+            // Convert back to arrays
+            const cleanMembers = Array.from(uniqueMembers.values());
+            const cleanMemberIds = Array.from(uniqueMemberIds);
+            
+            // Update the group with clean data
+            await updateDoc(groupRef, {
+                members: cleanMembers,
+                memberIds: cleanMemberIds,
+            });
+            
+            console.log(`Cleaned up group ${groupId}: ${members.length} -> ${cleanMembers.length} members`);
+            
+        } catch (error) {
+            console.error('Error cleaning up group members:', error);
             throw error;
         }
     }

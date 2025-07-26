@@ -130,26 +130,17 @@ const AddNewGroupScreen = () => {
       const currency = selectedCurrency;
       const description = '';
 
-      // Fetch current user's info to include as initial member
-      const currentUserDetails = await User.getUserDetails();
-      const creatorMember = {
-        id: created_by,
-        name: currentUserDetails.username,
-        initial: currentUserDetails.username ? currentUserDetails.username[0].toUpperCase() : '',
-        color: '#2979FF',
-      };
-
-      // Create group with only the creator as a member
+      // Create group (the creatGroup method will handle adding the creator as initial member)
       const groupInstance = new Group();
       const groupId = await groupInstance.creatGroup(
         groupName,
         created_by,
         currency,
-        [creatorMember],
+        [],  // Empty array - let creatGroup handle the creator member
         description
       );
 
-      // Send invitations by UID!
+      // Send invitations to selected members
       for (const member of selectedMembers) {
         if (member.id !== created_by) {
           try {

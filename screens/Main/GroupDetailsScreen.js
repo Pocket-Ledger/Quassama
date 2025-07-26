@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { getAuth } from 'firebase/auth';
 import CustomAlert from 'components/CustomALert';
 import Logger from 'utils/looger';
+import { cleanupAllUserGroups } from 'utils/cleanup';
 
 const LIMIT = 5;
 
@@ -49,10 +50,16 @@ const GroupDetailsScreen = () => {
 
   console.log('groupData', groupData);
 
+  const handleCleanup = async () => {
+    await cleanupAllGroups();
+    // Refresh your group data after cleanup
+};
+
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
       setLoading(true);
+      handleCleanup();
 
       const fetchGroupAndExpenses = async () => {
         try {
