@@ -78,7 +78,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      {/*  <StatusBar style="dark" backgroundColor="white" translucent={false} /> */}
+      <StatusBar style="dark" backgroundColor="white" translucent={false} />
 
       <SafeAreaProvider>
         <AuthProvider>

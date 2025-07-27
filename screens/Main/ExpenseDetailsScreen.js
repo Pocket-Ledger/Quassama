@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  ActivityIndicator,
-  ScrollView,
-  Share,
-} from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Share } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
@@ -201,7 +195,7 @@ const ExpenseDetailsScreen = () => {
   // Render loading state
   const renderLoading = () => (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="items-center justify-center flex-1">
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color="#2979FF" />
         <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
       </View>
@@ -212,12 +206,12 @@ const ExpenseDetailsScreen = () => {
   const renderError = () => (
     <SafeAreaView className="flex-1 bg-white">
       <View className="items-center px-4 py-12">
-        <View className="items-center justify-center mb-4">
+        <View className="mb-4 items-center justify-center">
           <Ionicons name="alert-circle" size={70} color="#FF6B6B" />
         </View>
         <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.error.title')}</Text>
         <Text className="mb-6 text-center text-gray-500">{error}</Text>
-        <TouchableOpacity className="px-6 py-3 rounded-lg bg-primary" onPress={loadExpenseDetails}>
+        <TouchableOpacity className="rounded-lg bg-primary px-6 py-3" onPress={loadExpenseDetails}>
           <Text className="font-semibold text-white">{t('expense.error.tryAgain')}</Text>
         </TouchableOpacity>
       </View>
@@ -255,7 +249,7 @@ const ExpenseDetailsScreen = () => {
               />
             </View>
 
-            <Text className="mb-2 text-3xl text-gray-900 font-dmsans-bold">
+            <Text className="mb-2 font-dmsans-bold text-3xl text-gray-900">
               {expense.amount} {t('common.currency')}
             </Text>
 
@@ -263,7 +257,7 @@ const ExpenseDetailsScreen = () => {
           </View>
 
           {/* Expense Title */}
-          <View className="pt-4 mt-4 border-t border-gray-100">
+          <View className="mt-4 border-t border-gray-100 pt-4">
             <Text className="mb-2 text-sm font-medium text-gray-500">
               {t('expense.details.title')}
             </Text>
@@ -282,14 +276,14 @@ const ExpenseDetailsScreen = () => {
         </View>
 
         {/* Details Card */}
-        <View className="p-4 mx-4 mt-4 bg-white rounded-lg shadow-sm">
+        <View className="mx-4 mt-4 rounded-lg bg-white p-4 shadow-sm">
           <Text className="mb-4 text-lg font-semibold text-gray-900">
             {t('expense.details.information')}
           </Text>
 
           {/* Paid By */}
-          <View className="flex-row items-center mb-4">
-            <View className="items-center justify-center w-10 h-10 mr-3 rounded-full bg-blue-50">
+          <View className="mb-4 flex-row items-center">
+            <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-blue-50">
               <Ionicons name="person" size={20} color="#2979FF" />
             </View>
             <View className="flex-1">
@@ -301,8 +295,8 @@ const ExpenseDetailsScreen = () => {
           </View>
 
           {/* Date */}
-          <View className="flex-row items-center mb-4">
-            <View className="items-center justify-center w-10 h-10 mr-3 rounded-full bg-green-50">
+          <View className="mb-4 flex-row items-center">
+            <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-green-50">
               <Ionicons name="calendar" size={20} color="#10B981" />
             </View>
             <View className="flex-1">
@@ -314,8 +308,8 @@ const ExpenseDetailsScreen = () => {
           </View>
 
           {/* Time */}
-          <View className="flex-row items-center mb-4">
-            <View className="items-center justify-center w-10 h-10 mr-3 rounded-full bg-purple-50">
+          <View className="mb-4 flex-row items-center">
+            <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-purple-50">
               <Ionicons name="time" size={20} color="#8B5CF6" />
             </View>
             <View className="flex-1">
@@ -329,7 +323,7 @@ const ExpenseDetailsScreen = () => {
           {/* Group (if available) */}
           {expense.group_name && (
             <View className="flex-row items-center">
-              <View className="items-center justify-center w-10 h-10 mr-3 rounded-full bg-orange-50">
+              <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-orange-50">
                 <Ionicons name="people" size={20} color="#F59E0B" />
               </View>
               <View className="flex-1">
@@ -341,10 +335,10 @@ const ExpenseDetailsScreen = () => {
         </View>
 
         {/* Action Buttons */}
-        <View className="flex gap-3 mx-4 mt-4">
+        <View className="mx-4 mt-4 flex gap-3">
           {/* Edit Button */}
           <TouchableOpacity
-            className="flex-row items-center justify-center py-3 rounded-lg bg-primary"
+            className="flex-row items-center justify-center rounded-lg bg-primary py-3"
             onPress={handleEditExpense}
             disabled={deleting}>
             <Feather name="edit-2" size={20} color="white" />
@@ -362,7 +356,7 @@ const ExpenseDetailsScreen = () => {
 
           {/* Delete Button */}
           <TouchableOpacity
-            className="flex-row items-center justify-center py-3 border border-red-300 rounded-lg"
+            className="flex-row items-center justify-center rounded-lg border border-red-300 py-3"
             onPress={handleDeleteExpense}
             disabled={deleting}>
             {deleting ? (

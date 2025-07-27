@@ -1,12 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import Header from 'components/Header';
@@ -53,7 +48,7 @@ const GroupDetailsScreen = () => {
   const handleCleanup = async () => {
     await cleanupAllGroups();
     // Refresh your group data after cleanup
-};
+  };
 
   useFocusEffect(
     useCallback(() => {

@@ -21,11 +21,7 @@
       "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": ["**/*"],
-    "androidStatusBar": {
-      "barStyle": "dark-content",
-      "backgroundColor": "#ffffff",
-      "translucent": true
-    },
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.quassama.app"

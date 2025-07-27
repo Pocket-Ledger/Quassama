@@ -5,9 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -136,7 +137,7 @@ const AddNewGroupScreen = () => {
         groupName,
         created_by,
         currency,
-        [],  // Empty array - let creatGroup handle the creator member
+        [], // Empty array - let creatGroup handle the creator member
         description
       );
 

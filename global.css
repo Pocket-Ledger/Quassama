@@ -39,7 +39,7 @@
 @layer components {
   /* Container Styles */
   .container {
-    @apply flex-1 px-4 pb-8;
+    @apply flex-1 px-4 pb-8 pt-4;
   }
 
   .login-content {

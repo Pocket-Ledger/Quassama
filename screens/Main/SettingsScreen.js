@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Switch,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Switch, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Ionicons } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useNavigation } from '@react-navigation/native';
@@ -60,12 +54,14 @@ const SettingsScreen = () => {
         <View className="relative pt-4">
           <View className="form-container">
             {/* Notifications Setting */}
-            <View className="flex-row items-center justify-between px-0 py-4 border-gray-200">
+            <View className="flex-row items-center justify-between border-gray-200 px-0 py-4">
               <View className="flex-row items-center ">
-                <View className="items-center justify-center w-10 h-10 ">
+                <View className="h-10 w-10 items-center justify-center ">
                   <Ionicons name="notifications-outline" size={20} color="#666" />
                 </View>
-                <Text className="text-lg font-normal text-black">{t('settings.notifications')}</Text>
+                <Text className="text-lg font-normal text-black">
+                  {t('settings.notifications')}
+                </Text>
               </View>
               <Switch
                 value={notificationsEnabled}
@@ -78,10 +74,10 @@ const SettingsScreen = () => {
 
             {/* Currency Setting */}
             <View className="mb-6">
-              <Text className="mb-2 input-label">{t('settings.currency')}</Text>
+              <Text className="input-label mb-2">{t('settings.currency')}</Text>
               <View className="input-container">
                 <TouchableOpacity
-                  className="h-14 w-full rounded-input border border-border-light bg-white px-4 flex-row items-center justify-between"
+                  className="h-14 w-full flex-row items-center justify-between rounded-input border border-border-light bg-white px-4"
                   onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
                   <Text className="text-base text-black">{selectedCurrency}</Text>
                   <Ionicons
@@ -93,7 +89,9 @@ const SettingsScreen = () => {
 
                 {/* Currency Dropdown */}
                 {showCurrencyDropdown && (
-                  <View className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-sm z-50" style={{ zIndex: 1000 }}>
+                  <View
+                    className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-200 bg-white shadow-sm"
+                    style={{ zIndex: 1000 }}>
                     {currencies.map((currency, index) => (
                       <TouchableOpacity
                         key={currency.code}
@@ -121,7 +119,9 @@ const SettingsScreen = () => {
               className="btn-primary"
               onPress={handleUpdateSettings}
               disabled={isLoading}>
-              <Text className="btn-primary-text">{isLoading ? t('settings.updating') : t('settings.update_info')}</Text>
+              <Text className="btn-primary-text">
+                {isLoading ? t('settings.updating') : t('settings.update_info')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

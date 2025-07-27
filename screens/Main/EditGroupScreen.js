@@ -5,9 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Feather } from '@expo/vector-icons';
 import { BackButton } from 'components/BackButton';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
@@ -284,7 +285,7 @@ const EditGroupScreen = () => {
             </Text>
             <View className="input-container flex-row">
               <TextInput
-                className="input-field flex-1 rounded-lg border border-gray-200 px-4  text-black"
+                className="input-field flex-1 rounded-lg border border-gray-200 px-4 text-black"
                 placeholder={t('editGroup.search_placeholder')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={memberInput}

@@ -1,16 +1,7 @@
 // NewExpenseScreen.js
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-  Platform,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal, FlatList, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
@@ -28,6 +19,7 @@ import FloatingPlusButton from 'components/FloatingPlusButton';
 import Logger from 'utils/looger';
 import RepeatSection from 'components/RepeatSection';
 import SplitWithSection from 'components/SplitWithSection';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const NewExpenseScreen = () => {
   const navigation = useNavigation();
@@ -381,8 +373,8 @@ const NewExpenseScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white ">
-      <View className="container">
+    <SafeAreaView className="container flex-1 bg-white">
+      <View className="">
         <Header title={t('expense.addExpense')} />
 
         <KeyboardAwareScrollView
@@ -493,7 +485,7 @@ const NewExpenseScreen = () => {
               )}
             </View>
 
-           {/*  <SplitWithSection
+            <SplitWithSection
               selectedGroup={selectedGroup}
               groupMembers={getGroupMembers(selectedGroup)}
               splits={splits}
@@ -501,7 +493,7 @@ const NewExpenseScreen = () => {
               totalAmount={amount}
               currentUserId={userId}
               error={errors.splits}
-            /> */}
+            />
 
             {/* Category */}
             <CategoryList

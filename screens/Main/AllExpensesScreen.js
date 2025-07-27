@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   FlatList,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useNavigation, useRoute } from '@react-navigation/native';
 import SearchBar from 'components/FilterSearchBar';
 import FilterModal from 'components/FilterModal';
@@ -81,7 +82,7 @@ const AllExpensesScreen = () => {
         }
 
         let result;
-        
+
         // Check if we should apply filters
         if (applyFilters && filterConfig.checkedFilter) {
           // Use filterExpenses method when filters are applied
@@ -93,12 +94,12 @@ const AllExpensesScreen = () => {
             filterConfig.minAmount,
             filterConfig.maxAmount
           );
-          
+
           // For filtered results, we'll handle pagination manually
           const startIndex = (page - 1) * pagination.pageSize;
           const endIndex = startIndex + pagination.pageSize;
           const paginatedExpenses = filteredExpenses.slice(startIndex, endIndex);
-          
+
           result = {
             expenses: paginatedExpenses,
             pagination: {
@@ -110,15 +111,11 @@ const AllExpensesScreen = () => {
               hasPreviousPage: page > 1,
               startIndex: startIndex + 1,
               endIndex: Math.min(endIndex, filteredExpenses.length),
-            }
+            },
           };
         } else {
           // Use regular pagination when no filters are applied
-          result = await Expense.getExpensesByGroupPaginated(
-            groupId,
-            page,
-            pagination.pageSize
-          );
+          result = await Expense.getExpensesByGroupPaginated(groupId, page, pagination.pageSize);
         }
 
         if (isRefresh || page === 1) {
@@ -146,7 +143,13 @@ const AllExpensesScreen = () => {
     if (!loadingMore && pagination.hasNextPage) {
       loadExpenses(pagination.currentPage + 1, false, filterConfig.checkedFilter);
     }
-  }, [loadExpenses, loadingMore, pagination.hasNextPage, pagination.currentPage, filterConfig.checkedFilter]);
+  }, [
+    loadExpenses,
+    loadingMore,
+    pagination.hasNextPage,
+    pagination.currentPage,
+    filterConfig.checkedFilter,
+  ]);
 
   // Refresh expenses
   const onRefresh = useCallback(() => {
@@ -163,23 +166,28 @@ const AllExpensesScreen = () => {
     if (filterConfig.checkedFilter) {
       loadExpenses(1, false, true);
     }
-  }, [filterConfig.checkedFilter, filterConfig.startDate, filterConfig.endDate, filterConfig.categories, filterConfig.minAmount, filterConfig.maxAmount]);
+  }, [
+    filterConfig.checkedFilter,
+    filterConfig.startDate,
+    filterConfig.endDate,
+    filterConfig.categories,
+    filterConfig.minAmount,
+    filterConfig.maxAmount,
+  ]);
 
   // Filter expenses by search text
   const filteredExpenses = React.useMemo(() => {
     if (!searchText.trim()) {
       return expenses;
     }
-    
+
     return expenses.filter((expense) => {
       const title = expense.title?.toLowerCase() || '';
       const description = expense.description?.toLowerCase() || '';
       const category = expense.category?.toLowerCase() || '';
       const search = searchText.toLowerCase();
-      
-      return title.includes(search) || 
-             description.includes(search) || 
-             category.includes(search);
+
+      return title.includes(search) || description.includes(search) || category.includes(search);
     });
   }, [expenses, searchText]);
 
@@ -210,7 +218,7 @@ const AllExpensesScreen = () => {
     };
     setFilterConfig(resetFilter);
     console.log('Filter reset');
-    
+
     // Immediately reload expenses without filters
     loadExpenses(1, false, false);
   };
@@ -270,20 +278,20 @@ const AllExpensesScreen = () => {
   const renderEmptyState = () => {
     const isSearchActive = searchText.trim().length > 0;
     const isFilterActive = filterConfig.checkedFilter;
-    
+
     return (
       <View className="items-center px-4 py-12">
         <View className="mb-4 items-center justify-center">
           <Ionicons name="receipt" size={70} color="#2979FF" />
         </View>
         <Text className="mb-2 font-dmsans-bold text-[24px]">
-          {isSearchActive || isFilterActive 
-            ? t('expense.empty.noResults') 
+          {isSearchActive || isFilterActive
+            ? t('expense.empty.noResults')
             : t('expense.empty.title')}
         </Text>
         <Text className="mb-6 text-center text-gray-500">
-          {isSearchActive || isFilterActive 
-            ? t('expense.empty.tryDifferentFilters') 
+          {isSearchActive || isFilterActive
+            ? t('expense.empty.tryDifferentFilters')
             : t('expense.empty.description')}
         </Text>
         {!isSearchActive && !isFilterActive && (
@@ -341,18 +349,14 @@ const AllExpensesScreen = () => {
           placeholder={t('expense.search.placeholder')}
           onFilterPress={() => setIsFilterModalVisible(true)}
         />
-        
+
         {/* Filter Active Indicator */}
         {filterConfig.checkedFilter && (
           <View className="mx-4 mt-2 flex-row items-center rounded-lg bg-blue-50 px-3 py-2">
             <Feather name="filter" size={16} color="#2979FF" />
-            <Text className="ml-2 flex-1 text-sm text-blue-700">
-              {t('expense.filtersActive')}
-            </Text>
+            <Text className="ml-2 flex-1 text-sm text-blue-700">{t('expense.filtersActive')}</Text>
             <TouchableOpacity onPress={handleResetFilter}>
-              <Text className="text-sm font-medium text-blue-700">
-                {t('filters.clear')}
-              </Text>
+              <Text className="text-sm font-medium text-blue-700">{t('filters.clear')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -368,7 +372,8 @@ const AllExpensesScreen = () => {
       ) : error && expenses.length === 0 ? (
         renderErrorState()
       ) : filteredExpenses.length > 0 ? (
-        <FlatList className='mx-2'
+        <FlatList
+          className="mx-2"
           data={filteredExpenses}
           renderItem={renderExpenseItem}
           keyExtractor={(item) => item.id}
