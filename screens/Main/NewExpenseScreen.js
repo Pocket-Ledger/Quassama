@@ -369,22 +369,6 @@ const NewExpenseScreen = () => {
     );
   };
 
-  const handleCheckboxChange = () => {
-    if (isSplitEnabled) {
-      // If disabling split, clear the splits data
-      onSplitsChange({});
-      onSplitEnabledChange(false);
-    } else {
-      // Check if amount is entered before allowing split
-      if (!totalAmount || parseFloat(totalAmount) <= 0) {
-        Alert.alert(t('expense.split.enterAmountFirst'));
-        return;
-      }
-      // If enabling split, open the sheet
-      openSplitSheet();
-    }
-  };
-
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const renderGroupItem = ({ item }) => (
