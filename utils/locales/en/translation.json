@@ -166,7 +166,8 @@
     "days": "days",
     "confirm": "Confirm",
     "apply": "Apply",
-    "updating": "Updating..."
+    "updating": "Updating...",
+    "summary": "Summary"
   },
   "home": {
     "goodMorning": "Good morning 👋",
@@ -261,7 +262,13 @@
       "enterPersonName": "Enter person name",
       "selectGroupFirst": "Select a group first",
       "equalSplit": "Equal Split",
-      "noMembers": "No members to split with"
+      "noMembers": "No members to split with",
+      "tapToEdit": "Tap to edit",
+      "editSplit": "Edit Split",
+      "people": "people",
+      "splitWith": "Split With",
+      "enableSplit": "Enable split",
+      "enterAmountFirst": "Enter amount first"
     },
     "validation": {
       "expenseNameRequired": "Expense name is required",

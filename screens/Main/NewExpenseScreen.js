@@ -47,6 +47,7 @@ const NewExpenseScreen = () => {
   const [customDays, setCustomDays] = useState('');
   const [customInterval, setCustomInterval] = useState('days');
   const [splits, setSplits] = useState({});
+  const [isSplitEnabled, setIsSplitEnabled] = useState(false);
 
   // Fetch the user's groups (or fall back to Personal)
   useFocusEffect(
@@ -124,8 +125,8 @@ const NewExpenseScreen = () => {
       }
     }
 
-    // Split validation
-    if (splits && Object.keys(splits).length > 0) {
+    // Split validation - only validate if split is enabled
+    if (isSplitEnabled && splits && Object.keys(splits).length > 0) {
       const totalSplitAmount = Object.values(splits).reduce((sum, split) => {
         return sum + (parseFloat(split.amount) || 0);
       }, 0);
@@ -158,12 +159,12 @@ const NewExpenseScreen = () => {
         customInterval: selectedRepeat === 'custom' ? customInterval : null,
       };
 
-      // Prepare splits data
-      const splitsData = splits && Object.keys(splits).length > 0 ? splits : null;
+      // Prepare splits data - only include if split is enabled
+      const splitsData = isSplitEnabled && splits && Object.keys(splits).length > 0 ? splits : null;
 
-      Logger.info(repeatData);
-      Logger.info(splitsData);
-      Logger.info(selectedCategory);
+      console.log(repeatData);
+      console.log('Splits Data', splitsData);
+      console.log(selectedCategory);
       const expense = new Expense(
         expenseName.trim(), // title
         amount.trim(), // amount
@@ -182,6 +183,7 @@ const NewExpenseScreen = () => {
       setCustomDays('');
       setCustomInterval('days');
       setSplits({});
+      setIsSplitEnabled(false);
       // Don't reset selectedGroup to maintain the selection for next expense
 
       showSuccess(t('customAlert.titles.success'), t('expense.added_success'), () => {
@@ -199,8 +201,26 @@ const NewExpenseScreen = () => {
   const handleGroupSelect = (groupId) => {
     setSelectedGroup(groupId);
     setIsGroupModalVisible(false);
+
+    // Reset split data when group changes
+    if (isSplitEnabled) {
+      setSplits({});
+      setIsSplitEnabled(false);
+    }
+
     if (errors.group) {
       setErrors((prev) => ({ ...prev, group: null }));
+    }
+  };
+
+  const handleSplitEnabledChange = (enabled) => {
+    setIsSplitEnabled(enabled);
+    if (!enabled) {
+      setSplits({});
+    }
+    // Clear split errors when disabling
+    if (!enabled && errors.splits) {
+      setErrors((prev) => ({ ...prev, splits: null }));
     }
   };
 
@@ -349,6 +369,22 @@ const NewExpenseScreen = () => {
     );
   };
 
+  const handleCheckboxChange = () => {
+    if (isSplitEnabled) {
+      // If disabling split, clear the splits data
+      onSplitsChange({});
+      onSplitEnabledChange(false);
+    } else {
+      // Check if amount is entered before allowing split
+      if (!totalAmount || parseFloat(totalAmount) <= 0) {
+        Alert.alert(t('expense.split.enterAmountFirst'));
+        return;
+      }
+      // If enabling split, open the sheet
+      openSplitSheet();
+    }
+  };
+
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
 
   const renderGroupItem = ({ item }) => (
@@ -373,8 +409,8 @@ const NewExpenseScreen = () => {
   };
 
   return (
-    <SafeAreaView className="container flex-1 bg-white">
-      <View className="">
+    <SafeAreaView className="flex-1 bg-white ">
+      <View className="container">
         <Header title={t('expense.addExpense')} />
 
         <KeyboardAwareScrollView
@@ -485,6 +521,7 @@ const NewExpenseScreen = () => {
               )}
             </View>
 
+            {/* Split With Section */}
             <SplitWithSection
               selectedGroup={selectedGroup}
               groupMembers={getGroupMembers(selectedGroup)}
@@ -493,6 +530,8 @@ const NewExpenseScreen = () => {
               totalAmount={amount}
               currentUserId={userId}
               error={errors.splits}
+              isSplitEnabled={isSplitEnabled}
+              onSplitEnabledChange={handleSplitEnabledChange}
             />
 
             {/* Category */}

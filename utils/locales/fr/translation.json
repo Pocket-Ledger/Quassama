@@ -164,7 +164,8 @@
     "days": "jours",
     "confirm": "Confirmer",
     "apply": "Appliquer",
-    "updating": "Mise à jour..."
+    "updating": "Mise à jour...",
+    "summary": "Résumé"
   },
   "home": {
     "goodMorning": "Bonjour 👋",
@@ -259,7 +260,13 @@
       "enterPersonName": "Entrez le nom de la personne",
       "selectGroupFirst": "Sélectionnez d'abord un groupe",
       "equalSplit": "Partage égal",
-      "noMembers": "Aucun membre avec qui partager"
+      "noMembers": "Aucun membre avec qui partager",
+      "tapToEdit": "Appuyez pour modifier",
+      "editSplit": "Modifier la répartition",
+      "people": "personnes",
+      "splitWith": "Répartir avec",
+      "enableSplit": "Activer la répartition",
+      "enterAmountFirst": "Entrez le montant d'abord"
     },
     "validation": {
       "expenseNameRequired": "Le nom de la dépense est requis",
