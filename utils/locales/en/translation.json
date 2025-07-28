@@ -215,7 +215,10 @@
       "edit": "Edit Expense",
       "share": "Share Expense",
       "delete": "Delete Expense",
-      "deleting": "Deleting..."
+      "deleting": "Deleting...",
+      "customSplit": "Custom Split",
+      "equalSplit": "Equal Split",
+      "equalSplitNote": "Total {{amount}} split equally among {{count}} members ({{share}} each)"
     },
     "delete": {
       "title": "Delete Expense",
@@ -268,7 +271,9 @@
       "people": "people",
       "splitWith": "Split With",
       "enableSplit": "Enable split",
-      "enterAmountFirst": "Enter amount first"
+      "enterAmountFirst": "Enter amount first",
+      "invalidSplit": "Invalid Split",
+      "splitMustEqualTotal": "Split amounts must equal expense total. Split: {{splitTotal}}, Expense: {{expenseTotal}}"
     },
     "validation": {
       "expenseNameRequired": "Expense name is required",

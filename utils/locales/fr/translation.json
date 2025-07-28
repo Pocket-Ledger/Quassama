@@ -213,7 +213,10 @@
       "edit": "Modifier la dépense",
       "share": "Partager la dépense",
       "delete": "Supprimer la dépense",
-      "deleting": "Suppression en cours..."
+      "deleting": "Suppression en cours...",
+      "customSplit": "Partage personnalisé",
+      "equalSplit": "Partage égal",
+      "equalSplitNote": "Total {{amount}} partagé équitablement entre {{count}} membres ({{share}} chacun)"
     },
     "delete": {
       "title": "Supprimer la dépense",
@@ -266,7 +269,9 @@
       "people": "personnes",
       "splitWith": "Répartir avec",
       "enableSplit": "Activer la répartition",
-      "enterAmountFirst": "Entrez le montant d'abord"
+      "enterAmountFirst": "Entrez le montant d'abord",
+      "invalidSplit": "Répartition invalide",
+      "splitMustEqualTotal": "Les montants partagés doivent égaler le total de la dépense. Répartition: {{splitTotal}}, Dépense: {{expenseTotal}}"
     },
     "validation": {
       "expenseNameRequired": "Le nom de la dépense est requis",

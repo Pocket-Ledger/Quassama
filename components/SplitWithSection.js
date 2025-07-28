@@ -168,7 +168,11 @@ const SplitWithSection = ({
     } else {
       // Check if amount is entered before allowing split
       if (!totalAmount || parseFloat(totalAmount) <= 0) {
-        return; // Don't proceed if no amount
+        Alert.alert(
+          t('expense.split.amountRequired'),
+          t('expense.split.enterAmountFirst')
+        );
+        return;
       }
       // If enabling split, open the sheet
       openSplitSheet();
@@ -209,6 +213,23 @@ const SplitWithSection = ({
   };
 
   const handleSplitSheetConfirm = () => {
+    // Validate that splits add up to total amount
+    const total = parseFloat(totalAmount) || 0;
+    const splitsTotal = Object.values(tempSplits).reduce((sum, person) => {
+      return sum + (parseFloat(person.amount) || 0);
+    }, 0);
+
+    if (Math.abs(splitsTotal - total) > 0.01) {
+      Alert.alert(
+        t('expense.split.invalidSplit'),
+        t('expense.split.splitMustEqualTotal', {
+          splitTotal: splitsTotal.toFixed(2),
+          expenseTotal: total.toFixed(2)
+        })
+      );
+      return;
+    }
+
     onSplitsChange(tempSplits);
     onSplitEnabledChange(true);
     setIsSplitSheetVisible(false);

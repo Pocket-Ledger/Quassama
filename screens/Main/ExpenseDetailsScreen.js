@@ -11,6 +11,8 @@ import CustomAlert from 'components/CustomALert';
 import { useAlert } from 'hooks/useAlert';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import Expense from 'models/expense/Expense';
+import Group from 'models/group/group';
+import User from 'models/auth/user';
 import { useTranslation } from 'react-i18next';
 import Logger from 'utils/looger';
 import { formatDate, formatTime } from 'utils/time';
@@ -39,6 +41,7 @@ const ExpenseDetailsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [splitDetails, setSplitDetails] = useState(null);
 
   // Dummy expense data for testing
   const getDummyExpense = () => {
@@ -66,25 +69,14 @@ const ExpenseDetailsScreen = () => {
 
       Logger.log('Loading expense details for ID:', expenseId);
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // For now, use dummy data
       const dummyExpense = await Expense.getExpenseByID(expenseId);
       console.log('Dummy expense data:', dummyExpense);
       setExpense(dummyExpense);
 
-      Logger.log('Expense details loaded:', dummyExpense);
+      // Calculate split details
+      await calculateSplitDetails(dummyExpense);
 
-      /* 
-      // Real API call would be:
-      const expenseData = await Expense.getExpenseById(expenseId);
-      if (expenseData) {
-        setExpense(expenseData);
-      } else {
-        setError(t('expense.error.notFound'));
-      }
-      */
+      Logger.log('Expense details loaded:', dummyExpense);
     } catch (err) {
       Logger.error('Error loading expense details:', err);
       setError(err.message || t('expense.error.loadFailed'));
@@ -92,6 +84,66 @@ const ExpenseDetailsScreen = () => {
       setLoading(false);
     }
   }, [expenseId, t]);
+
+  // Calculate split details for display
+  const calculateSplitDetails = async (expenseData) => {
+    try {
+      if (!expenseData) return;
+
+      const { is_split, splits, group_id, amount } = expenseData;
+      
+      if (is_split && splits && Object.keys(splits).length > 0) {
+        // Custom split - show individual splits
+        const splitList = await Promise.all(
+          Object.values(splits).map(async (split) => {
+            const userId = split.user_id || split.id;
+            const username = await User.getUsernameById(userId).catch(() => 'Unknown User');
+            return {
+              userId,
+              username,
+              amount: parseFloat(split.amount) || 0,
+              type: 'custom'
+            };
+          })
+        );
+        setSplitDetails({ type: 'custom', splits: splitList });
+      } else if (group_id && group_id !== `personal_${expenseData.user_id}`) {
+        // Equal split among group members
+        try {
+          const group = await Group.getGroupById(group_id);
+          const members = group?.members || [];
+          
+          if (members.length > 0) {
+            const sharePerMember = amount / members.length;
+            const splitList = await Promise.all(
+              members.map(async (member) => {
+                const userId = typeof member === 'string' ? member : (member.id || member.user_id);
+                const username = await User.getUsernameById(userId).catch(() => 'Unknown User');
+                return {
+                  userId,
+                  username,
+                  amount: sharePerMember,
+                  type: 'equal'
+                };
+              })
+            );
+            setSplitDetails({ type: 'equal', splits: splitList });
+          } else {
+            setSplitDetails({ type: 'personal', splits: [] });
+          }
+        } catch (error) {
+          console.error('Error fetching group for split calculation:', error);
+          setSplitDetails({ type: 'personal', splits: [] });
+        }
+      } else {
+        // Personal expense
+        setSplitDetails({ type: 'personal', splits: [] });
+      }
+    } catch (error) {
+      console.error('Error calculating split details:', error);
+      setSplitDetails(null);
+    }
+  };
 
   // Load expense on component mount and when screen is focused
   useFocusEffect(
@@ -322,7 +374,7 @@ const ExpenseDetailsScreen = () => {
 
           {/* Group (if available) */}
           {expense.group_name && (
-            <View className="flex-row items-center">
+            <View className="mb-4 flex-row items-center">
               <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-orange-50">
                 <Ionicons name="people" size={20} color="#F59E0B" />
               </View>
@@ -333,6 +385,49 @@ const ExpenseDetailsScreen = () => {
             </View>
           )}
         </View>
+
+        {/* Split Information Card */}
+        {splitDetails && splitDetails.splits.length > 0 && (
+          <View className="mx-4 mt-4 rounded-lg bg-white p-4 shadow-sm">
+            <View className="mb-4 flex-row items-center">
+              <Ionicons name="pie-chart" size={20} color="#6366F1" />
+              <Text className="ml-2 text-lg font-semibold text-gray-900">
+                {splitDetails.type === 'custom' 
+                  ? t('expense.details.customSplit') 
+                  : t('expense.details.equalSplit')
+                }
+              </Text>
+            </View>
+            
+            {splitDetails.splits.map((split, index) => (
+              <View key={split.userId} className="mb-3 flex-row items-center justify-between">
+                <View className="flex-row items-center flex-1">
+                  <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+                    <Ionicons name="person" size={16} color="#6B7280" />
+                  </View>
+                  <Text className="flex-1 text-base text-gray-700" numberOfLines={1}>
+                    {split.username}
+                  </Text>
+                </View>
+                <Text className="font-medium text-gray-900">
+                  {split.amount.toFixed(2)} {t('common.currency')}
+                </Text>
+              </View>
+            ))}
+            
+            {splitDetails.type === 'equal' && (
+              <View className="mt-2 rounded-lg bg-blue-50 p-3">
+                <Text className="text-sm text-blue-700">
+                  {t('expense.details.equalSplitNote', { 
+                    amount: expense.amount, 
+                    count: splitDetails.splits.length,
+                    share: (expense.amount / splitDetails.splits.length).toFixed(2)
+                  })}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Action Buttons */}
         <View className="mx-4 mt-4 flex gap-3">

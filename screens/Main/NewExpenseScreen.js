@@ -48,6 +48,7 @@ const NewExpenseScreen = () => {
   const [customInterval, setCustomInterval] = useState('days');
   const [splits, setSplits] = useState({});
   const [isSplitEnabled, setIsSplitEnabled] = useState(false);
+  const [groupMembers, setGroupMembers] = useState([]); // Add state for group members
 
   // Fetch the user's groups (or fall back to Personal)
   useFocusEffect(
@@ -85,17 +86,28 @@ const NewExpenseScreen = () => {
               const groupExists = list.find((g) => g.id === routeGroupId);
               if (groupExists) {
                 setSelectedGroup(routeGroupId);
+                fetchGroupMembers(routeGroupId); // Fetch members for the selected group
               } else {
                 // If passed groupId doesn't exist, fallback to first group
                 setSelectedGroup(list[0]?.id || null);
+                fetchGroupMembers(list[0]?.id || null);
               }
             } else {
               // If no groupId was passed in route params, always reset to first group
               setSelectedGroup(list[0]?.id || null);
+              fetchGroupMembers(list[0]?.id || null);
             }
           }
         } catch (err) {
           console.error('Error loading groups:', err);
+          // Set default personal group members even if there's an error
+          setGroupMembers([
+            {
+              user_id: userId,
+              username: t('expense.split.you'),
+              email: auth.currentUser?.email || '',
+            },
+          ]);
         }
       }
 
@@ -163,14 +175,16 @@ const NewExpenseScreen = () => {
       const splitsData = isSplitEnabled && splits && Object.keys(splits).length > 0 ? splits : null;
 
       console.log(repeatData);
-      console.log('Splits Data', splitsData);
+      console.log('Splits Data:', JSON.stringify(splitsData, null, 2));
+      console.log('Is Split Enabled:', isSplitEnabled);
       console.log(selectedCategory);
       const expense = new Expense(
         expenseName.trim(), // title
         amount.trim(), // amount
         selectedCategory, // category (icon name instead of id)
         note.trim(), // note/description
-        selectedGroup // group_id
+        selectedGroup, // group_id
+        splitsData // splits data
       );
       await expense.save();
 
@@ -208,8 +222,46 @@ const NewExpenseScreen = () => {
       setIsSplitEnabled(false);
     }
 
+    // Fetch group members when group changes
+    fetchGroupMembers(groupId);
+
     if (errors.group) {
       setErrors((prev) => ({ ...prev, group: null }));
+    }
+  };
+
+  // Function to fetch real group members
+  const fetchGroupMembers = async (groupId) => {
+    if (!groupId || groupId.startsWith('personal_')) {
+      setGroupMembers([
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+      ]);
+      return;
+    }
+
+    try {
+      const members = await Group.getMembersByGroup(groupId);
+      const formattedMembers = members.map(member => ({
+        user_id: member.user_id || member.id,
+        username: member.user_id === userId ? t('expense.split.you') : member.username,
+        email: member.email || '',
+      }));
+      console.log('Fetched group members for group', groupId, ':', formattedMembers);
+      setGroupMembers(formattedMembers);
+    } catch (error) {
+      console.error('Error fetching group members:', error);
+      // Fallback to current user only
+      setGroupMembers([
+        {
+          user_id: userId,
+          username: t('expense.split.you'),
+          email: auth.currentUser?.email || '',
+        },
+      ]);
     }
   };
 
@@ -225,148 +277,7 @@ const NewExpenseScreen = () => {
   };
 
   const getGroupMembers = (groupId) => {
-    if (!groupId || groupId.startsWith('personal_')) {
-      return [
-        {
-          user_id: userId,
-          username: t('expense.split.you'),
-          email: auth.currentUser?.email || '',
-        },
-      ];
-    }
-
-    // Dummy data for different groups
-    const dummyGroupMembers = {
-      '6d22x8q7JEcWuefoiUX1': [
-        {
-          user_id: userId,
-          username: t('expense.split.you'),
-          email: auth.currentUser?.email || '',
-        },
-        {
-          user_id: 'user_sara',
-          username: 'Sara',
-          email: 'sara@example.com',
-        },
-        {
-          user_id: 'user_ahmad',
-          username: 'Ahmad',
-          email: 'ahmad@example.com',
-        },
-        {
-          user_id: 'user_yassin',
-          username: 'yassin',
-          email: 'yassin@example.com',
-        },
-        {
-          user_id: 'user_3abdo',
-          username: '3abdo',
-          email: '3abdo@example.com',
-        },
-      ],
-      vacation_group: [
-        {
-          user_id: userId,
-          username: t('expense.split.you'),
-          email: auth.currentUser?.email || '',
-        },
-        {
-          user_id: 'user_sara',
-          username: 'Sara',
-          email: 'sara@example.com',
-        },
-        {
-          user_id: 'user_ahmad',
-          username: 'Ahmad',
-          email: 'ahmad@example.com',
-        },
-        {
-          user_id: 'user_maria',
-          username: 'Maria',
-          email: 'maria@example.com',
-        },
-        {
-          user_id: 'user_john',
-          username: 'John',
-          email: 'john@example.com',
-        },
-      ],
-      family_group: [
-        {
-          user_id: userId,
-          username: t('expense.split.you'),
-          email: auth.currentUser?.email || '',
-        },
-        {
-          user_id: 'user_mom',
-          username: 'Mom',
-          email: 'mom@family.com',
-        },
-        {
-          user_id: 'user_dad',
-          username: 'Dad',
-          email: 'dad@family.com',
-        },
-        {
-          user_id: 'user_sister',
-          username: 'Sister',
-          email: 'sister@family.com',
-        },
-      ],
-      work_team: [
-        {
-          user_id: userId,
-          username: t('expense.split.you'),
-          email: auth.currentUser?.email || '',
-        },
-        {
-          user_id: 'user_alex',
-          username: 'Alex',
-          email: 'alex@company.com',
-        },
-        {
-          user_id: 'user_priya',
-          username: 'Priya',
-          email: 'priya@company.com',
-        },
-        {
-          user_id: 'user_mike',
-          username: 'Mike',
-          email: 'mike@company.com',
-        },
-        {
-          user_id: 'user_emma',
-          username: 'Emma',
-          email: 'emma@company.com',
-        },
-        {
-          user_id: 'user_david',
-          username: 'David',
-          email: 'david@company.com',
-        },
-      ],
-    };
-
-    // Return dummy data for the selected group, or default group if not found
-    return (
-      dummyGroupMembers[groupId] || [
-        {
-          user_id: userId,
-          username: t('expense.split.you'),
-          email: auth.currentUser?.email || '',
-        },
-        {
-          user_id: 'user_friend1',
-          username: 'Friend 1',
-          email: 'friend1@example.com',
-        },
-        {
-          user_id: 'user_friend2',
-          username: 'Friend 2',
-          email: 'friend2@example.com',
-        },
-      ]
-    );
+    return groupMembers;
   };
 
   const selectedGroupData = groups.find((g) => g.id === selectedGroup);
@@ -508,7 +419,7 @@ const NewExpenseScreen = () => {
             {/* Split With Section */}
             <SplitWithSection
               selectedGroup={selectedGroup}
-              groupMembers={getGroupMembers(selectedGroup)}
+              groupMembers={groupMembers}
               splits={splits}
               onSplitsChange={setSplits}
               totalAmount={amount}

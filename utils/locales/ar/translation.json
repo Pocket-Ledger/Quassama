@@ -213,7 +213,10 @@
       "edit": "تعديل المصروف",
       "share": "مشاركة المصروف",
       "delete": "حذف المصروف",
-      "deleting": "جاري الحذف..."
+      "deleting": "جاري الحذف...",
+      "customSplit": "تقسيم مخصص",
+      "equalSplit": "تقسيم متساوي",
+      "equalSplitNote": "المجموع {{amount}} مقسم بالتساوي بين {{count}} أعضاء ({{share}} لكل عضو)"
     },
     "delete": {
       "title": "حذف المصروف",
@@ -266,7 +269,9 @@
       "people": "أشخاص",
       "splitWith": "تقسيم مع",
       "enableSplit": "تفعيل التقسيم",
-      "enterAmountFirst": "أدخل المبلغ أولاً"
+      "enterAmountFirst": "أدخل المبلغ أولاً",
+      "invalidSplit": "تقسيم غير صحيح",
+      "splitMustEqualTotal": "يجب أن تساوي مبالغ التقسيم إجمالي المصروف. التقسيم: {{splitTotal}}، المصروف: {{expenseTotal}}"
     },
     "validation": {
       "expenseNameRequired": "اسم المصروف مطلوب",
