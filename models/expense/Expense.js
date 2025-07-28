@@ -404,6 +404,14 @@ class Expense {
         }
       } else if (is_split && splits && Object.keys(splits).length > 0) {
         // For split expenses, assign each person's share from the split data
+        let totalSplitAmount = 0;
+        
+        // First calculate total split amount
+        Object.values(splits).forEach(splitInfo => {
+          totalSplitAmount += parseFloat(splitInfo.amount) || 0;
+        });
+        
+        // Assign split amounts to participants
         Object.values(splits).forEach(splitInfo => {
           const splitUserId = splitInfo.user_id || splitInfo.id;
           const splitAmount = parseFloat(splitInfo.amount) || 0;
@@ -413,6 +421,13 @@ class Expense {
             totals[splitUserId] += splitAmount;
           }
         });
+        
+        // The payer owes the remaining amount (total - total splits)
+        const payerShare = amount - totalSplitAmount;
+        if (payerShare > 0) {
+          if (!totals[user_id]) totals[user_id] = 0;
+          totals[user_id] += payerShare;
+        }
       } else {
         // For non-split expenses, split equally among all group members
         const members = group && group.members ? group.members : [];
@@ -467,7 +482,18 @@ class Expense {
         );
         
         if (userSplit) {
+          // Current user is a split participant, add their split amount
           total += parseFloat(userSplit.amount) || 0;
+        } else if (user_id === currentUser.uid) {
+          // Current user is the payer but not in splits, they owe the remaining amount
+          let totalSplitAmount = 0;
+          Object.values(splits).forEach(splitInfo => {
+            totalSplitAmount += parseFloat(splitInfo.amount) || 0;
+          });
+          const payerShare = amount - totalSplitAmount;
+          if (payerShare > 0) {
+            total += payerShare;
+          }
         }
       } else {
         // For non-split expenses, split equally among all group members
@@ -548,7 +574,18 @@ class Expense {
         );
         
         if (userSplit) {
+          // Current user is a split participant, add their split amount
           total += parseFloat(userSplit.amount) || 0;
+        } else if (user_id === currentUser.uid) {
+          // Current user is the payer but not in splits, they owe the remaining amount
+          let totalSplitAmount = 0;
+          Object.values(splits).forEach(splitInfo => {
+            totalSplitAmount += parseFloat(splitInfo.amount) || 0;
+          });
+          const payerShare = parseFloat(amount) - totalSplitAmount;
+          if (payerShare > 0) {
+            total += payerShare;
+          }
         }
       } else {
         // For non-split expenses, check if it should be split equally among group members
@@ -612,8 +649,16 @@ class Expense {
         balances[user_id].paid += amount;
 
         if (is_split && splits && Object.keys(splits).length > 0) {
-          // For split expenses, assign debt to each participant
+          // For split expenses, assign debt to each participant including the payer
           console.log(`Processing split expense: ${expense.title || 'Unknown'}, splits:`, splits);
+          
+          // Calculate total split amount to determine payer's share
+          let totalSplitAmount = 0;
+          Object.values(splits).forEach(splitInfo => {
+            totalSplitAmount += parseFloat(splitInfo.amount) || 0;
+          });
+          
+          // Assign split amounts to participants
           Object.values(splits).forEach(splitInfo => {
             const splitUserId = splitInfo.user_id || splitInfo.id;
             const splitAmount = parseFloat(splitInfo.amount) || 0;
@@ -626,6 +671,13 @@ class Expense {
               console.log(`User ${splitUserId} owes ${splitAmount} from split`);
             }
           });
+          
+          // The payer owes the remaining amount (total - total splits)
+          const payerShare = amount - totalSplitAmount;
+          if (payerShare > 0) {
+            balances[user_id].owes += payerShare;
+            console.log(`Payer ${user_id} owes ${payerShare} (their share of split expense)`);
+          }
         } else {
           // For non-split expenses, split equally among all group members
           console.log(`Processing non-split expense: ${expense.title || 'Unknown'}, amount: ${amount}`);
@@ -807,7 +859,15 @@ class Expense {
         balances[user_id].paid += amount;
 
         if (is_split && splits && Object.keys(splits).length > 0) {
-          // For split expenses, assign debt to each participant
+          // For split expenses, assign debt to each participant including the payer
+          let totalSplitAmount = 0;
+          
+          // First calculate total split amount
+          Object.values(splits).forEach(splitInfo => {
+            totalSplitAmount += parseFloat(splitInfo.amount) || 0;
+          });
+          
+          // Assign split amounts to participants
           Object.values(splits).forEach(splitInfo => {
             const splitUserId = splitInfo.user_id || splitInfo.id;
             const splitAmount = parseFloat(splitInfo.amount) || 0;
@@ -819,6 +879,12 @@ class Expense {
               balances[splitUserId].owes += splitAmount;
             }
           });
+          
+          // The payer owes the remaining amount (total - total splits)
+          const payerShare = amount - totalSplitAmount;
+          if (payerShare > 0) {
+            balances[user_id].owes += payerShare;
+          }
         } else {
           // For non-split expenses, the payer owes the full amount
           balances[user_id].owes += amount;
@@ -882,6 +948,15 @@ class Expense {
           filteredBalances[user_id].paid += amount;
 
           if (is_split && splits && Object.keys(splits).length > 0) {
+            // For split expenses, assign debt to each participant including the payer
+            let totalSplitAmount = 0;
+            
+            // First calculate total split amount
+            Object.values(splits).forEach(splitInfo => {
+              totalSplitAmount += parseFloat(splitInfo.amount) || 0;
+            });
+            
+            // Assign split amounts to participants
             Object.values(splits).forEach(splitInfo => {
               const splitUserId = splitInfo.user_id || splitInfo.id;
               const splitAmount = parseFloat(splitInfo.amount) || 0;
@@ -893,6 +968,12 @@ class Expense {
                 filteredBalances[splitUserId].owes += splitAmount;
               }
             });
+            
+            // The payer owes the remaining amount (total - total splits)
+            const payerShare = amount - totalSplitAmount;
+            if (payerShare > 0) {
+              filteredBalances[user_id].owes += payerShare;
+            }
           } else {
             filteredBalances[user_id].owes += amount;
           }
