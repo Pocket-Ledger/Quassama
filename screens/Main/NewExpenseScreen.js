@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
 import { useTranslation } from 'react-i18next';
+import * as Haptics from 'expo-haptics';
 
 import Expense from 'models/expense/Expense';
 import Group from 'models/group/group';
@@ -187,6 +188,9 @@ const NewExpenseScreen = () => {
         splitsData // splits data
       );
       await expense.save();
+
+      // Add haptic feedback for successful expense creation
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
       console.log('Expense saved successfully:', expense);
       setExpenseName('');
