@@ -271,7 +271,9 @@
       "enableSplit": "تفعيل التقسيم",
       "enterAmountFirst": "أدخل المبلغ أولاً",
       "invalidSplit": "تقسيم غير صحيح",
-      "splitMustEqualTotal": "يجب أن تساوي مبالغ التقسيم إجمالي المصروف. التقسيم: {{splitTotal}}، المصروف: {{expenseTotal}}"
+      "splitMustEqualTotal": "يجب أن تساوي مبالغ التقسيم إجمالي المصروف. التقسيم: {{splitTotal}}، المصروف: {{expenseTotal}}",
+      "amountRequired": "المبلغ مطلوب",
+      "totalAmount": "المبلغ الإجمالي"
     },
     "validation": {
       "expenseNameRequired": "اسم المصروف مطلوب",

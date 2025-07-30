@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useAlert } from 'hooks/useAlert';
+import CustomAlert from './CustomALert';
 
 const SplitWithSection = ({
   selectedGroup,
@@ -29,6 +31,7 @@ const SplitWithSection = ({
   const [newPersonName, setNewPersonName] = useState('');
   const [isSplitSheetVisible, setIsSplitSheetVisible] = useState(false);
   const [tempSplits, setTempSplits] = useState({});
+  const { alertConfig, showWarning, hideAlert } = useAlert();
 
   // Function to calculate current user's amount based on others
   const calculateCurrentUserAmount = (splitsObj) => {
@@ -168,10 +171,7 @@ const SplitWithSection = ({
     } else {
       // Check if amount is entered before allowing split
       if (!totalAmount || parseFloat(totalAmount) <= 0) {
-        Alert.alert(
-          t('expense.split.amountRequired'),
-          t('expense.split.enterAmountFirst')
-        );
+        showWarning(t('expense.split.amountRequired'), t('expense.split.enterAmountFirst'));
         return;
       }
       // If enabling split, open the sheet
@@ -181,7 +181,7 @@ const SplitWithSection = ({
 
   const openSplitSheet = () => {
     if (!selectedGroup) {
-      Alert.alert(t('expense.split.selectGroupFirst'));
+      showWarning(t('expense.split.selectGroupFirst'), '');
       return;
     }
 
@@ -220,11 +220,11 @@ const SplitWithSection = ({
     }, 0);
 
     if (Math.abs(splitsTotal - total) > 0.01) {
-      Alert.alert(
+      showWarning(
         t('expense.split.invalidSplit'),
         t('expense.split.splitMustEqualTotal', {
           splitTotal: splitsTotal.toFixed(2),
-          expenseTotal: total.toFixed(2)
+          expenseTotal: total.toFixed(2),
         })
       );
       return;
@@ -246,7 +246,7 @@ const SplitWithSection = ({
 
     return (
       <View className="flex-row items-center justify-between py-3">
-        <View className="flex-1 flex-row items-center">
+        <View className="flex-row items-center flex-1">
           <View
             className={`h-10 w-10 items-center justify-center rounded-full ${
               person.isCurrentUser ? 'bg-primary' : 'bg-gray-300'
@@ -256,7 +256,7 @@ const SplitWithSection = ({
               {person.name.charAt(0).toUpperCase()}
             </Text>
           </View>
-          <View className="ml-3 flex-1">
+          <View className="flex-1 ml-3">
             <Text className="font-medium text-black">{person.name}</Text>
             {person.isCurrentUser && (
               <Text className="text-xs text-gray-500">{t('expense.split.you')}</Text>
@@ -278,7 +278,7 @@ const SplitWithSection = ({
           />
 
           {!person.isCurrentUser && person.isTemporary && isSheet && (
-            <TouchableOpacity className="ml-2 p-1" onPress={() => handleRemovePerson(person.id)}>
+            <TouchableOpacity className="p-1 ml-2" onPress={() => handleRemovePerson(person.id)}>
               <Feather name="x" size={18} color="#666" />
             </TouchableOpacity>
           )}
@@ -292,10 +292,10 @@ const SplitWithSection = ({
 
     return (
       <TouchableOpacity
-        className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+        className="p-3 mt-3 border border-gray-200 rounded-lg bg-gray-50"
         onPress={openSplitSheet}
         activeOpacity={0.7}>
-        <View className="mb-2 flex-row items-center justify-between">
+        <View className="flex-row items-center justify-between mb-2">
           <Text className="text-sm font-medium text-gray-700">{t('common.summary')}</Text>
           <View className="flex-row items-center">
             <Text className="mr-1 text-xs text-gray-500">{t('expense.split.tapToEdit')}</Text>
@@ -319,7 +319,7 @@ const SplitWithSection = ({
   return (
     <View className="input-group">
       {/* Split With Checkbox */}
-      <View className="mb-3 flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between mb-3">
         <Text className="text-base font-medium text-black">
           {t('expense.split.splitWith')}
           {isSplitEnabled && (
@@ -346,7 +346,7 @@ const SplitWithSection = ({
       {/* Split Summary - shown when split is enabled and data exists */}
       {renderSplitSummary()}
 
-      {error && <Text className="error-text mt-1 text-sm text-red-500">{error}</Text>}
+      {error && <Text className="mt-1 text-sm text-red-500 error-text">{error}</Text>}
 
       {/* Split Sheet Modal */}
       <Modal
@@ -357,7 +357,7 @@ const SplitWithSection = ({
         <SafeAreaView className="flex-1 bg-white">
           <View className="flex-1">
             {/* Header */}
-            <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
+            <View className="flex-row items-center justify-between px-4 py-4 border-b border-gray-200">
               <TouchableOpacity onPress={handleSplitSheetCancel}>
                 <Text className="font-medium text-red-500">{t('common.cancel')}</Text>
               </TouchableOpacity>
@@ -371,8 +371,8 @@ const SplitWithSection = ({
 
             {/* Total Amount Display */}
             {totalAmount && (
-              <View className="border-b border-gray-100 bg-gray-50 px-4 py-3">
-                <Text className="text-center text-sm text-gray-600">
+              <View className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                <Text className="text-sm text-center text-gray-600">
                   {t('expense.split.totalAmount')}: {totalAmount} {t('common.currency')}
                 </Text>
               </View>
@@ -390,7 +390,7 @@ const SplitWithSection = ({
                   contentContainerStyle={{ paddingTop: 16 }}
                 />
               ) : (
-                <View className="flex-1 items-center justify-center">
+                <View className="items-center justify-center flex-1">
                   <Text className="text-center text-gray-500">{t('expense.split.noMembers')}</Text>
                 </View>
               )}
@@ -417,7 +417,7 @@ const SplitWithSection = ({
         onRequestClose={() => setIsAddPersonModalVisible(false)}>
         <SafeAreaView className="flex-1 bg-white">
           <View className="flex-1">
-            <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4">
+            <View className="flex-row items-center justify-between px-4 py-4 border-b border-gray-200">
               <TouchableOpacity onPress={() => setIsAddPersonModalVisible(false)}>
                 <Text className="font-medium text-primary">{t('common.cancel')}</Text>
               </TouchableOpacity>
@@ -437,7 +437,7 @@ const SplitWithSection = ({
             <View className="p-4">
               <Text className="mb-2 font-medium text-black">{t('expense.split.personName')}</Text>
               <TextInput
-                className="rounded-lg border border-gray-200 px-4 py-3 text-black"
+                className="px-4 py-3 text-black border border-gray-200 rounded-lg"
                 placeholder={t('expense.split.enterPersonName')}
                 placeholderTextColor="rgba(0, 0, 0, 0.4)"
                 value={newPersonName}
@@ -451,6 +451,17 @@ const SplitWithSection = ({
           </View>
         </SafeAreaView>
       </Modal>
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
     </View>
   );
 };

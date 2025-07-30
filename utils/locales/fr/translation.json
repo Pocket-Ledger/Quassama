@@ -271,7 +271,9 @@
       "enableSplit": "Activer la répartition",
       "enterAmountFirst": "Entrez le montant d'abord",
       "invalidSplit": "Répartition invalide",
-      "splitMustEqualTotal": "Les montants partagés doivent égaler le total de la dépense. Répartition: {{splitTotal}}, Dépense: {{expenseTotal}}"
+      "splitMustEqualTotal": "Les montants partagés doivent égaler le total de la dépense. Répartition: {{splitTotal}}, Dépense: {{expenseTotal}}",
+      "amountRequired": "Le montant est requis",
+      "totalAmount": "Montant total"
     },
     "validation": {
       "expenseNameRequired": "Le nom de la dépense est requis",

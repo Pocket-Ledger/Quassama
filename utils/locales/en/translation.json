@@ -273,7 +273,9 @@
       "enableSplit": "Enable split",
       "enterAmountFirst": "Enter amount first",
       "invalidSplit": "Invalid Split",
-      "splitMustEqualTotal": "Split amounts must equal expense total. Split: {{splitTotal}}, Expense: {{expenseTotal}}"
+      "splitMustEqualTotal": "Split amounts must equal expense total. Split: {{splitTotal}}, Expense: {{expenseTotal}}",
+      "amountRequired": "Amount is required",
+      "totalAmount": "Total amount"
     },
     "validation": {
       "expenseNameRequired": "Expense name is required",
