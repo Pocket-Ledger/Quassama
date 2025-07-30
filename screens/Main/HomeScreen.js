@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from 'models/notifications/notifications';
 import { capitalizeFirst, getFirstLetterCapitalized } from 'utils/text';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -358,12 +359,12 @@ const HomeScreen = () => {
   };
 
   return (
-    <>
-      <View className="flex-row items-center justify-between bg-white px-4 pb-4 pt-12">
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-row items-center justify-between px-4 pb-4 bg-white ">
         <View className="flex-row items-center">
           <TouchableOpacity onPress={handleProfilePress}>
-            <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary">
-              <Text className="font-dmsans-bold text-lg text-white">
+            <View className="items-center justify-center w-12 h-12 mr-3 rounded-full bg-primary">
+              <Text className="text-lg text-white font-dmsans-bold">
                 {getFirstLetterCapitalized(user.username)}
               </Text>
             </View>
@@ -372,11 +373,11 @@ const HomeScreen = () => {
             <Text className="text-sm font-normal text-gray-500">{getDynamicGreeting()}</Text>
             {isLoadingUser ? (
               <>
-                <View className="mb-2 h-6 w-48 rounded bg-gray-100" />
+                <View className="w-48 h-6 mb-2 bg-gray-100 rounded" />
               </>
             ) : (
               <>
-                <Text className="mb-2 font-dmsans-bold text-xl text-black">{user.username}</Text>
+                <Text className="mb-2 text-xl text-black font-dmsans-bold">{user.username}</Text>
               </>
             )}
           </View>
@@ -384,36 +385,36 @@ const HomeScreen = () => {
         <TouchableOpacity className="relative" onPress={() => navigation.navigate('Notifications')}>
           <Feather name="bell" size={24} color="#666" />
           {unreadCount > 0 && (
-            <View className="absolute -right-1 -top-1 min-h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
+            <View className="absolute items-center justify-center px-1 bg-red-500 rounded-full -right-1 -top-1 min-h-4 min-w-4">
               <Text className="text-xs font-bold text-white">{unreadCount}</Text>
             </View>
           )}
         </TouchableOpacity>
       </View>
       <ScrollView
-        className="container flex flex-1 gap-6 bg-white pb-6 pt-2 "
+        className="container flex flex-1 gap-6 pt-2 pb-6 bg-white "
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* Header */}
 
         {/* Balance Cards */}
         <View className="flex gap-8 pb-4">
-          <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
-            <View className="mr-2 flex-1">
+          <View className="flex-row px-4 py-2 border border-gray-100 rounded-md">
+            <View className="flex-1 mr-2">
               <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.oweYou')}</Text>
-              <Text className="font-dmsans-bold text-2xl text-error">
+              <Text className="text-2xl font-dmsans-bold text-error">
                 {oweYou.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
               </Text>
             </View>
-            <View className="ml-2 flex-1">
+            <View className="flex-1 ml-2">
               <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.youOwe')}</Text>
-              <Text className="font-dmsans-bold text-2xl text-green-500">
+              <Text className="text-2xl text-green-500 font-dmsans-bold">
                 {youOwe.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
               </Text>
             </View>
           </View>
 
           {/* Overview Section */}
-          <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+          <View className="p-4 bg-white border border-gray-100 shadow-sm rounded-xl">
             <Text className="mb-4 text-lg font-medium text-black">
               {t('home.monthlyOverview', {
                 month: overviewData.monthName,
@@ -424,12 +425,12 @@ const HomeScreen = () => {
             {isLoadingOverview ? (
               <View className="flex-row items-center">
                 <View className="relative mr-6">
-                  <View className="h-20 w-20 rounded-full bg-gray-200" />
+                  <View className="w-20 h-20 bg-gray-200 rounded-full" />
                 </View>
                 <View className="flex-1">
-                  <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
-                  <View className="mb-2 h-4 w-24 rounded bg-gray-200" />
-                  <View className="mb-2 h-4 w-28 rounded bg-gray-200" />
+                  <View className="w-32 h-4 mb-2 bg-gray-200 rounded" />
+                  <View className="w-24 h-4 mb-2 bg-gray-200 rounded" />
+                  <View className="h-4 mb-2 bg-gray-200 rounded w-28" />
                 </View>
               </View>
             ) : overviewData.categoryData.length === 0 ? (
@@ -445,10 +446,10 @@ const HomeScreen = () => {
 
                 <View className="flex-1">
                   {overviewData.categoryData.slice(0, 4).map((item, index) => (
-                    <View key={index} className="mb-2 flex-row items-center justify-between">
+                    <View key={index} className="flex-row items-center justify-between mb-2">
                       <View className="flex-row items-center">
                         <View
-                          className="mr-2 h-3 w-3 rounded-full"
+                          className="w-3 h-3 mr-2 rounded-full"
                           style={{ backgroundColor: item.color }}
                         />
                         <Text className="text-lg font-normal text-gray-500">
@@ -473,17 +474,17 @@ const HomeScreen = () => {
 
             {/* Total amount display */}
             {!isLoadingOverview && overviewData.totalAmount > 0 && (
-              <View className="mt-4 border-t border-gray-100 pt-4">
+              <View className="pt-4 mt-4 border-t border-gray-100">
                 <View className="flex-row justify-between">
-                  <Text className="font-dmsans-medium text-gray-500">
+                  <Text className="text-gray-500 font-dmsans-medium">
                     {t('home.totalExpenses')}
                   </Text>
-                  <Text className="font-dmsans-bold text-black">
+                  <Text className="text-black font-dmsans-bold">
                     {overviewData.totalAmount.toFixed(2)} {getCurrency()}
                   </Text>
                 </View>
-                <View className="mt-1 flex-row justify-between">
-                  <Text className="font-dmsans-medium text-gray-500">
+                <View className="flex-row justify-between mt-1">
+                  <Text className="text-gray-500 font-dmsans-medium">
                     {t('home.totalTransactions')}
                   </Text>
                   <Text className="text-black">{overviewData.expenseCount}</Text>
@@ -494,7 +495,7 @@ const HomeScreen = () => {
 
           {/* Recent Activity */}
           <View className="mx-4 ">
-            <View className="mb-4 flex-row items-center justify-between">
+            <View className="flex-row items-center justify-between mb-4">
               <Text className="text-lg font-medium text-black">{t('home.recentActivity')}</Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate('AllExpenses', { groupId: selectedGroup })}>
@@ -507,15 +508,15 @@ const HomeScreen = () => {
                 [...Array(3)].map((_, index) => (
                   <View
                     key={index}
-                    className="mb-4 flex-row items-center rounded-lg bg-gray-50 p-4">
-                    <View className="mr-4 h-12 w-12 rounded-full bg-gray-200" />
+                    className="flex-row items-center p-4 mb-4 rounded-lg bg-gray-50">
+                    <View className="w-12 h-12 mr-4 bg-gray-200 rounded-full" />
                     <View className="flex-1">
-                      <View className="mb-2 h-4 w-32 rounded bg-gray-200" />
-                      <View className="h-3 w-24 rounded bg-gray-200" />
+                      <View className="w-32 h-4 mb-2 bg-gray-200 rounded" />
+                      <View className="w-24 h-3 bg-gray-200 rounded" />
                     </View>
                     <View className="items-end">
-                      <View className="mb-2 h-4 w-16 rounded bg-gray-200" />
-                      <View className="h-3 w-12 rounded bg-gray-200" />
+                      <View className="w-16 h-4 mb-2 bg-gray-200 rounded" />
+                      <View className="w-12 h-3 bg-gray-200 rounded" />
                     </View>
                   </View>
                 ))
@@ -540,12 +541,12 @@ const HomeScreen = () => {
 
           {/* Group Members */}
           <View className="mx-4 ">
-            <View className="mb-4 flex-row items-start justify-between">
+            <View className="flex-row items-start justify-between mb-4">
               <View>
                 <Text className="text-lg font-medium text-black ">
                   {capitalizeFirst(groupName)}
                 </Text>
-                <Text className="font-dmsans text-xs text-black">{t('group.groupMembers')}</Text>
+                <Text className="text-xs text-black font-dmsans">{t('group.groupMembers')}</Text>
               </View>
               <TouchableOpacity onPress={openGroupModal}>
                 <Text className="font-medium text-primary">{t('home.switchGroup')}</Text>
@@ -576,20 +577,20 @@ const HomeScreen = () => {
                 contentContainerStyle={{ paddingHorizontal: 4 }}
                 className="flex-row">
                 {[...Array(4)].map((_, index) => (
-                  <View key={index} className="mr-4 items-center">
-                    <View className="mb-2 h-16 w-16 rounded-full bg-gray-200" />
-                    <View className="h-3 w-12 rounded bg-gray-200" />
+                  <View key={index} className="items-center mr-4">
+                    <View className="w-16 h-16 mb-2 bg-gray-200 rounded-full" />
+                    <View className="w-12 h-3 bg-gray-200 rounded" />
                   </View>
                 ))}
               </ScrollView>
             ) : friends?.length === 0 ? (
-              <View className="w-full items-center gap-4 space-y-4">
+              <View className="items-center w-full gap-4 space-y-4">
                 <Feather name="users" size={48} color="#ccc" />
                 <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
                 <TouchableOpacity
-                  className="btn-primary mb-8 rounded-lg bg-primary "
+                  className="mb-8 rounded-lg btn-primary bg-primary "
                   onPress={() => navigation.navigate('AddNewGroup')}>
-                  <Text className="btn-primary-text text-center text-base font-semibold text-white">
+                  <Text className="text-base font-semibold text-center text-white btn-primary-text">
                     {t('addGroup.title')}
                   </Text>
                 </TouchableOpacity>
@@ -616,7 +617,7 @@ const HomeScreen = () => {
           </View>
         </View>
       </ScrollView>
-    </>
+    </SafeAreaView>
   );
 };
 
