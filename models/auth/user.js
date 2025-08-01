@@ -24,7 +24,8 @@ class User{
         const userData = {
             username: this.username,
             email: this.email,
-            user_id: this.user_id
+            user_id: this.user_id,
+            created_at: new Date().toISOString(),
         };
         const usersCollection = collection(db, "users"); // Reference to the "users" collection
         const docRef = await addDoc(usersCollection, userData); // Add document to the collection
