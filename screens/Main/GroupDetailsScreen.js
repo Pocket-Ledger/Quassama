@@ -152,7 +152,15 @@ const GroupDetailsScreen = () => {
     Logger.error(groupId);
 
     try {
-      await Group.deleteGroup(groupId);
+      const auth = getAuth();
+      const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+      
+      if (!currentUserId) {
+        showError(t('common.error'), 'User not authenticated', hideAlert);
+        return;
+      }
+
+      await Group.deleteGroup(groupId, currentUserId);
 
       // Show success alert
       showSuccess(t('common.success'), t('groupDetails.groupDeletedSuccess'), () => {

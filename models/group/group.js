@@ -1,4 +1,4 @@
-import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion, getDoc } from "firebase/firestore";
+import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUnion, getDoc, deleteDoc } from "firebase/firestore";
 import { app, db } from "../../firebase";
 import Notification from "models/notifications/notifications";
 import User from '../auth/user';
@@ -249,10 +249,17 @@ class Group{
             if (groupData.created_by !== currentUserId) {
                 throw new Error('Only the group admin can delete this group');
             }
-            await updateDoc(groupRef, {
-                members: [],
-                memberIds: [],
-            });
+
+            // Import Expense class to delete associated expenses
+            const Expense = (await import('../expense/Expense')).default;
+            
+            // Delete all expenses associated with this group
+            const deletedExpensesCount = await Expense.deleteExpensesByGroup(groupId);
+            console.log(`Deleted ${deletedExpensesCount} expenses for group ${groupId}`);
+
+            // Actually delete the group document from Firestore
+            await deleteDoc(groupRef);
+            
             console.log(`Group ${groupId} deleted successfully`);
         } catch (error) {
             console.error("Error deleting group:", error);

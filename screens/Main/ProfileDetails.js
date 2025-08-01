@@ -127,11 +127,7 @@ const ProfileDetailsScreen = () => {
       newErrors.name = t('profileDetails.validation.nameRequired');
     }
 
-    if (!email.trim()) {
-      newErrors.email = t('profileDetails.validation.emailRequired');
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = t('profileDetails.validation.emailInvalid');
-    }
+    // Email validation removed since it's disabled for editing
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -142,8 +138,8 @@ const ProfileDetailsScreen = () => {
 
     setIsLoading(true);
     try {
-      // Add your update profile logic here
-      // await User.updateProfile({ name, email });
+      // Update username
+      await User.updateUsername(name);
       showSuccess(t('customAlert.titles.success'), t('profileDetails.updateSuccess'));
       navigation.goBack();
     } catch (error) {
@@ -214,27 +210,22 @@ const ProfileDetailsScreen = () => {
                       left: 16,
                       top: '50%',
                       transform: [{ translateY: -10 }],
-                      color: errors.email ? 'red' : 'rgba(0, 0, 0, 0.2)',
+                      color: 'rgba(0, 0, 0, 0.3)',
                       zIndex: 1,
                     }}
                   />
                   <TextInput
-                    className={`input-field ${errors.email ? 'input-field-error' : ''}`}
+                    className="input-field opacity-50"
                     placeholder={t('profileDetails.emailPlaceholder')}
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={email}
-                    onChangeText={(text) => {
-                      setEmail(text);
-                      if (errors.email) {
-                        setErrors((prev) => ({ ...prev, email: null }));
-                      }
-                    }}
+                    editable={false}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
                 </View>
-                {errors.email && <Text className="error-text">{errors.email}</Text>}
+                <Text className="text-xs text-gray-500 mt-1">{t('profileDetails.emailNotEditable', 'Email cannot be changed')}</Text>
               </View>
 
               <TouchableOpacity

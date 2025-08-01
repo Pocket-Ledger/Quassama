@@ -2255,6 +2255,32 @@ class Expense {
     }
   }
 
+  /**
+   * Delete all expenses associated with a specific group
+   * @param {string} groupId - The ID of the group whose expenses should be deleted
+   * @returns {Promise<number>} - Number of expenses deleted
+   */
+  static async deleteExpensesByGroup(groupId) {
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+
+    try {
+      const expensesCol = collection(db, 'expenses');
+      const q = query(expensesCol, where('group_id', '==', groupId));
+      const snapshot = await getDocs(q);
+      
+      const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+      
+      console.log(`Deleted ${snapshot.docs.length} expenses for group ${groupId}`);
+      return snapshot.docs.length;
+    } catch (error) {
+      console.error('Error deleting expenses by group:', error);
+      throw new Error(`Failed to delete group expenses: ${error.message}`);
+    }
+  }
+
 }
 
 export default Expense;

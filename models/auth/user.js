@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { app, db } from "../../firebase"; 
 import { getAuth } from "firebase/auth";
 class User{
@@ -91,6 +91,41 @@ class User{
     const doc = snap.docs[0];
     const data = doc.data();
     return data.username;
+  }
+
+  // Update user's username
+  static async updateUsername(newUsername) {
+    if (!newUsername || newUsername.trim() === "") {
+      throw new Error("Username is required");
+    }
+
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error("No authenticated user found");
+    }
+
+    const userId = currentUser.uid;
+    
+    // Find the user document
+    const usersCollection = collection(db, "users");
+    const userQuery = query(usersCollection, where("user_id", "==", userId));
+    const querySnapshot = await getDocs(userQuery);
+    
+    if (querySnapshot.empty) {
+      throw new Error("No user found with the given ID");
+    }
+
+    // Update the username
+    const userDoc = querySnapshot.docs[0];
+    const userDocRef = doc(db, "users", userDoc.id);
+    
+    await updateDoc(userDocRef, {
+      username: newUsername.trim()
+    });
+
+    console.log("Username updated successfully");
+    return true;
   }
 
 
