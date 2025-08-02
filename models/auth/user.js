@@ -1,6 +1,13 @@
 import { addDoc, collection, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { app, db } from "../../firebase"; 
 import { getAuth } from "firebase/auth";
+
+// Import Group class for updating member usernames
+// Using dynamic import to avoid circular dependency
+const getGroupClass = async () => {
+    const { default: Group } = await import('../group/group');
+    return Group;
+};
 class User{
     username;
     email;
@@ -117,7 +124,7 @@ class User{
       throw new Error("No user found with the given ID");
     }
 
-    // Update the username
+    // Update the username in users collection
     const userDoc = querySnapshot.docs[0];
     const userDocRef = doc(db, "users", userDoc.id);
     
@@ -125,7 +132,19 @@ class User{
       username: newUsername.trim()
     });
 
-    console.log("Username updated successfully");
+    console.log("Username updated successfully in users collection");
+
+    // Update the username in all groups where this user is a member
+    try {
+      const Group = await getGroupClass();
+      const updatedGroupsCount = await Group.updateMemberUsernameInGroups(userId, newUsername.trim());
+      console.log(`Username updated in ${updatedGroupsCount} groups`);
+    } catch (error) {
+      console.error("Error updating username in groups:", error);
+      // Don't throw error here, as the main username update was successful
+      // We just log the error for group updates
+    }
+
     return true;
   }
 

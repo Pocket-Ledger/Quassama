@@ -81,6 +81,19 @@ class Group{
     }
 
     static async addMemberToGroup(groupId, member) {
+        // Check if all current members have zero balance before adding new member
+        const Expense = (await import('../expense/Expense')).default;
+        const balances = await Expense.calculateGroupBalances(groupId);
+        
+        // Check if any member has non-zero balance
+        const hasOutstandingBalances = Object.values(balances).some(
+            balance => Math.abs(balance.balance) > 0.01 // Allow for small floating point differences
+        );
+        
+        if (hasOutstandingBalances) {
+            throw new Error('Cannot add new member while there are outstanding balances. Please settle up all expenses first.');
+        }
+
         const groupRef = doc(db, "groups", groupId);
         
         // If member is just a string (user ID), we need to construct a proper member object
@@ -132,6 +145,8 @@ class Group{
             members: arrayUnion(memberObject),
             memberIds: arrayUnion(memberId),
         });
+        
+        console.log(`Member ${memberId} added to group ${groupId} successfully`);
     }
 
     static async getGroupById(groupId) {
@@ -210,10 +225,23 @@ class Group{
 
             const updateData = { ...updates };
             
+            // If updating members, check for outstanding balances first
             if (updates.members) {
-            updateData.memberIds = updates.members.map(m => 
-                typeof m === 'string' ? m : m.id
-            );
+                const Expense = (await import('../expense/Expense')).default;
+                const balances = await Expense.calculateGroupBalances(groupId);
+                
+                // Check if any member has non-zero balance
+                const hasOutstandingBalances = Object.values(balances).some(
+                    balance => Math.abs(balance.balance) > 0.01 // Allow for small floating point differences
+                );
+                
+                if (hasOutstandingBalances) {
+                    throw new Error('Cannot update group members while there are outstanding balances. Please settle up all expenses first.');
+                }
+
+                updateData.memberIds = updates.members.map(m => 
+                    typeof m === 'string' ? m : m.id
+                );
             }
 
             updateData.updated_at = new Date().toISOString();
@@ -353,6 +381,378 @@ class Group{
         const user = await getUserDetails();
         const groups = await this.getGroupsByUser(userId);
         return { user, groups };
+    }
+
+    /**
+     * Update a member's username across all groups they belong to
+     * @param {string} userId - The ID of the user whose username changed
+     * @param {string} newUsername - The new username
+     * @returns {Promise<number>} - Number of groups updated
+     */
+    static async updateMemberUsernameInGroups(userId, newUsername) {
+        try {
+            if (!userId || !newUsername) {
+                throw new Error('User ID and new username are required');
+            }
+
+            // Find all groups where this user is a member
+            const GroupsCollection = collection(db, "groups");
+            const q = query(
+                GroupsCollection,
+                or(
+                    where("created_by", "==", userId),
+                    where("memberIds", "array-contains", userId)
+                )
+            );
+            
+            const querySnapshot = await getDocs(q);
+            let updatedGroupsCount = 0;
+
+            // Update each group
+            for (const groupDoc of querySnapshot.docs) {
+                const groupData = groupDoc.data();
+                const members = groupData.members || [];
+                
+                // Check if this user exists in the members array
+                let memberUpdated = false;
+                const updatedMembers = members.map(member => {
+                    if (typeof member === 'object' && member.id === userId) {
+                        memberUpdated = true;
+                        return {
+                            ...member,
+                            name: newUsername,
+                            initial: newUsername ? newUsername[0].toUpperCase() : 'U'
+                        };
+                    }
+                    return member;
+                });
+
+                // Only update if we found and modified the member
+                if (memberUpdated) {
+                    const groupRef = doc(db, "groups", groupDoc.id);
+                    await updateDoc(groupRef, {
+                        members: updatedMembers,
+                        updated_at: new Date().toISOString()
+                    });
+                    updatedGroupsCount++;
+                    console.log(`Updated username in group ${groupDoc.id}`);
+                }
+            }
+
+            console.log(`Updated username in ${updatedGroupsCount} groups`);
+            return updatedGroupsCount;
+
+        } catch (error) {
+            console.error("Error updating member username in groups:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Batch update multiple members' usernames in groups
+     * @param {Array<{userId: string, newUsername: string}>} userUpdates - Array of user updates
+     * @returns {Promise<number>} - Total number of groups updated
+     */
+    static async batchUpdateMemberUsernames(userUpdates) {
+        try {
+            if (!Array.isArray(userUpdates) || userUpdates.length === 0) {
+                throw new Error('User updates array is required');
+            }
+
+            let totalUpdatedGroups = 0;
+            
+            for (const { userId, newUsername } of userUpdates) {
+                if (userId && newUsername) {
+                    const updatedCount = await this.updateMemberUsernameInGroups(userId, newUsername);
+                    totalUpdatedGroups += updatedCount;
+                }
+            }
+
+            console.log(`Batch update completed: ${totalUpdatedGroups} total group updates`);
+            return totalUpdatedGroups;
+
+        } catch (error) {
+            console.error("Error in batch updating member usernames:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Remove a member from a group
+     * @param {string} groupId - The ID of the group
+     * @param {string} memberIdToRemove - The ID of the member to remove
+     * @param {string} currentUserId - The ID of the user performing the removal
+     * @returns {Promise<void>}
+     */
+    static async removeMemberFromGroup(groupId, memberIdToRemove, currentUserId) {
+        try {
+            if (!groupId || !memberIdToRemove || !currentUserId) {
+                throw new Error('Group ID, member ID to remove, and current user ID are required');
+            }
+
+            // Check if all members have zero balance before removing member
+            const Expense = (await import('../expense/Expense')).default;
+            const balances = await Expense.calculateGroupBalances(groupId);
+            
+            // Check if any member has non-zero balance
+            const hasOutstandingBalances = Object.values(balances).some(
+                balance => Math.abs(balance.balance) > 0.01 // Allow for small floating point differences
+            );
+            
+            if (hasOutstandingBalances) {
+                throw new Error('Cannot remove member while there are outstanding balances. Please settle up all expenses first.');
+            }
+
+            const groupRef = doc(db, "groups", groupId);
+            const groupSnap = await getDoc(groupRef);
+            
+            if (!groupSnap.exists()) {
+                throw new Error('Group not found');
+            }
+
+            const groupData = groupSnap.data();
+            
+            // Check if current user is the admin (created_by) or the member themselves
+            if (groupData.created_by !== currentUserId && memberIdToRemove !== currentUserId) {
+                throw new Error('Only the group admin or the member themselves can remove a member from the group');
+            }
+
+            // Cannot remove the group creator
+            if (memberIdToRemove === groupData.created_by) {
+                throw new Error('Cannot remove the group creator. Transfer ownership first or delete the group.');
+            }
+
+            const members = groupData.members || [];
+            const memberIds = groupData.memberIds || [];
+
+            // Check if member exists in the group
+            if (!memberIds.includes(memberIdToRemove)) {
+                throw new Error('Member not found in the group');
+            }
+
+            // Remove member from both arrays
+            const updatedMembers = members.filter(member => {
+                const memberId = typeof member === 'string' ? member : member.id;
+                return memberId !== memberIdToRemove;
+            });
+
+            const updatedMemberIds = memberIds.filter(id => id !== memberIdToRemove);
+
+            // Update the group
+            await updateDoc(groupRef, {
+                members: updatedMembers,
+                memberIds: updatedMemberIds,
+                updated_at: new Date().toISOString()
+            });
+
+            console.log(`Member ${memberIdToRemove} removed from group ${groupId} successfully`);
+
+        } catch (error) {
+            console.error("Error removing member from group:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Check if a group has outstanding balances that need to be settled
+     * @param {string} groupId - The ID of the group to check
+     * @returns {Promise<{hasOutstandingBalances: boolean, balances: Object}>}
+     */
+    static async checkOutstandingBalances(groupId) {
+        try {
+            if (!groupId) {
+                throw new Error('Group ID is required');
+            }
+
+            const Expense = (await import('../expense/Expense')).default;
+            const balances = await Expense.calculateGroupBalances(groupId);
+            
+            // Check if any member has non-zero balance
+            const hasOutstandingBalances = Object.values(balances).some(
+                balance => Math.abs(balance.balance) > 0.01 // Allow for small floating point differences
+            );
+
+            return {
+                hasOutstandingBalances,
+                balances
+            };
+
+        } catch (error) {
+            console.error("Error checking outstanding balances:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get detailed balance information for a group
+     * @param {string} groupId - The ID of the group
+     * @returns {Promise<Object>} - Detailed balance information
+     */
+    static async getGroupBalanceDetails(groupId) {
+        try {
+            if (!groupId) {
+                throw new Error('Group ID is required');
+            }
+
+            const Expense = (await import('../expense/Expense')).default;
+            const balances = await Expense.calculateGroupBalances(groupId);
+            
+            // Separate users who owe money from users who are owed money
+            const usersWhoOwe = {};
+            const usersWhoAreOwed = {};
+            let totalOutstanding = 0;
+
+            for (const [userId, balance] of Object.entries(balances)) {
+                if (balance.balance < -0.01) { // User owes money
+                    usersWhoOwe[userId] = {
+                        ...balance,
+                        owesAmount: Math.abs(balance.balance)
+                    };
+                    totalOutstanding += Math.abs(balance.balance);
+                } else if (balance.balance > 0.01) { // User is owed money
+                    usersWhoAreOwed[userId] = {
+                        ...balance,
+                        owedAmount: balance.balance
+                    };
+                }
+            }
+
+            return {
+                balances,
+                usersWhoOwe,
+                usersWhoAreOwed,
+                totalOutstanding: parseFloat(totalOutstanding.toFixed(2)),
+                hasOutstandingBalances: totalOutstanding > 0.01
+            };
+
+        } catch (error) {
+            console.error("Error getting group balance details:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Settle up all balances in a group before adding/removing members
+     * @param {string} groupId - The ID of the group to settle up
+     * @returns {Promise<Object>} - Settlement summary
+     */
+    static async settleUpGroupBeforeMemberChange(groupId) {
+        try {
+            if (!groupId) {
+                throw new Error('Group ID is required');
+            }
+
+            const Expense = (await import('../expense/Expense')).default;
+            
+            // Check if settlement is needed
+            const balanceCheck = await this.checkOutstandingBalances(groupId);
+            
+            if (!balanceCheck.hasOutstandingBalances) {
+                return {
+                    settled: false,
+                    message: 'No outstanding balances to settle',
+                    transactions: []
+                };
+            }
+
+            // Perform settlement
+            const settlementResult = await Expense.settleUpGroup(groupId);
+            
+            return {
+                settled: true,
+                message: 'Group settled up successfully',
+                ...settlementResult
+            };
+
+        } catch (error) {
+            console.error("Error settling up group:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Add member to group with automatic settlement if needed
+     * @param {string} groupId - The ID of the group
+     * @param {string|Object} member - The member to add (user ID string or member object)
+     * @param {boolean} autoSettle - Whether to automatically settle before adding (default: false)
+     * @returns {Promise<Object>} - Result with settlement and addition info
+     */
+    static async addMemberWithSettlement(groupId, member, autoSettle = false) {
+        try {
+            let settlementResult = null;
+
+            if (autoSettle) {
+                // Automatically settle up first
+                settlementResult = await this.settleUpGroupBeforeMemberChange(groupId);
+            } else {
+                // Just check if settlement is needed and throw error if so
+                await this.addMemberToGroup(groupId, member);
+                return {
+                    memberAdded: true,
+                    settlementPerformed: false,
+                    message: 'Member added successfully'
+                };
+            }
+
+            // Now add the member
+            await this.addMemberToGroup(groupId, member);
+
+            return {
+                memberAdded: true,
+                settlementPerformed: settlementResult?.settled || false,
+                settlementDetails: settlementResult,
+                message: settlementResult?.settled 
+                    ? 'Group settled and member added successfully' 
+                    : 'Member added successfully'
+            };
+
+        } catch (error) {
+            console.error("Error adding member with settlement:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Remove member from group with automatic settlement if needed
+     * @param {string} groupId - The ID of the group
+     * @param {string} memberIdToRemove - The ID of the member to remove
+     * @param {string} currentUserId - The ID of the user performing the removal
+     * @param {boolean} autoSettle - Whether to automatically settle before removing (default: false)
+     * @returns {Promise<Object>} - Result with settlement and removal info
+     */
+    static async removeMemberWithSettlement(groupId, memberIdToRemove, currentUserId, autoSettle = false) {
+        try {
+            let settlementResult = null;
+
+            if (autoSettle) {
+                // Automatically settle up first
+                settlementResult = await this.settleUpGroupBeforeMemberChange(groupId);
+            } else {
+                // Just check if settlement is needed and throw error if so
+                await this.removeMemberFromGroup(groupId, memberIdToRemove, currentUserId);
+                return {
+                    memberRemoved: true,
+                    settlementPerformed: false,
+                    message: 'Member removed successfully'
+                };
+            }
+
+            // Now remove the member
+            await this.removeMemberFromGroup(groupId, memberIdToRemove, currentUserId);
+
+            return {
+                memberRemoved: true,
+                settlementPerformed: settlementResult?.settled || false,
+                settlementDetails: settlementResult,
+                message: settlementResult?.settled 
+                    ? 'Group settled and member removed successfully' 
+                    : 'Member removed successfully'
+            };
+
+        } catch (error) {
+            console.error("Error removing member with settlement:", error);
+            throw error;
+        }
     }
 }
 
