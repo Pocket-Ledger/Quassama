@@ -18,6 +18,7 @@ import ExpenseListItem from 'components/ExpenseListItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import Expense from 'models/expense/Expense';
+import ExpenseSearchService from 'services/searchForExpense';
 import { useTranslation } from 'react-i18next';
 import { dateToTimestamp } from 'utils/time';
 
@@ -30,6 +31,9 @@ const AllExpensesScreen = () => {
   const groupId = route.params?.groupId || 'vacation_tager';
 
   const [searchText, setSearchText] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchTimeout, setSearchTimeout] = useState(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [filterConfig, setFilterConfig] = useState({
     dateRange: t('filters.dateRanges.today'),
@@ -66,6 +70,73 @@ const AllExpensesScreen = () => {
     { id: 'work_team', name: t('groups.workTeam') },
     { id: 'friends_trip', name: t('groups.friendsTrip') },
   ];
+
+  // Search functionality with debounce
+  const handleSearch = useCallback(
+    (text) => {
+      setSearchText(text);
+      
+      // Clear previous timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      
+      if (!text.trim()) {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+
+      // Set new timeout for debounced search
+      const timeout = setTimeout(async () => {
+        try {
+          setIsSearching(true);
+          console.log('Searching for:', text.trim(), 'in group:', groupId);
+          
+          let results = [];
+          
+          try {
+            // First try the search service
+            results = await ExpenseSearchService.searchByText(
+              text.trim(),
+              groupId,
+              {
+                startDate: filterConfig.startDate ? dateToTimestamp(filterConfig.startDate) : null,
+                endDate: filterConfig.endDate ? dateToTimestamp(filterConfig.endDate) : null,
+              }
+            );
+          } catch (searchError) {
+            console.warn('Search service failed, falling back to local search:', searchError);
+            
+            // Fallback: Get all group expenses and filter locally
+            const allExpenses = await Expense.getExpensesByGroup(groupId);
+            const searchTerm = text.toLowerCase().trim();
+            
+            results = allExpenses.filter(expense => {
+              const title = expense.title?.toLowerCase() || '';
+              const description = expense.description?.toLowerCase() || '';
+              const category = expense.category?.toLowerCase() || '';
+              
+              return title.includes(searchTerm) || 
+                     description.includes(searchTerm) || 
+                     category.includes(searchTerm);
+            });
+          }
+          
+          console.log('Search results:', results);
+          setSearchResults(results);
+        } catch (error) {
+          console.error('Search error:', error);
+          setSearchResults([]);
+        } finally {
+          setIsSearching(false);
+        }
+      }, 300); // 300ms debounce
+      
+      setSearchTimeout(timeout);
+    },
+    [groupId, filterConfig.startDate, filterConfig.endDate, searchTimeout]
+  );
 
   // Load expenses function
   const loadExpenses = useCallback(
@@ -153,8 +224,14 @@ const AllExpensesScreen = () => {
 
   // Refresh expenses
   const onRefresh = useCallback(() => {
+    // Clear search when refreshing
+    if (searchText.trim()) {
+      setSearchText('');
+      setSearchResults([]);
+      setIsSearching(false);
+    }
     loadExpenses(1, true, filterConfig.checkedFilter);
-  }, [loadExpenses, filterConfig.checkedFilter]);
+  }, [loadExpenses, filterConfig.checkedFilter, searchText]);
 
   // Load expenses on component mount and when groupId changes
   useEffect(() => {
@@ -175,21 +252,25 @@ const AllExpensesScreen = () => {
     filterConfig.maxAmount,
   ]);
 
+  // Cleanup search timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
+
   // Filter expenses by search text
   const filteredExpenses = React.useMemo(() => {
-    if (!searchText.trim()) {
-      return expenses;
+    // If we have search text, use search results instead of filtering local expenses
+    if (searchText.trim()) {
+      return searchResults;
     }
-
-    return expenses.filter((expense) => {
-      const title = expense.title?.toLowerCase() || '';
-      const description = expense.description?.toLowerCase() || '';
-      const category = expense.category?.toLowerCase() || '';
-      const search = searchText.toLowerCase();
-
-      return title.includes(search) || description.includes(search) || category.includes(search);
-    });
-  }, [expenses, searchText]);
+    
+    // Otherwise return regular expenses
+    return expenses;
+  }, [expenses, searchText, searchResults]);
 
   const handleExpensePress = (expense) => {
     console.log('Expense pressed:', expense);
@@ -217,6 +298,12 @@ const AllExpensesScreen = () => {
       maxAmount: null,
     };
     setFilterConfig(resetFilter);
+    
+    // Also clear search
+    setSearchText('');
+    setSearchResults([]);
+    setIsSearching(false);
+    
     console.log('Filter reset');
 
     // Immediately reload expenses without filters
@@ -323,8 +410,20 @@ const AllExpensesScreen = () => {
 
   // Render pagination info
   const renderPaginationInfo = () => {
-    if (expenses?.length === 0) return null;
+    if (filteredExpenses?.length === 0) return null;
+    
+    // If searching, show search results count
+    if (searchText.trim()) {
+      return (
+        <View className="bg-gray-50 px-4 py-2">
+          <Text className="text-center text-sm text-gray-600">
+            {t('expense.search.resultsCount', { count: filteredExpenses.length })}
+          </Text>
+        </View>
+      );
+    }
 
+    // Otherwise show pagination info
     return (
       <View className="bg-gray-50 px-4 py-2">
         <Text className="text-center text-sm text-gray-600">
@@ -345,7 +444,7 @@ const AllExpensesScreen = () => {
       <View className="mb-4">
         <SearchBar
           searchText={searchText}
-          onSearchChange={setSearchText}
+          onSearchChange={handleSearch}
           placeholder={t('expense.search.placeholder')}
           onFilterPress={() => setIsFilterModalVisible(true)}
         />
@@ -369,6 +468,11 @@ const AllExpensesScreen = () => {
           <ActivityIndicator size="large" color="#2979FF" />
           <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
         </View>
+      ) : isSearching ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#2979FF" />
+          <Text className="mt-2 text-gray-500">{t('expense.searching')}</Text>
+        </View>
       ) : error && expenses.length === 0 ? (
         renderErrorState()
       ) : filteredExpenses.length > 0 ? (
@@ -387,9 +491,9 @@ const AllExpensesScreen = () => {
               tintColor="#2979FF"
             />
           }
-          onEndReached={loadMoreExpenses}
+          onEndReached={searchText.trim() ? null : loadMoreExpenses}
           onEndReachedThreshold={0.1}
-          ListFooterComponent={renderFooter}
+          ListFooterComponent={searchText.trim() ? null : renderFooter}
         />
       ) : (
         renderEmptyState()
