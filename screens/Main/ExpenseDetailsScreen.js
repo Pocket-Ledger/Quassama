@@ -91,7 +91,7 @@ const ExpenseDetailsScreen = () => {
       if (!expenseData) return;
 
       const { is_split, splits, group_id, amount } = expenseData;
-      
+
       if (is_split && splits && Object.keys(splits).length > 0) {
         // Custom split - show individual splits
         const splitList = await Promise.all(
@@ -102,7 +102,7 @@ const ExpenseDetailsScreen = () => {
               userId,
               username,
               amount: parseFloat(split.amount) || 0,
-              type: 'custom'
+              type: 'custom',
             };
           })
         );
@@ -112,18 +112,18 @@ const ExpenseDetailsScreen = () => {
         try {
           const group = await Group.getGroupById(group_id);
           const members = group?.members || [];
-          
+
           if (members.length > 0) {
             const sharePerMember = amount / members.length;
             const splitList = await Promise.all(
               members.map(async (member) => {
-                const userId = typeof member === 'string' ? member : (member.id || member.user_id);
+                const userId = typeof member === 'string' ? member : member.id || member.user_id;
                 const username = await User.getUsernameById(userId).catch(() => 'Unknown User');
                 return {
                   userId,
                   username,
                   amount: sharePerMember,
-                  type: 'equal'
+                  type: 'equal',
                 };
               })
             );
@@ -392,16 +392,15 @@ const ExpenseDetailsScreen = () => {
             <View className="mb-4 flex-row items-center">
               <Ionicons name="pie-chart" size={20} color="#6366F1" />
               <Text className="ml-2 text-lg font-semibold text-gray-900">
-                {splitDetails.type === 'custom' 
-                  ? t('expense.details.customSplit') 
-                  : t('expense.details.equalSplit')
-                }
+                {splitDetails.type === 'custom'
+                  ? t('expense.details.customSplit')
+                  : t('expense.details.equalSplit')}
               </Text>
             </View>
-            
+
             {splitDetails.splits.map((split, index) => (
               <View key={split.userId} className="mb-3 flex-row items-center justify-between">
-                <View className="flex-row items-center flex-1">
+                <View className="flex-1 flex-row items-center">
                   <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-gray-100">
                     <Ionicons name="person" size={16} color="#6B7280" />
                   </View>
@@ -414,14 +413,14 @@ const ExpenseDetailsScreen = () => {
                 </Text>
               </View>
             ))}
-            
+
             {splitDetails.type === 'equal' && (
               <View className="mt-2 rounded-lg bg-blue-50 p-3">
                 <Text className="text-sm text-blue-700">
-                  {t('expense.details.equalSplitNote', { 
-                    amount: expense.amount, 
+                  {t('expense.details.equalSplitNote', {
+                    amount: expense.amount,
                     count: splitDetails.splits.length,
-                    share: (expense.amount / splitDetails.splits.length).toFixed(2)
+                    share: (expense.amount / splitDetails.splits.length).toFixed(2),
                   })}
                 </Text>
               </View>

@@ -154,7 +154,7 @@ const GroupDetailsScreen = () => {
     try {
       const auth = getAuth();
       const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
-      
+
       if (!currentUserId) {
         showError(t('common.error'), 'User not authenticated', hideAlert);
         return;

@@ -75,12 +75,12 @@ const AllExpensesScreen = () => {
   const handleSearch = useCallback(
     (text) => {
       setSearchText(text);
-      
+
       // Clear previous timeout
       if (searchTimeout) {
         clearTimeout(searchTimeout);
       }
-      
+
       if (!text.trim()) {
         setSearchResults([]);
         setIsSearching(false);
@@ -92,37 +92,35 @@ const AllExpensesScreen = () => {
         try {
           setIsSearching(true);
           console.log('Searching for:', text.trim(), 'in group:', groupId);
-          
+
           let results = [];
-          
+
           try {
             // First try the search service
-            results = await ExpenseSearchService.searchByText(
-              text.trim(),
-              groupId,
-              {
-                startDate: filterConfig.startDate ? dateToTimestamp(filterConfig.startDate) : null,
-                endDate: filterConfig.endDate ? dateToTimestamp(filterConfig.endDate) : null,
-              }
-            );
+            results = await ExpenseSearchService.searchByText(text.trim(), groupId, {
+              startDate: filterConfig.startDate ? dateToTimestamp(filterConfig.startDate) : null,
+              endDate: filterConfig.endDate ? dateToTimestamp(filterConfig.endDate) : null,
+            });
           } catch (searchError) {
             console.warn('Search service failed, falling back to local search:', searchError);
-            
+
             // Fallback: Get all group expenses and filter locally
             const allExpenses = await Expense.getExpensesByGroup(groupId);
             const searchTerm = text.toLowerCase().trim();
-            
-            results = allExpenses.filter(expense => {
+
+            results = allExpenses.filter((expense) => {
               const title = expense.title?.toLowerCase() || '';
               const description = expense.description?.toLowerCase() || '';
               const category = expense.category?.toLowerCase() || '';
-              
-              return title.includes(searchTerm) || 
-                     description.includes(searchTerm) || 
-                     category.includes(searchTerm);
+
+              return (
+                title.includes(searchTerm) ||
+                description.includes(searchTerm) ||
+                category.includes(searchTerm)
+              );
             });
           }
-          
+
           console.log('Search results:', results);
           setSearchResults(results);
         } catch (error) {
@@ -132,7 +130,7 @@ const AllExpensesScreen = () => {
           setIsSearching(false);
         }
       }, 300); // 300ms debounce
-      
+
       setSearchTimeout(timeout);
     },
     [groupId, filterConfig.startDate, filterConfig.endDate, searchTimeout]
@@ -267,7 +265,7 @@ const AllExpensesScreen = () => {
     if (searchText.trim()) {
       return searchResults;
     }
-    
+
     // Otherwise return regular expenses
     return expenses;
   }, [expenses, searchText, searchResults]);
@@ -298,12 +296,12 @@ const AllExpensesScreen = () => {
       maxAmount: null,
     };
     setFilterConfig(resetFilter);
-    
+
     // Also clear search
     setSearchText('');
     setSearchResults([]);
     setIsSearching(false);
-    
+
     console.log('Filter reset');
 
     // Immediately reload expenses without filters
@@ -411,7 +409,7 @@ const AllExpensesScreen = () => {
   // Render pagination info
   const renderPaginationInfo = () => {
     if (filteredExpenses?.length === 0) return null;
-    
+
     // If searching, show search results count
     if (searchText.trim()) {
       return (

@@ -7,13 +7,14 @@ const GroupsList = ({
   onGroupPress,
   onStarPress,
   showScrollIndicator = false,
-  contentContainerStyle = { paddingBottom: 20 },
+  //contentContainerStyle = { paddingBottom: 20 },
 }) => {
   return (
     <ScrollView
       className="flex-1 px-[10px]"
       showsVerticalScrollIndicator={showScrollIndicator}
-      contentContainerStyle={contentContainerStyle}>
+      //contentContainerStyle={contentContainerStyle}
+    >
       {groups.map((group) => (
         <GroupItem key={group.id} group={group} onPress={onGroupPress} onStarPress={onStarPress} />
       ))}

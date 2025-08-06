@@ -249,7 +249,7 @@ const NewExpenseScreen = () => {
 
     try {
       const members = await Group.getMembersByGroup(groupId);
-      const formattedMembers = members.map(member => ({
+      const formattedMembers = members.map((member) => ({
         user_id: member.user_id || member.id,
         username: member.user_id === userId ? t('expense.split.you') : member.username,
         email: member.email || '',
@@ -308,7 +308,7 @@ const NewExpenseScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white ">
+    <SafeAreaView className="flex-1 bg-white " edges={['top', 'left', 'right']}>
       <View className="container">
         <Header title={t('expense.addExpense')} />
 

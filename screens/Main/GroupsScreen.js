@@ -241,7 +241,7 @@ const GroupsScreen = () => {
   const sortedGroups = [...favoriteGroups, ...nonFavoriteGroups];
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white" edges={['top', 'left', 'right']}>
       <View className="container">
         {/* Header */}
         <Header title={t('group.title')} showIcon={true} route="AddNewGroup" />
@@ -268,7 +268,8 @@ const GroupsScreen = () => {
         <ScrollView
           className="flex-1 "
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 5 }}>
+          // contentContainerStyle={{ paddingBottom: 5 }}
+        >
           {/* Groups List or Empty State */}
           {isLoadingGroups ? (
             // Loading skeleton
