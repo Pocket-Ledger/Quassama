@@ -291,7 +291,8 @@
     "loading": "Loading expenses...",
     "loadingMore": "Loading more expenses...",
     "search": {
-      "placeholder": "Eg: \"T9edia\""
+      "placeholder": "Eg: \"T9edia\"",
+      "resultsCount": "Results count"
     },
     "empty": {
       "title": "No Expenses Yet",
