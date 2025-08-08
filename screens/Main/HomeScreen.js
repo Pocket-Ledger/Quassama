@@ -24,7 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from 'models/notifications/notifications';
 import { capitalizeFirst, getFirstLetterCapitalized } from 'utils/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Wallet } from 'lucide-react-native';
+import { TrendingDown, TrendingUp, Wallet } from 'lucide-react-native';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -401,19 +401,33 @@ const HomeScreen = () => {
         <View className="flex gap-8 pb-4">
           <View className="flex-row rounded-md border border-gray-100 px-4 py-2">
             <View className="mr-2 flex-1">
-              <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.oweYou')}</Text>
-              <Text className="font-dmsans-bold text-2xl text-error">
-                {oweYou.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
+              <View className="mb-2 flex-row items-center">
+                <View className="mr-2 rounded-full bg-green-100 p-2">
+                  <TrendingDown size={16} color="#34C759" />
+                </View>
+                <Text className="text-base font-medium text-gray-900">{t('home.oweYou')}</Text>
+              </View>
+              <Text className="font-dmsans-bold text-2xl text-green-500">
+                {oweYou.toFixed(2)} <Text className="text-sm text-gray-500">{getCurrency()}</Text>
+              </Text>
+              <Text className="mt-1 font-dmsans text-sm text-gray-500">
+                Friends owe you this amount
               </Text>
             </View>
+
             <View className="ml-2 flex-1">
-              <Text className="mb-1 text-lg font-medium text-gray-500">{t('home.youOwe')}</Text>
-              <Text className="font-dmsans-bold text-2xl text-green-500">
-                {youOwe.toFixed(2)} <Text className="text-sm">{getCurrency()}</Text>
+              <View className="mb-2 flex-row items-center">
+                <View className="mr-2 rounded-full bg-red-100 p-2">
+                  <TrendingUp size={16} color="#ff3b30" />
+                </View>
+                <Text className="text-base font-medium text-gray-900">{t('home.youOwe')}</Text>
+              </View>
+              <Text className="font-dmsans-bold text-2xl text-red-500 ">
+                {youOwe.toFixed(2)} <Text className="text-sm text-gray-500">{getCurrency()}</Text>
               </Text>
+              <Text className="mt-1 font-dmsans text-sm text-gray-500">You owe your friends</Text>
             </View>
           </View>
-
           {/* Overview Section */}
           <View className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
             <Text className="mb-4 text-lg font-medium text-black">
@@ -435,14 +449,17 @@ const HomeScreen = () => {
                 </View>
               </View>
             ) : overviewData.categoryData.length === 0 ? (
-              <View className="flex flex-row justify-around py-8 items-center">
-
+              <View className="flex flex-row items-center justify-around py-8">
                 {/* <Feather name="pie-chart" size={48} color="#ccc" /> */}
-                <View className=''>
-                  <Text className="mt-2 text-gray-500 text-lg">{t('home.noExpensesThisMonth')}</Text>
-                  <Text className="mt-1 text-gray-400 text-sm">Tap + to add Your first Expense</Text>
+                <View className="">
+                  <Text className="mt-2 text-lg text-gray-500">
+                    {t('home.noExpensesThisMonth')}
+                  </Text>
+                  <Text className="mt-1 text-sm text-gray-400">
+                    Tap + to add Your first Expense
+                  </Text>
                 </View>
-                <View className='bg-blue-100 w-18 h-18 rounded-full items-center justify-center'>
+                <View className="h-18 w-18 items-center justify-center rounded-full bg-blue-100">
                   <Wallet size={38} color="#3B82F6" strokeWidth={2.5} />
                 </View>
               </View>
@@ -500,7 +517,6 @@ const HomeScreen = () => {
               </View>
             )}
           </View>
-
           {/* Recent Activity */}
           <View className="mx-4 ">
             <View className="mb-4 flex-row items-center justify-between">
@@ -546,7 +562,6 @@ const HomeScreen = () => {
               )}
             </View>
           </View>
-
           {/* Group Members */}
           <View className="mx-4 ">
             <View className="mb-4 flex-row items-start justify-between">
