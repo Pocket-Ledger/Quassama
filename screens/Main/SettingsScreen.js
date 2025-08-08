@@ -77,18 +77,19 @@ const SettingsScreen = () => {
               <Text className="input-label mb-2">{t('settings.currency')}</Text>
               <View className="input-container">
                 <TouchableOpacity
-                  className="h-14 w-full flex-row items-center justify-between rounded-input border border-border-light bg-white px-4"
-                  onPress={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
-                  <Text className="text-base text-black">{selectedCurrency}</Text>
+                  className="h-14 w-full flex-row items-center justify-between rounded-input border border-border-light bg-gray-100 px-4"
+                  disabled={true}>
+                  <Text className="text-base text-gray-400">{selectedCurrency}</Text>
                   <Ionicons
-                    name={showCurrencyDropdown ? 'chevron-up' : 'chevron-down'}
+                    name="chevron-down"
                     size={20}
-                    color="#666"
+                    color="#ccc"
                   />
                 </TouchableOpacity>
+              <Text className="text-xs text-gray-500 mt-2">This feature is coming soon</Text>
 
-                {/* Currency Dropdown */}
-                {showCurrencyDropdown && (
+                {/* Currency Dropdown - Commented out since feature is disabled */}
+                {/* {showCurrencyDropdown && (
                   <View
                     className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-200 bg-white shadow-sm"
                     style={{ zIndex: 1000 }}>
@@ -111,7 +112,7 @@ const SettingsScreen = () => {
                       </TouchableOpacity>
                     ))}
                   </View>
-                )}
+                )} */}
               </View>
             </View>
 
