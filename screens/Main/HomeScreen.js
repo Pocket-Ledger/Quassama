@@ -8,7 +8,7 @@ import {
   Pressable,
   RefreshControl,
 } from 'react-native';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Feather, Fontisto, MaterialIcons } from '@expo/vector-icons';
 import PieChart from 'components/PieChart';
 import Expense from 'models/expense/Expense';
 import { useFocusEffect, useNavigation } from '@react-navigation/core';
@@ -24,6 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from 'models/notifications/notifications';
 import { capitalizeFirst, getFirstLetterCapitalized } from 'utils/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Wallet } from 'lucide-react-native';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -434,9 +435,16 @@ const HomeScreen = () => {
                 </View>
               </View>
             ) : overviewData.categoryData.length === 0 ? (
-              <View className="items-center py-8">
-                <Feather name="pie-chart" size={48} color="#ccc" />
-                <Text className="mt-2 text-gray-500">{t('home.noExpensesThisMonth')}</Text>
+              <View className="flex flex-row justify-around py-8 items-center">
+
+                {/* <Feather name="pie-chart" size={48} color="#ccc" /> */}
+                <View className=''>
+                  <Text className="mt-2 text-gray-500 text-lg">{t('home.noExpensesThisMonth')}</Text>
+                  <Text className="mt-1 text-gray-400 text-sm">Tap + to add Your first Expense</Text>
+                </View>
+                <View className='bg-blue-100 w-18 h-18 rounded-full items-center justify-center'>
+                  <Wallet size={38} color="#3B82F6" strokeWidth={2.5} />
+                </View>
               </View>
             ) : (
               <View className="flex-row items-center">
