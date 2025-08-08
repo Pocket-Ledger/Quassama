@@ -403,7 +403,7 @@ const HomeScreen = () => {
             <View className="mr-2 flex-1">
               <View className="mb-2 flex-row items-center">
                 <View className="mr-2 rounded-full bg-green-100 p-2">
-                  <TrendingDown size={16} color="#34C759" />
+                  <TrendingUp size={16} color="#34C759" />
                 </View>
                 <Text className="text-base font-medium text-gray-900">{t('home.oweYou')}</Text>
               </View>
@@ -418,7 +418,7 @@ const HomeScreen = () => {
             <View className="ml-2 flex-1">
               <View className="mb-2 flex-row items-center">
                 <View className="mr-2 rounded-full bg-red-100 p-2">
-                  <TrendingUp size={16} color="#ff3b30" />
+                  <TrendingDown size={16} color="#ff3b30" />
                 </View>
                 <Text className="text-base font-medium text-gray-900">{t('home.youOwe')}</Text>
               </View>
