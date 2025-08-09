@@ -28,7 +28,7 @@
     },
     "android": {
       "package": "com.quassama.app",
-      "versionCode": 8,
+      "versionCode": 9,
       "adaptiveIcon": {
         "foregroundImage": "./assets/Icon/logo1.png",
         "backgroundColor": "#ffffff"

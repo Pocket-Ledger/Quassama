@@ -18,9 +18,10 @@ import ExpenseListItem from 'components/ExpenseListItem';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import Expense from 'models/expense/Expense';
-import ExpenseSearchService from 'services/searchForExpense';
+import ExpenseSearchService from 'services/expense/searchForExpense';
 import { useTranslation } from 'react-i18next';
 import { dateToTimestamp } from 'utils/time';
+import filterExpenses from 'services/expense/filterExpense';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
@@ -155,7 +156,7 @@ const AllExpensesScreen = () => {
         // Check if we should apply filters
         if (applyFilters && filterConfig.checkedFilter) {
           // Use filterExpenses method when filters are applied
-          const filteredExpenses = await Expense.filterExpenses(
+          const filteredExpenses = await filterExpenses.filterExpenses(
             groupId,
             dateToTimestamp(filterConfig.startDate),
             dateToTimestamp(filterConfig.endDate),
