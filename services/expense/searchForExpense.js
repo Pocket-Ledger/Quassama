@@ -1,8 +1,8 @@
 import { collection, query, where, orderBy, getDocs, getDoc, doc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { db, app } from '../firebase';
-import Group from '../models/group/group';
-import User from '../models/auth/user';
+import { db, app } from '../../firebase';
+import Group from '../../models/group/group';
+import User from '../../models/auth/user';
 
 /**
  * Search service for expenses with various criteria
