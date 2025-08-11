@@ -185,7 +185,9 @@
     "switchGroup": "Switch Group",
     "noGroupSet": "No group set yet",
     "noGroupMembers": "No group members",
-    "moreCategoriesCount": "+{{count}} more categories"
+    "moreCategoriesCount": "+{{count}} more categories",
+    "friendsOweYou": "Friends owe you this amount",
+    "youOweFriends": "You owe your friends"
   },
   "expense": {
     "paidBy": "Paid by {{name}}",

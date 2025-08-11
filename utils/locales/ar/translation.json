@@ -183,7 +183,9 @@
     "noGroupSet": "لم يتم تعيين مجموعة بعد",
     "noGroupMembers": "لا يوجد أعضاء في المجموعة",
     "moreCategoriesCount": "+{{count}} فئات أخرى",
-    "groupMembers": "أعضاء المجموعة"
+    "groupMembers": "أعضاء المجموعة",
+    "friendsOweYou": "أصدقاؤك مدينون لك بهذا المبلغ",
+    "youOweFriends": "أنت مدين لأصدقائك"
   },
 
   "expense": {

@@ -183,7 +183,9 @@
     "switchGroup": "Changer de Groupe",
     "noGroupSet": "Aucun groupe défini encore",
     "noGroupMembers": "Aucun membre du groupe",
-    "moreCategoriesCount": "+{{count}} catégories de plus"
+    "moreCategoriesCount": "+{{count}} catégories de plus",
+    "friendsOweYou": "Vos amis vous doivent ce montant",
+    "youOweFriends": "Vous devez à vos amis"
   },
 
   "expense": {
