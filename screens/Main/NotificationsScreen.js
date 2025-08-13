@@ -1,10 +1,11 @@
 import Header from 'components/Header';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Notification from 'models/notifications/notifications';
 import NotificationItem from 'components/NotificationItem';
 import { NotificationsList } from 'components/NotificationsList';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
@@ -38,9 +39,7 @@ const NotificationsScreen = () => {
       await Notification.markAsRead(notificationId);
       // Update local state to reflect the change
       setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === notificationId ? { ...n, read: true } : n
-        )
+        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
       );
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
@@ -48,17 +47,17 @@ const NotificationsScreen = () => {
   };
 
   const EmptyNotificationsState = () => (
-    <View className="flex-1 px-6 mt-20 ">
-      <View className="items-center mb-8 ">
-        <View className="items-center justify-center w-24 h-24 mb-6 rounded-full">
+    <View className="mt-20 flex-1 px-6 ">
+      <View className="mb-8 items-center ">
+        <View className="mb-6 h-24 w-24 items-center justify-center rounded-full">
           <Ionicons name="notifications-off-outline" size={70} color="#3B82F6" />
         </View>
 
-        <Text className="mb-3 text-xl font-semibold text-center text-black">
+        <Text className="mb-3 text-center text-xl font-semibold text-black">
           No Notifications Yet
         </Text>
 
-        <Text className="text-base leading-6 text-center text-gray-600">
+        <Text className="text-center text-base leading-6 text-gray-600">
           Stay tuned! When someone adds an expense, settles up, or invites you, it'll show up here.
         </Text>
       </View>
@@ -78,14 +77,14 @@ const NotificationsScreen = () => {
         <Header title="Notifications" />
 
         {loading ? (
-          <View className="items-center justify-center flex-1 ">
+          <View className="flex-1 items-center justify-center ">
             <Text className="text-gray-500">Loading notifications...</Text>
           </View>
         ) : notifications.length === 0 ? (
           <EmptyNotificationsState />
         ) : (
-          <NotificationsList 
-            notifications={notifications} 
+          <NotificationsList
+            notifications={notifications}
             onNotificationPress={handleNotificationPress}
           />
         )}
