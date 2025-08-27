@@ -498,7 +498,8 @@
     "profile": "Profile",
     "back": "Back",
     "next": "Next",
-    "done": "Done"
+    "done": "Done",
+    "achievements": "Achievements"
   },
   "invitations": {
     "join": "Join \"{{groupName}}\"?",
@@ -662,5 +663,9 @@
       "title": "Navigation",
       "description": "Use the bottom tabs to navigate between Home, New Expense, Groups, and Profile."
     }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "description": "Track your achievements and milestones."
   }
 }

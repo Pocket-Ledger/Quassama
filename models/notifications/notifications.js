@@ -161,6 +161,39 @@ class Notification{
             throw new Error('Failed to count unread notifications');
         }
     }
+
+    /**
+     * function to mark all notifications as read for the current user
+     * @returns {Promise<void>}
+     */
+    static async markAllAsRead() {
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            throw new Error('No authenticated user found');
+        }
+        const db = getFirestore();
+        const notificationsRef = collection(db, 'notifications');
+        const q = query(
+            notificationsRef,
+            where('receiver_id', '==', currentUser.uid),
+            where('read', '==', false)
+        );
+        try {
+            const querySnapshot = await getDocs(q);
+            const updatePromises = [];
+            querySnapshot.forEach((docSnapshot) => {
+                const notificationRef = doc(db, 'notifications', docSnapshot.id);
+                updatePromises.push(updateDoc(notificationRef, { read: true }));
+            });
+            await Promise.all(updatePromises);
+            console.log('All notifications marked as read');
+        } catch (error) {
+            console.error('Error marking all notifications as read:', error);
+            throw new Error('Failed to mark all notifications as read');
+        }
+    }
+
 }
 
 export default Notification;

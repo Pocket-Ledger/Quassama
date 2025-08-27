@@ -496,7 +496,8 @@
     "profile": "Profil",
     "back": "Retour",
     "next": "Suivant",
-    "done": "Terminé"
+    "done": "Terminé",
+    "achievements": "Réalisations"
   },
   "invitations": {
     "join": "Rejoindre \"{{groupName}}\"?",
@@ -661,5 +662,9 @@
       "title": "Navigation",
       "description": "Utilisez les onglets du bas pour naviguer entre Accueil, Nouvelle dépense, Groupes et Profil."
     }
+  },
+  "achievements": {
+    "title": "Réalisations",
+    "description": "Suivez vos réalisations et vos étapes importantes."
   }
 }
