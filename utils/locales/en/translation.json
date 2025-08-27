@@ -1,0 +1,666 @@
+{
+  "languages": {
+    "title": "Languages",
+    "subtitle": "Change the app language.",
+    "change": "Change language",
+    "changing": "Changing...",
+    "success_title": "Success",
+    "success_message": "Language changed successfully",
+    "error_title": "Error",
+    "error_message": "Failed to change language. Please try again."
+  },
+  "validation": {
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "at_least_6_chars": "At least 6 characters",
+    "mix_chars": "Mix of letters, numbers, or symbols",
+    "passwords_match": "Passwords match",
+    "passwords_no_match": "Passwords do not match",
+
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidAmount": "Invalid amount",
+    "amountTooSmall": "Amount must be greater than 0",
+    "titleTooShort": "Title must be at least 3 characters",
+    "titleTooLong": "Title must be less than 50 characters",
+    "invalidDate": "Invalid date",
+    "selectCategory": "Please select a category",
+    "selectMembers": "Please select at least one member",
+    "username_required": "Username is required",
+    "username_min_length": "Username must be at least 3 characters",
+    "username_invalid": "Username can only contain letters, numbers, and underscores",
+    "email_required": "Email is required",
+    "email_invalid": "Please enter a valid email address",
+    "password_required": "Password is required",
+    "password_min_length": "Password must be at least 6 characters",
+    "password_complexity": "Password needs at least 2 of: uppercase, lowercase, number, or special character",
+    "confirm_password_required": "Please confirm your password",
+    "passwords_dont_match": "Passwords do not match"
+  },
+  "login": {
+    "title": "Login",
+    "subtitle": "Please enter your email and password to enjoy the experience",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forget Password?",
+    "login_button": "Login",
+    "logging_in": "Logging in...",
+    "or_continue_with": "Or Continue with",
+    "google": "Google",
+    "apple": "Apple",
+    "no_account": "Didn't have an account? ",
+    "sign_up": "Sign Up"
+  },
+  "register": {
+    "password_strength": "Password Strength",
+
+    "title": "Create an Account",
+    "subtitle": "Please enter your details to enjoy the experience",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "remember_me": "Remember me",
+    "create_account": "Create an Account",
+    "creating_account": "Creating Account...",
+    "or_use": "OR use",
+    "google": "Google",
+    "apple": "Apple",
+    "already_have_account": "Already have an account? ",
+    "login": "Log In",
+    "success_title": "Registration Successful",
+    "success_message": "Your account has been created successfully!",
+    "error_title": "Registration Failed"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize app preferences.",
+    "notifications": "Notifications",
+    "currency": "Currency",
+    "update_info": "Update Info",
+    "updating": "Updating..."
+  },
+  "addGroup": {
+    "title": "Add New Group",
+    "group_name": "Group Name",
+    "group_name_placeholder": "Eg: 'Roommates', 'Vacation Agadir'",
+    "currency": "Currency",
+    "add_members": "Add Members",
+    "search_placeholder": "Search by username: 'user02718'",
+    "searching": "Searching...",
+    "search_results": "Search Results",
+    "no_users_found": "No users found",
+    "selected_members": "Selected Members ({{count}})",
+    "allow_invite_others": "Allow members to invite others",
+    "notify_new_expenses": "Notify for new expenses",
+    "creating": "Creating...",
+    "add_group": "Add Group",
+    "success_title": "Success",
+    "success_message": "Group created successfully!",
+    "error_title": "Creation Error",
+    "error_message": "Failed to create group. Please try again.",
+    "search_error_title": "Search Error",
+    "search_error_message": "Failed to search for users. Please try again.",
+    "errors": {
+      "group_name_required": "Group name is required",
+      "members_required": "Please add at least one member",
+      "maxLength": "Group name cannot exceed 50 characters"
+    }
+  },
+  "customAlert": {
+    "buttons": {
+      "ok": "OK",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "close": "Close",
+      "continue": "Continue",
+      "retry": "Retry",
+      "dismiss": "Dismiss"
+    },
+    "titles": {
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Information",
+      "confirmation": "Confirmation"
+    },
+    "messages": {
+      "default_success": "Operation completed successfully",
+      "default_error": "An error occurred. Please try again.",
+      "default_warning": "Please review your action",
+      "default_info": "Here's some information for you",
+      "network_error": "Network connection failed. Please check your internet connection.",
+      "validation_error": "Please check your input and try again",
+      "timeout_error": "Request timed out. Please try again later.",
+      "permission_denied": "Permission denied. Please check your access rights.",
+      "save_success": "Changes saved successfully",
+      "delete_success": "Item deleted successfully",
+      "update_success": "Update completed successfully",
+      "logout_success": "You have been logged out successfully",
+      "login_success": "Welcome back! Login successful",
+      "registration_success": "Account created successfully"
+    }
+  },
+
+  "common": {
+    "currency": "MAD",
+    "seeAll": "See All",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "adding": "adding...",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "noData": "No data available",
+    "retry": "Retry",
+    "unknown": "Unknown",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "days": "days",
+    "confirm": "Confirm",
+    "apply": "Apply",
+    "updating": "Updating...",
+    "summary": "Summary"
+  },
+  "home": {
+    "goodMorning": "Good morning 👋",
+    "goodAfternoon": "Good Afternoon👋",
+    "goodEvening": "Good Evening👋",
+    "goodNight": "Good Night👋",
+    "oweYou": "Owe You",
+    "youOwe": "You Owe",
+    "monthlyOverview": "{{month}} {{year}} Overview",
+    "recentActivity": "Recently Activity",
+    "noExpensesThisMonth": "No expenses for this month",
+    "noRecentActivity": "No recent activity",
+    "totalExpenses": "Total Expenses",
+    "totalTransactions": "Total Transactions",
+    "switchGroup": "Switch Group",
+    "noGroupSet": "No group set yet",
+    "noGroupMembers": "No group members",
+    "moreCategoriesCount": "+{{count}} more categories",
+    "friendsOweYou": "Friends owe you this amount",
+    "youOweFriends": "You owe your friends"
+  },
+  "expense": {
+    "paidBy": "Paid by {{name}}",
+    "amount": "{{amount}} {{currency}}",
+    "expenseDetails": "Expense Details",
+    "addExpense": "Add Expense",
+    "editExpense": "Edit Expense",
+    "updateExpense": "Update Expense",
+
+    "deleteExpense": "Delete Expense",
+    "expenseTitle": "Expense Title",
+    "expenseAmount": "Amount",
+    "selectCategory": "Select Category",
+    "selectDate": "Select Date",
+    "addNote": "Add Note",
+    "splitBetween": "Split Between",
+    "note": "Note",
+    "added_success": "Expense successfully added",
+    "details": {
+      "title": "Expense Details",
+      "information": "Information",
+      "description": "Description",
+      "paidBy": "Paid by",
+      "date": "Date",
+      "time": "Time",
+      "group": "Group",
+      "edit": "Edit Expense",
+      "share": "Share Expense",
+      "delete": "Delete Expense",
+      "deleting": "Deleting...",
+      "customSplit": "Custom Split",
+      "equalSplit": "Equal Split",
+      "equalSplitNote": "Total {{amount}} split equally among {{count}} members ({{share}} each)"
+    },
+    "delete": {
+      "title": "Delete Expense",
+      "message": "Are you sure you want to delete this expense? This action cannot be undone.",
+      "success": {
+        "title": "Expense Deleted",
+        "message": "The expense has been successfully deleted."
+      },
+      "error": {
+        "title": "Delete Failed",
+        "message": "Failed to delete the expense. Please try again."
+      }
+    },
+    "share": {
+      "title": "Expense Details",
+      "text": "Expense: {{title}}\nAmount: {{amount}} {{currency}}\nCategory: {{category}}\nPaid by: {{paidBy}}\nDate: {{date}}",
+      "error": {
+        "title": "Share Failed",
+        "message": "Unable to share the expense. Please try again."
+      }
+    },
+    "category": {
+      "unknown": "Unknown Category"
+    },
+    "repeat": {
+      "title": "Repeat",
+      "oneTime": "One Time",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "custom": "Custom",
+      "repeatedEvery": "Repeated every",
+      "selectInterval": "Select Interval",
+      "intervals": {
+        "days": "days",
+        "weeks": "weeks",
+        "months": "months"
+      }
+    },
+    "split": {
+      "title": "Split with",
+      "you": "You",
+      "addPerson": "Add People",
+      "personName": "Person Name",
+      "enterPersonName": "Enter person name",
+      "selectGroupFirst": "Select a group first",
+      "equalSplit": "Equal Split",
+      "noMembers": "No members to split with",
+      "tapToEdit": "Tap to edit",
+      "editSplit": "Edit Split",
+      "people": "people",
+      "splitWith": "Split With",
+      "enableSplit": "Enable split",
+      "enterAmountFirst": "Enter amount first",
+      "invalidSplit": "Invalid Split",
+      "splitMustEqualTotal": "Split amounts must equal expense total. Split: {{splitTotal}}, Expense: {{expenseTotal}}",
+      "amountRequired": "Amount is required",
+      "totalAmount": "Total amount"
+    },
+    "validation": {
+      "expenseNameRequired": "Expense name is required",
+      "amountRequired": "Amount is required",
+      "validAmount": "Please enter a valid amount greater than 0",
+      "selectCategory": "Please select a category",
+      "selectGroup": "Please select a group",
+      "maxCharacter": "Amount cannot exceed 100,000",
+      "validCustomDays": "Please enter a valid number of days",
+      "splitAmountMismatch": "Split amounts don't match total expense"
+    },
+    "title": "All Expenses",
+    "loading": "Loading expenses...",
+    "loadingMore": "Loading more expenses...",
+    "search": {
+      "placeholder": "Eg: \"T9edia\"",
+      "resultsCount": "Results count"
+    },
+    "empty": {
+      "title": "No Expenses Yet",
+      "description": "Start by adding your first expense. Keep track of who paid what and split it fairly between your group members.",
+      "addFirstExpense": "Add Your First Expense",
+      "noResults": "No Results Found",
+      "tryDifferentFilters": "Try adjusting your search or filter criteria to find what you're looking for."
+    },
+    "error": {
+      "title": "Oops! Something went wrong",
+      "tryAgain": "Try Again",
+      "notFound": "Expense not found",
+      "loadFailed": "Failed to load expense details",
+      "invalidId": "Invalid expense ID"
+    },
+    "errors": {
+      "loadFailed": "Failed to load expenses"
+    },
+    "pagination": {
+      "showing": "Showing {{start}}-{{end}} of {{total}} expenses"
+    },
+    "filtersActive": "Filters are active"
+  },
+  "group": {
+    "selectGroup": "Select Group",
+    "switchGroup": "Switch Group",
+    "createNewGroup": "Create New Group",
+    "addNewGroup": "Add New Group",
+    "groupName": "Group Name",
+    "groupMembers": "Group Members",
+    "addMembers": "Add Members",
+    "removeMember": "Remove Member",
+    "leaveGroup": "Leave Group",
+    "deleteGroup": "Delete Group",
+    "noGroupsAvailable": "No groups available",
+    "memberCount": "{{count}} members",
+    "groupSettings": "Group Settings",
+    "inviteMembers": "Invite Members",
+    "title": "Groups",
+    "tabs": {
+      "all": "All",
+      "youOwed": "You Owed",
+      "youOw": "You Ow",
+      "settled": "Settled"
+    },
+    "noGroupsYet": "No Groups Yet",
+    "startByCreating": "Start by creating a group for your trip, event, or shared expenses. It only takes a few seconds!",
+    "createFirstGroup": "Create Your First Group",
+    "noExpensesYet": "No expenses yet",
+    "personal": "Personal"
+  },
+  "editGroup": {
+    "title": "Edit Group",
+    "group_name": "Group Name",
+    "group_name_placeholder": "Enter group name",
+    "add_members": "Add Members",
+    "search_placeholder": "Search by username",
+    "searching": "Searching...",
+    "search_results": "Search Results",
+    "current_members": "Current Members ({{count}})",
+    "no_users_found": "No users found",
+    "allow_invite_others": "Allow members to invite others",
+    "notify_new_expenses": "Notify for new expenses",
+    "updating": "Updating...",
+    "update_group": "Update Group",
+    "you": "You",
+    "cannot_remove_self": "You cannot remove yourself from the group",
+    "errors": {
+      "group_name_required": "Group name is required",
+      "members_required": "At least one member is required"
+    },
+    "search_error_title": "Search Error",
+    "search_error_message": "Failed to search for users. Please try again.",
+    "success_title": "Success",
+    "success_message": "Group updated successfully!",
+    "error_title": "Error",
+    "error_message": "Failed to update group. Please try again.",
+    "fetch_error_message": "Failed to load group data. Please try again."
+  },
+  "groupDetails": {
+    "totalGroupExpenses": "Total Group Expenses",
+    "youPaid": "You Paid",
+    "youOwe": "You Owe",
+    "settleUp": "Settle Up",
+    "settleUpTitle": "Settle Up Group",
+    "settleUpMessage": "This will create balancing expenses to make all members have equal share (zero balance). Are you sure you want to proceed?",
+    "onlyAdminCanSettle": "Only group admin can settle up expenses",
+    "settleUpError": "Failed to settle up. Please try again.",
+    "noExpensesToSettle": "No expenses found to settle",
+    "alreadySettled": "All expenses are already settled",
+    "recentExpenses": "Recently Expenses",
+    "noExpenses": "No expenses yet",
+    "noRecentExpenses": "No expenses yet",
+    "addFirstExpense": "Add the first expense to get started",
+    "deleteGroup": "Delete Group",
+    "deleteGroupTitle": "Delete Group?",
+    "deleteGroupMessage": "Are you sure you want to delete this group? This action will permanently remove the group and all its expenses. This cannot be undone.",
+    "groupDeletedSuccess": "Group deleted successfully",
+    "groupDeleteError": "Failed to delete group. Please try again.",
+    "editGroup": "Edit Group"
+  },
+  "notifications": {
+    "notifications": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllAsRead": "Mark all as read",
+    "newExpense": "New expense added",
+    "expenseUpdated": "Expense updated",
+    "expenseDeleted": "Expense deleted",
+    "memberAdded": "New member added to group",
+    "memberLeft": "Member left the group",
+    "paymentReceived": "Payment received",
+    "paymentRequest": "Payment request"
+  },
+  "categories": {
+    "food": "Food",
+    "transport": "Transport",
+    "entertainment": "Entertainment",
+    "shopping": "Shopping",
+    "bills": "Bills",
+    "health": "Health",
+    "education": "Education",
+    "travel": "Travel",
+    "settlement": "Settlement",
+    "other": "Other",
+    "groceries": "Groceries",
+    "restaurant": "Restaurant",
+    "gas": "Gas",
+    "taxi": "Taxi",
+    "movies": "Movies",
+    "clothing": "Clothing",
+    "electricity": "Electricity",
+    "internet": "Internet",
+    "medicine": "Medicine",
+    "books": "Books",
+    "hotel": "Hotel",
+    "cleaning": "Cleaning",
+    "rent": "Rent"
+  },
+
+  "errors": {
+    "networkError": "Network connection error",
+    "serverError": "Server error occurred",
+    "unauthorizedAccess": "Unauthorized access",
+    "dataNotFound": "Data not found",
+    "validationFailed": "Validation failed",
+    "operationFailed": "Operation failed",
+    "unknownError": "An unknown error occurred"
+  },
+  "profile": {
+    "title": "Profile",
+    "profile": "Profile",
+    "settings": "Settings",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "logout": "Logout",
+    "profileDetails": "Profile Details",
+    "editProfile": "Edit Profile",
+    "personalInfo": "Personal Information",
+    "accountSettings": "Account Settings",
+    "preferences": "Preferences",
+    "security": "Security",
+    "privacy": "Privacy",
+    "notifications": "Notifications",
+    "about": "About",
+    "help": "Help & Support",
+    "termsAndConditions": "Terms & Conditions",
+    "privacyPolicy": "Privacy Policy",
+    "version": "Version",
+    "buildNumber": "Build Number"
+  },
+  "profileDetails": {
+    "subtitle": "View and update your personal information.",
+    "name": "Name",
+    "email": "Email",
+    "namePlaceholder": "Enter your name",
+    "emailPlaceholder": "Enter your email",
+    "updateButton": "Update Info",
+    "updating": "Updating...",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Failed to update profile. Please try again.",
+    "fetchError": "Failed to fetch user details. Please try again.",
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address"
+    }
+  },
+
+  "logout": {
+    "title": "Logout",
+    "message": "Are you sure you want to logout?",
+    "confirm": "Logout",
+    "cancel": "Cancel",
+    "success": "You have been logged out successfully",
+    "error": "Failed to log out. Please try again"
+  },
+  "navigation": {
+    "home": "Home",
+    "newExpense": "New Expense",
+    "groups": "Groups",
+    "profile": "Profile",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done"
+  },
+  "invitations": {
+    "join": "Join \"{{groupName}}\"?",
+    "invitedBy": "Invited By {{name}}",
+    "accept": "Accept",
+    "decline": "Decline",
+    "unknown": "Unknown"
+  },
+  "passwordRecovery": {
+    "forgetPassword": {
+      "title": "Forget Password",
+      "subtitle": "Please enter your email to receive a code",
+      "email": "Email",
+      "emailPlaceholder": "John.doe@gmail.com",
+      "sendButton": "Send",
+      "sending": "Sending...",
+      "successMessage": "Verification code has been sent to your email address. Please check your inbox.",
+      "errorMessage": "Failed to send verification code. Please try again."
+    },
+    "otpVerification": {
+      "title": "Enter Code",
+      "subtitle": "We've sent an email with an activation code to your email {{email}}",
+      "wrongCode": "Wrong Code, Please try again",
+      "didntReceive": "Didn't receive the code?",
+      "resend": "Resend",
+      "confirmButton": "Confirm",
+      "confirming": "Confirming..."
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Create a new secure password for your account",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Re-enter new password",
+      "saveButton": "Save",
+      "saving": "Saving...",
+      "successMessage": "Your password has been reset successfully",
+      "validation": {
+        "newPasswordRequired": "New password is required",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "confirmPasswordRequired": "Please confirm your password",
+        "passwordsDoNotMatch": "Passwords do not match"
+      }
+    },
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address"
+    }
+  },
+  "time": {
+    "minutesAgo_one": "{{count}}m ago",
+    "minutesAgo_other": "{{count}}m ago",
+    "hoursAgo_one": "{{count}}h ago",
+    "hoursAgo_other": "{{count}}h ago",
+    "daysAgo_one": "{{count}}d ago",
+    "daysAgo_other": "{{count}}d ago",
+    "yesterday": "Yesterday",
+    "today": "Today",
+    "tomorrow": "Tomorrow"
+  },
+  "filters": {
+    "title": "Filter",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "clear": "Clear",
+    "see": "See",
+    "seeExpenses_one": "See ",
+    "seeExpenses_other": "See {{count}} Expenses",
+    "dateRange": {
+      "title": "Date Range",
+      "customDate": "Custom Date",
+      "customDateTitle": "Select Date Range",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "selectedRange": "Selected range",
+      "invalidRange": "End date must be after start date",
+      "selectStartDate": "Select Start Date",
+      "selectEndDate": "Select End Date"
+    },
+    "dateRanges": {
+      "today": "Today",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "thisMonth": "This Month"
+    },
+    "categories": {
+      "title": "Categories"
+    },
+    "amountRange": {
+      "title": "Amount Range"
+    },
+    "group": {
+      "title": "Group",
+      "selectGroup": "Select group"
+    },
+    "settlements": {
+      "settled": "Settled",
+      "settlementHistory": "Settlement History",
+      "noSettlements": "No settlements yet"
+    }
+  },
+  "logoutModal": {
+    "title": "Logout",
+    "message": "Are you sure you want to log out?",
+    "cancel": "Cancel",
+    "logout": "Logout",
+    "loggingOut": "Logging out..."
+  },
+  "auth": {
+    "errors": {
+      "email_already_in_use": "This email address is already registered. Please use a different email or try logging in.",
+      "invalid_email": "Please enter a valid email address.",
+      "operation_not_allowed": "Email/password authentication is not enabled. Please contact support.",
+      "weak_password": "Password is too weak. Please choose a stronger password.",
+      "network_error": "Network error. Please check your internet connection and try again.",
+      "too_many_requests": "Too many requests. Please try again later.",
+      "user_disabled": "This account has been disabled. Please contact support.",
+      "requires_recent_login": "Please log in again to complete this action.",
+      "credential_already_in_use": "This credential is already associated with a different account.",
+      "invalid_credentials": "Invalid email or password. Please check your credentials and try again.",
+      "user_not_found": "No account found with this email address.",
+      "wrong_password": "Incorrect password. Please try again.",
+      "general": "An error occurred. Please try again."
+    }
+  },
+  "tour": {
+    "skip": "Skip Tour",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish",
+    "welcome": {
+      "title": "Welcome to Qassama!",
+      "description": "Let's take a quick tour to help you get started with managing your shared expenses."
+    },
+    "profile": {
+      "title": "Your Profile",
+      "description": "Tap here to view and edit your profile information."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Stay updated with expense notifications and group activities."
+    },
+    "balance": {
+      "title": "Balance Overview",
+      "description": "See how much you owe and how much others owe you at a glance."
+    },
+    "overview": {
+      "title": "Monthly Overview",
+      "description": "Track your monthly expenses with visual charts and summaries."
+    },
+    "recent_activity": {
+      "title": "Recent Activity",
+      "description": "View your latest transactions and expense activities."
+    },
+    "see_all": {
+      "title": "See All Expenses",
+      "description": "Tap here to view all your expenses in detail."
+    },
+    "bottom_navigation": {
+      "title": "Navigation",
+      "description": "Use the bottom tabs to navigate between Home, New Expense, Groups, and Profile."
+    }
+  }
+}

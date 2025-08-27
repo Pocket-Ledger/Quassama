@@ -1,13 +1,283 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { Ionicons } from '@expo/vector-icons'; // or react-native-vector-icons
+import { Logo } from 'components/Logo';
+import { BackButton } from 'components/BackButton';
+import { useNavigation } from '@react-navigation/native';
+import Login from 'models/auth/Login';
+import { useTranslation } from 'react-i18next';
+import i18n from 'utils/i18n';
+import Header from 'components/Header';
+import { useAlert } from 'hooks/useAlert';
+import CustomAlert from 'components/CustomALert';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const LoginScreen = () => {
-  return (
-    <View className="flex-1 justify-center items-center bg-white">
-      <Text className='text-red-500'>Login Screen</Text>
-      {/* Add your login form here */}
-    </View>
-  )
-}
+  const navigation = useNavigation();
+  const { t } = useTranslation();
+  const { alertConfig, showError, hideAlert } = useAlert();
 
-export default LoginScreen
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Function to convert Firebase error codes to user-friendly messages
+  const getFirebaseErrorMessage = (errorCode) => {
+    switch (errorCode) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return t('auth.errors.invalid_credentials');
+
+      case 'auth/invalid-email':
+        return t('auth.errors.invalid_email');
+
+      case 'auth/user-disabled':
+        return t('auth.errors.user_disabled');
+
+      case 'auth/too-many-requests':
+        return t('auth.errors.too_many_requests');
+
+      case 'auth/network-request-failed':
+        return t('auth.errors.network_error');
+
+      case 'auth/operation-not-allowed':
+        return t('auth.errors.operation_not_allowed');
+
+      default:
+        return t('auth.errors.general');
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!email) {
+      newErrors.email = t('validation.email_required');
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = t('validation.email_invalid');
+    }
+
+    if (!password) {
+      newErrors.password = t('validation.password_required');
+    } else if (password.length < 6) {
+      newErrors.password = t('validation.password_min_length');
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleLogin = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setErrors({}); // Clear any previous errors
+
+    try {
+      const loginInstance = new Login(email, password);
+      const userCredential = await loginInstance.login();
+      console.log('Login successful:', userCredential.user);
+      /* navigation.navigate('MainTabs'); */
+    } catch (error) {
+      console.error('Login failed:', error);
+
+      // Extract Firebase error code
+      let errorCode = '';
+      let errorMessage = '';
+
+      if (error.code) {
+        errorCode = error.code;
+        errorMessage = getFirebaseErrorMessage(errorCode);
+      } else if (error.message) {
+        // Handle other error formats
+        if (error.message.includes('auth/invalid-credential')) {
+          errorCode = 'auth/invalid-credential';
+          errorMessage = getFirebaseErrorMessage(errorCode);
+        } else {
+          errorMessage = error.message;
+        }
+      } else {
+        errorMessage = getFirebaseErrorMessage('default');
+      }
+
+      // Show custom error alert
+      showError(t('login.error_title', 'Login Failed'), errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = (provider) => {
+    console.log(`Login with ${provider}`);
+    // Add social login logic here
+  };
+
+  const handleSignUp = () => {
+    console.log('Navigate to Sign Up');
+    // Add navigation to sign up screen here
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-white ">
+      <KeyboardAwareScrollView
+        className="container"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 50 : 100}
+        keyboardOpeningTime={0}>
+        <Header />
+        <View className="login-content relative ">
+          <View className="logo-container">
+            <Logo />
+          </View>
+          {/* Title and Subtitle */}
+          <View>
+            <Text className="title">{t('login.title')}</Text>
+            <Text className="subtitle">{t('login.subtitle')}</Text>
+          </View>
+          {/* Form */}
+          <View className="form-container">
+            <View className="gap-4">
+              <View className="input-group">
+                <Text className="input-label">{t('login.email')}</Text>
+                <View className="input-container">
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    style={{
+                      position: 'absolute',
+                      left: 16,
+                      top: '50%',
+                      transform: [{ translateY: -10 }],
+                      color: errors.email ? 'red' : 'rgba(0, 0, 0, 0.2)',
+                      zIndex: 1,
+                    }}
+                  />
+                  <TextInput
+                    className={`input-field ${errors.email ? 'input-field-error' : ''}`}
+                    placeholder="John.doe@gmail.com"
+                    placeholderTextColor="rgba(0, 0, 0, 0.2)"
+                    value={email}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (errors.email) {
+                        setErrors((prev) => ({ ...prev, email: null }));
+                      }
+                    }}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                {errors.email && <Text className="error-text">{errors.email}</Text>}
+              </View>
+
+              <View className="input-group">
+                <Text className="input-label">{t('login.password')}</Text>
+                <View className="input-container">
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    style={{
+                      position: 'absolute',
+                      left: 16,
+                      top: '50%',
+                      transform: [{ translateY: -10 }],
+                      color: errors.password ? 'red' : 'rgba(0, 0, 0, 0.2)',
+                      zIndex: 1,
+                    }}
+                  />
+                  <TextInput
+                    className={`input-field ${errors.password ? 'input-field-error' : ''}`}
+                    placeholder="••••••••••••••••"
+                    placeholderTextColor="rgba(0, 0, 0, 0.2)"
+                    value={password}
+                    onChangeText={(text) => {
+                      setPassword(text);
+                      if (errors.password) {
+                        setErrors((prev) => ({ ...prev, password: null }));
+                      }
+                    }}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity
+                    className="password-toggle z-99"
+                    onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons
+                      name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                      size={20}
+                      color="rgba(0, 0, 0, 0.2)"
+                    />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && <Text className="error-text">{errors.password}</Text>}
+              </View>
+            </View>
+
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+              <Text className="forgot-password-link">{t('login.forgot_password')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity className="btn-primary" onPress={handleLogin} disabled={isLoading}>
+              <Text className="btn-primary-text">
+                {isLoading ? t('login.logging_in') : t('login.login_button')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {/* <View className="divider-container">
+            <View className="divider-line" />
+            <Text className="font-normal divider-text">{t('login.or_continue_with')}</Text>
+            <View className="divider-line" />
+          </View>
+          <View className="flex flex-row w-full gap-4">
+            <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Google')}>
+              <Image
+                source={require('../../assets/google.png')}
+                className="w-5 h-5"
+                resizeMode="contain"
+              />
+              <Text className="text-label">{t('login.google')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity className="social-button" onPress={() => handleSocialLogin('Apple')}>
+              <Ionicons name="logo-apple" size={20} color="#000000" />
+              <Text className="text-label">{t('login.apple')}</Text>
+            </TouchableOpacity>
+          </View> */}
+          {/* Sign Up Link - UNCOMMENTED */}
+          <View className="signup-container">
+            <Text className="signup-text font-normal">{t('login.no_account')}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+              <Text className="signup-link">{t('login.sign_up')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </KeyboardAwareScrollView>
+
+      {/* Custom Alert */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={hideAlert}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+      />
+    </SafeAreaView>
+  );
+};
+
+export default LoginScreen;

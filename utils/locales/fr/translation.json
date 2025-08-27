@@ -1,0 +1,665 @@
+{
+  "languages": {
+    "title": "Langues",
+    "subtitle": "Changer la langue de l'application.",
+    "change": "Changer la langue",
+    "changing": "Changement...",
+    "success_title": "Succès",
+    "success_message": "Langue changée avec succès",
+    "error_title": "Erreur",
+    "error_message": "Échec du changement de langue. Veuillez réessayer."
+  },
+  "validation": {
+    "weak": "Faible",
+    "medium": "Moyen",
+    "strong": "Fort",
+    "at_least_6_chars": "Au moins 6 caractères",
+    "mix_chars": "Mélange de lettres, chiffres ou symboles",
+    "passwords_match": "Les mots de passe correspondent",
+    "passwords_no_match": "Les mots de passe ne correspondent pas",
+    "required": "Ce champ est requis",
+    "invalidEmail": "Adresse e-mail invalide",
+    "invalidAmount": "Montant invalide",
+    "amountTooSmall": "Le montant doit être supérieur à 0",
+    "titleTooShort": "Le titre doit contenir au moins 3 caractères",
+    "titleTooLong": "Le titre doit contenir moins de 50 caractères",
+    "invalidDate": "Date invalide",
+    "selectCategory": "Veuillez sélectionner une catégorie",
+    "selectMembers": "Veuillez sélectionner au moins un membre",
+    "username_required": "Le nom d'utilisateur est requis",
+    "username_min_length": "Le nom d'utilisateur doit contenir au moins 3 caractères",
+    "username_invalid": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des traits de soulignement",
+    "email_required": "L'email est requis",
+    "email_invalid": "Veuillez saisir une adresse email valide",
+    "password_required": "Le mot de passe est requis",
+    "password_min_length": "Le mot de passe doit contenir au moins 6 caractères",
+    "password_complexity": "Le mot de passe nécessite au moins 2 éléments parmi : majuscule, minuscule, chiffre ou caractère spécial",
+    "confirm_password_required": "Veuillez confirmer votre mot de passe",
+    "passwords_dont_match": "Les mots de passe ne correspondent pas"
+  },
+  "login": {
+    "title": "Connexion",
+    "subtitle": "Veuillez entrer votre email et mot de passe pour profiter de l'application",
+    "email": "Email",
+    "password": "Mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "login_button": "Se connecter",
+    "logging_in": "Connexion...",
+    "or_continue_with": "Ou continuer avec",
+    "google": "Google",
+    "apple": "Apple",
+    "no_account": "Vous n'avez pas de compte ? ",
+    "sign_up": "S'inscrire"
+  },
+  "register": {
+    "password_strength": "Force du mot de passe",
+
+    "title": "Créer un compte",
+    "subtitle": "Veuillez entrer vos informations pour profiter de l'application",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "remember_me": "Se souvenir de moi",
+    "create_account": "Créer un compte",
+    "creating_account": "Création du compte...",
+    "or_use": "Ou utiliser",
+    "google": "Google",
+    "apple": "Apple",
+    "already_have_account": "Vous avez déjà un compte ? ",
+    "login": "Se connecter",
+    "success_title": "Connexion réussie",
+    "success_message": "Bon retour parmi nous !",
+    "error_title": "Échec de la connexion"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Personnaliser les préférences de l'application.",
+    "notifications": "Notifications",
+    "currency": "Devise",
+    "update_info": "Mettre à jour",
+    "updating": "Mise à jour..."
+  },
+  "addGroup": {
+    "title": "Créer un nouveau groupe",
+    "group_name": "Nom du groupe",
+    "group_name_placeholder": "Ex: 'Colocataires', 'Vacances Agadir'",
+    "currency": "Devise",
+    "add_members": "Ajouter des membres",
+    "search_placeholder": "Rechercher par nom d'utilisateur : 'user02718'",
+    "searching": "Recherche...",
+    "search_results": "Résultats de recherche",
+    "no_users_found": "Aucun utilisateur trouvé",
+    "selected_members": "Membres sélectionnés ({{count}})",
+    "allow_invite_others": "Permettre aux membres d'inviter d'autres",
+    "notify_new_expenses": "Notifier pour les nouvelles dépenses",
+    "creating": "Création...",
+    "add_group": "Ajouter le groupe",
+    "success_title": "Succès",
+    "success_message": "Groupe créé avec succès !",
+    "error_title": "Erreur de création",
+    "error_message": "Échec de la création du groupe. Veuillez réessayer.",
+    "search_error_title": "Erreur de recherche",
+    "search_error_message": "Échec de la recherche d'utilisateurs. Veuillez réessayer.",
+    "errors": {
+      "group_name_required": "Le nom du groupe est obligatoire",
+      "members_required": "Veuillez ajouter au moins un membre",
+      "maxLength": "Le nom du groupe ne peut pas dépasser 50 caractères"
+    }
+  },
+  "customAlert": {
+    "buttons": {
+      "ok": "OK",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "close": "Fermer",
+      "continue": "Continuer",
+      "retry": "Réessayer",
+      "dismiss": "Ignorer"
+    },
+    "titles": {
+      "success": "Succès",
+      "error": "Erreur",
+      "warning": "Attention",
+      "info": "Information",
+      "confirmation": "Confirmation"
+    },
+    "messages": {
+      "default_success": "Opération terminée avec succès",
+      "default_error": "Une erreur s'est produite. Veuillez réessayer.",
+      "default_warning": "Veuillez vérifier votre action",
+      "default_info": "Voici quelques informations pour vous",
+      "network_error": "Échec de la connexion réseau. Veuillez vérifier votre connexion internet.",
+      "validation_error": "Veuillez vérifier votre saisie et réessayer",
+      "timeout_error": "Délai d'attente dépassé. Veuillez réessayer plus tard.",
+      "permission_denied": "Permission refusée. Veuillez vérifier vos droits d'accès.",
+      "save_success": "Modifications enregistrées avec succès",
+      "delete_success": "Élément supprimé avec succès",
+      "update_success": "Mise à jour terminée avec succès",
+      "logout_success": "Vous avez été déconnecté avec succès",
+      "login_success": "Bon retour ! Connexion réussie",
+      "registration_success": "Compte créé avec succès"
+    }
+  },
+  "common": {
+    "currency": "MAD",
+    "seeAll": "Voir Tout",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "adding": "ajout en cours...",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "noData": "Aucune donnée disponible",
+    "retry": "Réessayer",
+    "unknown": "Inconnu",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé",
+    "days": "jours",
+    "confirm": "Confirmer",
+    "apply": "Appliquer",
+    "updating": "Mise à jour...",
+    "summary": "Résumé"
+  },
+  "home": {
+    "goodMorning": "Bonjour 👋",
+    "goodAfternoon": "Bon après-midi👋",
+    "goodEvening": "Bonsoir👋",
+    "goodNight": "Bonne nuit👋",
+    "oweYou": "Vous Doit",
+    "youOwe": "Vous Devez",
+    "monthlyOverview": "Aperçu de {{month}} {{year}}",
+    "recentActivity": "Activité Récente",
+    "noExpensesThisMonth": "Aucune dépense ce mois-ci",
+    "noRecentActivity": "Aucune activité récente",
+    "totalExpenses": "Total des Dépenses",
+    "totalTransactions": "Total des Transactions",
+    "switchGroup": "Changer de Groupe",
+    "noGroupSet": "Aucun groupe défini encore",
+    "noGroupMembers": "Aucun membre du groupe",
+    "moreCategoriesCount": "+{{count}} catégories de plus",
+    "friendsOweYou": "Vos amis vous doivent ce montant",
+    "youOweFriends": "Vous devez à vos amis"
+  },
+
+  "expense": {
+    "paidBy": "Payé par {{name}}",
+    "amount": "{{amount}} {{currency}}",
+    "expenseDetails": "Détails de la dépense",
+    "addExpense": "Ajouter une dépense",
+    "editExpense": "Modifier la dépense",
+    "updateExpense": "Mettre à Jour la Dépense",
+    "deleteExpense": "Supprimer la dépense",
+    "expenseTitle": "Titre de la dépense",
+    "expenseAmount": "Montant",
+    "selectCategory": "Sélectionner une catégorie",
+    "selectDate": "Sélectionner une date",
+    "addNote": "Ajouter une note",
+    "splitBetween": "Partager entre",
+    "note": "Note",
+    "added_success": "Dépense ajoutée avec succès",
+    "details": {
+      "title": "Détails de la dépense",
+      "information": "Informations",
+      "description": "Description",
+      "paidBy": "Payé par",
+      "date": "Date",
+      "time": "Heure",
+      "group": "Groupe",
+      "edit": "Modifier la dépense",
+      "share": "Partager la dépense",
+      "delete": "Supprimer la dépense",
+      "deleting": "Suppression en cours...",
+      "customSplit": "Partage personnalisé",
+      "equalSplit": "Partage égal",
+      "equalSplitNote": "Total {{amount}} partagé équitablement entre {{count}} membres ({{share}} chacun)"
+    },
+    "delete": {
+      "title": "Supprimer la dépense",
+      "message": "Êtes-vous sûr de vouloir supprimer cette dépense ? Cette action ne peut pas être annulée.",
+      "success": {
+        "title": "Dépense supprimée",
+        "message": "La dépense a été supprimée avec succès."
+      },
+      "error": {
+        "title": "Échec de la suppression",
+        "message": "Impossible de supprimer la dépense. Veuillez réessayer."
+      }
+    },
+    "share": {
+      "title": "Détails de la dépense",
+      "text": "Dépense : {{title}}\nMontant : {{amount}} {{currency}}\nCatégorie : {{category}}\nPayé par : {{paidBy}}\nDate : {{date}}",
+      "error": {
+        "title": "Échec du partage",
+        "message": "Impossible de partager la dépense. Veuillez réessayer."
+      }
+    },
+    "category": {
+      "unknown": "Catégorie inconnue"
+    },
+    "repeat": {
+      "title": "Répéter",
+      "oneTime": "Une fois",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuel",
+      "custom": "Personnalisé",
+      "repeatedEvery": "Répété tous les",
+      "selectInterval": "Sélectionner l'intervalle",
+      "intervals": {
+        "days": "jours",
+        "weeks": "semaines",
+        "months": "mois"
+      }
+    },
+    "split": {
+      "title": "Partager avec",
+      "you": "Vous",
+      "addPerson": "Ajouter des personnes",
+      "personName": "Nom de la personne",
+      "enterPersonName": "Entrez le nom de la personne",
+      "selectGroupFirst": "Sélectionnez d'abord un groupe",
+      "equalSplit": "Partage égal",
+      "noMembers": "Aucun membre avec qui partager",
+      "tapToEdit": "Appuyez pour modifier",
+      "editSplit": "Modifier la répartition",
+      "people": "personnes",
+      "splitWith": "Répartir avec",
+      "enableSplit": "Activer la répartition",
+      "enterAmountFirst": "Entrez le montant d'abord",
+      "invalidSplit": "Répartition invalide",
+      "splitMustEqualTotal": "Les montants partagés doivent égaler le total de la dépense. Répartition: {{splitTotal}}, Dépense: {{expenseTotal}}",
+      "amountRequired": "Le montant est requis",
+      "totalAmount": "Montant total"
+    },
+    "validation": {
+      "expenseNameRequired": "Le nom de la dépense est requis",
+      "amountRequired": "Le montant est requis",
+      "validAmount": "Veuillez saisir un montant valide supérieur à 0",
+      "selectCategory": "Veuillez sélectionner une catégorie",
+      "selectGroup": "Veuillez sélectionner un groupe",
+      "maxCharacter": "Le montant ne peut pas dépasser 100 000",
+      "validCustomDays": "Veuillez entrer un nombre de jours valide",
+      "splitAmountMismatch": "Les montants partagés ne correspondent pas au total"
+    },
+    "title": "Toutes les dépenses",
+    "loading": "Chargement des dépenses...",
+    "loadingMore": "Chargement de plus de dépenses...",
+    "search": {
+      "placeholder": "Ex : \"Restaurant\"",
+      "resultsCount": "Nombre de résultats"
+    },
+    "empty": {
+      "title": "Aucune dépense pour le moment",
+      "description": "Commencez par ajouter votre première dépense. Gardez une trace de qui a payé quoi et partagez équitablement entre les membres de votre groupe.",
+      "addFirstExpense": "Ajouter votre première dépense",
+      "noResults": "Aucun résultat trouvé",
+      "tryDifferentFilters": "Essayez d'ajuster vos critères de recherche ou de filtrage pour trouver ce que vous cherchez."
+    },
+    "error": {
+      "title": "Oups ! Quelque chose s'est mal passé",
+      "tryAgain": "Réessayer",
+      "notFound": "Dépense introuvable",
+      "loadFailed": "Échec du chargement des détails de la dépense",
+      "invalidId": "ID de dépense invalide"
+    },
+    "errors": {
+      "loadFailed": "Échec du chargement des dépenses"
+    },
+    "pagination": {
+      "showing": "Affichage de {{start}}-{{end}} sur {{total}} dépenses"
+    },
+    "filtersActive": "Les filtres sont actifs"
+  },
+  "group": {
+    "title": "Groupes",
+    "selectGroup": "Sélectionner le Groupe",
+    "switchGroup": "Changer de Groupe",
+    "createNewGroup": "Créer un Nouveau Groupe",
+    "addNewGroup": "Ajouter un Nouveau Groupe",
+    "groupName": "Nom du Groupe",
+    "groupMembers": "Membres du Groupe",
+    "addMembers": "Ajouter des Membres",
+    "removeMember": "Supprimer le Membre",
+    "leaveGroup": "Quitter le Groupe",
+    "deleteGroup": "Supprimer le Groupe",
+    "noGroupsAvailable": "Aucun groupe disponible",
+    "memberCount": "{{count}} membres",
+    "groupSettings": "Paramètres du Groupe",
+    "inviteMembers": "Inviter des Membres",
+    "tabs": {
+      "all": "Tous",
+      "youOwed": "On vous doit",
+      "youOw": "Vous devez",
+      "settled": "Réglé"
+    },
+    "noGroupsYet": "Pas encore de groupes",
+    "startByCreating": "Commencez par créer un groupe pour votre voyage, événement ou dépenses partagées. Cela ne prend que quelques secondes!",
+    "createFirstGroup": "Créer votre premier groupe",
+    "noExpensesYet": "Pas encore de dépenses",
+    "personal": "Personnel"
+  },
+  "editGroup": {
+    "title": "Modifier le Groupe",
+    "group_name": "Nom du Groupe",
+    "group_name_placeholder": "Entrez le nom du groupe",
+    "add_members": "Ajouter des Membres",
+    "search_placeholder": "Rechercher par nom d'utilisateur",
+    "searching": "Recherche en cours...",
+    "search_results": "Résultats de Recherche",
+    "current_members": "Membres Actuels ({{count}})",
+    "no_users_found": "Aucun utilisateur trouvé",
+    "allow_invite_others": "Permettre aux membres d'inviter d'autres",
+    "notify_new_expenses": "Notifier pour les nouvelles dépenses",
+    "updating": "Mise à jour en cours...",
+    "update_group": "Mettre à Jour le Groupe",
+    "you": "Vous",
+    "cannot_remove_self": "Vous ne pouvez pas vous retirer du groupe",
+    "errors": {
+      "group_name_required": "Le nom du groupe est requis",
+      "members_required": "Au moins un membre est requis"
+    },
+    "search_error_title": "Erreur de Recherche",
+    "search_error_message": "Échec de la recherche d'utilisateurs. Veuillez réessayer.",
+    "success_title": "Succès",
+    "success_message": "Groupe mis à jour avec succès!",
+    "error_title": "Erreur",
+    "error_message": "Échec de la mise à jour du groupe. Veuillez réessayer.",
+    "fetch_error_message": "Échec du chargement des données du groupe. Veuillez réessayer."
+  },
+
+  "groupDetails": {
+    "totalGroupExpenses": "Dépenses Totales du Groupe",
+    "youPaid": "Vous Avez Payé",
+    "youOwe": "Vous Devez",
+    "settleUp": "Régler les Comptes",
+    "settleUpTitle": "Régler les Comptes du Groupe",
+    "settleUpMessage": "Cela créera des dépenses d'équilibrage pour que tous les membres aient une part égale (solde zéro). Êtes-vous sûr de vouloir continuer ?",
+    "onlyAdminCanSettle": "Seul l'administrateur du groupe peut régler les comptes",
+    "settleUpError": "Échec du règlement. Veuillez réessayer.",
+    "noExpensesToSettle": "Aucune dépense trouvée à régler",
+    "alreadySettled": "Toutes les dépenses sont déjà réglées",
+    "recentExpenses": "Dépenses Récentes",
+    "noExpenses": "Pas encore de dépenses",
+    "noRecentExpenses": "Aucune dépense pour le moment",
+    "addFirstExpense": "Ajoutez la première dépense pour commencer",
+    "deleteGroup": "Supprimer le groupe",
+    "deleteGroupTitle": "Supprimer le groupe ?",
+    "deleteGroupMessage": "Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action supprimera définitivement le groupe et toutes ses dépenses. Cette action ne peut pas être annulée.",
+    "groupDeletedSuccess": "Groupe supprimé avec succès",
+    "groupDeleteError": "Échec de la suppression du groupe. Veuillez réessayer.",
+    "editGroup": "Modifier le groupe"
+  },
+  "notifications": {
+    "notifications": "Notifications",
+    "noNotifications": "Aucune notification",
+    "markAllAsRead": "Marquer tout comme lu",
+    "newExpense": "Nouvelle dépense ajoutée",
+    "expenseUpdated": "Dépense mise à jour",
+    "expenseDeleted": "Dépense supprimée",
+    "memberAdded": "Nouveau membre ajouté au groupe",
+    "memberLeft": "Le membre a quitté le groupe",
+    "paymentReceived": "Paiement reçu",
+    "paymentRequest": "Demande de paiement"
+  },
+  "categories": {
+    "food": "Nourriture",
+    "transport": "Transport",
+    "entertainment": "Divertissement",
+    "shopping": "Achats",
+    "bills": "Factures",
+    "health": "Santé",
+    "education": "Éducation",
+    "travel": "Voyage",
+    "settlement": "Règlement",
+    "other": "Autre",
+    "groceries": "Épicerie",
+    "restaurant": "Restaurant",
+    "gas": "Carburant",
+    "taxi": "Taxi",
+    "movies": "Cinéma",
+    "clothing": "Vêtements",
+    "electricity": "Électricité",
+    "internet": "Internet",
+    "medicine": "Médicaments",
+    "books": "Livres",
+    "hotel": "Hôtel",
+    "cleaning": "Ménage",
+    "rent": "Loyer"
+  },
+
+  "errors": {
+    "networkError": "Erreur de connexion réseau",
+    "serverError": "Erreur du serveur",
+    "unauthorizedAccess": "Accès non autorisé",
+    "dataNotFound": "Données non trouvées",
+    "validationFailed": "Échec de la validation",
+    "operationFailed": "Échec de l'opération",
+    "unknownError": "Une erreur inconnue s'est produite"
+  },
+  "profile": {
+    "title": "Profil",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "language": "Langue",
+    "darkMode": "Mode Sombre",
+    "logout": "Déconnexion",
+    "profileDetails": "Détails du Profil",
+    "editProfile": "Modifier le Profil",
+    "personalInfo": "Informations Personnelles",
+    "accountSettings": "Paramètres du Compte",
+    "preferences": "Préférences",
+    "security": "Sécurité",
+    "privacy": "Confidentialité",
+    "notifications": "Notifications",
+    "about": "À Propos",
+    "help": "Aide et Support",
+    "termsAndConditions": "Conditions Générales",
+    "privacyPolicy": "Politique de Confidentialité",
+    "version": "Version",
+    "buildNumber": "Numéro de Build"
+  },
+  "profileDetails": {
+    "subtitle": "Consultez et mettez à jour vos informations personnelles.",
+    "name": "Nom",
+    "email": "Email",
+    "namePlaceholder": "Entrez votre nom",
+    "emailPlaceholder": "Entrez votre email",
+    "updateButton": "Mettre à jour",
+    "updating": "Mise à jour...",
+    "updateSuccess": "Profil mis à jour avec succès",
+    "updateError": "Échec de la mise à jour du profil. Veuillez réessayer.",
+    "fetchError": "Échec de la récupération des détails de l'utilisateur. Veuillez réessayer.",
+    "validation": {
+      "nameRequired": "Le nom est requis",
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Veuillez entrer une adresse email valide"
+    }
+  },
+  "logout": {
+    "title": "Déconnexion",
+    "message": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "confirm": "Déconnexion",
+    "cancel": "Annuler",
+    "success": "Vous avez été déconnecté avec succès",
+    "error": "Échec de la déconnexion. Veuillez réessayer"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "newExpense": "Nouvelle Dépense",
+    "groups": "Groupes",
+    "profile": "Profil",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé"
+  },
+  "invitations": {
+    "join": "Rejoindre \"{{groupName}}\"?",
+    "invitedBy": "Invité par {{name}}",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "unknown": "Inconnu"
+  },
+  "passwordRecovery": {
+    "forgetPassword": {
+      "title": "Mot de Passe Oublié",
+      "subtitle": "Veuillez entrer votre email pour recevoir un code",
+      "email": "Email",
+      "emailPlaceholder": "John.doe@gmail.com",
+      "sendButton": "Envoyer",
+      "sending": "Envoi en cours...",
+      "successMessage": "Le code de vérification a été envoyé à votre adresse e-mail. Veuillez vérifier votre boîte de réception.",
+      "errorMessage": "Échec de l'envoi du code de vérification. Veuillez réessayer."
+    },
+    "otpVerification": {
+      "title": "Entrez le Code",
+      "subtitle": "Nous avons envoyé un email avec un code d'activation à votre email {{email}}",
+      "wrongCode": "Code erroné, veuillez réessayer",
+      "didntReceive": "Vous n'avez pas reçu le code ?",
+      "resend": "Renvoyer",
+      "confirmButton": "Confirmer",
+      "confirming": "Confirmation..."
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le Mot de Passe",
+      "subtitle": "Créez un nouveau mot de passe sécurisé pour votre compte",
+      "newPassword": "Nouveau Mot de Passe",
+      "newPasswordPlaceholder": "Entrez le nouveau mot de passe",
+      "confirmPassword": "Confirmer le Nouveau Mot de Passe",
+      "confirmPasswordPlaceholder": "Entrez à nouveau le mot de passe",
+      "saveButton": "Enregistrer",
+      "saving": "Enregistrement...",
+      "successMessage": "Votre mot de passe a été réinitialisé avec succès",
+      "validation": {
+        "newPasswordRequired": "Le nouveau mot de passe est requis",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+        "passwordsDoNotMatch": "Les mots de passe ne correspondent pas"
+      }
+    },
+    "validation": {
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Veuillez entrer une adresse email valide"
+    }
+  },
+  "time": {
+    "minutesAgo_one": "Il y a {{count}} minute",
+    "minutesAgo_other": "Il y a {{count}} minutes",
+    "hoursAgo_one": "Il y a {{count}} heure",
+    "hoursAgo_other": "Il y a {{count}} heures",
+    "daysAgo_one": "Il y a {{count}} jour",
+    "daysAgo_other": "Il y a {{count}} jours",
+    "yesterday": "Hier",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain"
+  },
+  "filters": {
+    "title": "Filtrer",
+    "cancel": "Annuler",
+    "reset": "Réinitialiser",
+    "clear": "Effacer",
+    "see": "Voir",
+    "seeExpenses_one": "Voir {{count}} Dépense",
+    "seeExpenses_other": "Voir {{count}} Dépenses",
+
+    "dateRange": {
+      "title": "Plage de Dates",
+      "customDate": "Date Personnalisée",
+      "customDateTitle": "Sélectionner la Plage de Dates",
+      "startDate": "Date de Début",
+      "endDate": "Date de Fin",
+      "selectedRange": "Plage sélectionnée",
+      "invalidRange": "La date de fin doit être après la date de début",
+      "selectStartDate": "Sélectionner la Date de Début",
+      "selectEndDate": "Sélectionner la Date de Fin"
+    },
+    "dateRanges": {
+      "today": "Aujourd'hui",
+      "last7Days": "7 Derniers Jours",
+      "last30Days": "30 Derniers Jours",
+      "thisMonth": "Ce Mois"
+    },
+    "categories": {
+      "title": "Catégories"
+    },
+    "amountRange": {
+      "title": "Plage de Montant"
+    },
+    "group": {
+      "title": "Groupe",
+      "selectGroup": "Sélectionner un groupe"
+    },
+    "settlements": {
+      "settled": "Réglé",
+      "settlementHistory": "Historique des Règlements",
+      "noSettlements": "Aucun règlement pour le moment"
+    }
+  },
+  "logoutModal": {
+    "title": "Se déconnecter",
+    "message": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "cancel": "Annuler",
+    "logout": "Se déconnecter",
+    "loggingOut": "Déconnexion en cours..."
+  },
+  "auth": {
+    "errors": {
+      "email_already_in_use": "Cette adresse e-mail est déjà enregistrée. Veuillez utiliser une autre adresse ou essayer de vous connecter.",
+      "invalid_email": "Veuillez saisir une adresse e-mail valide.",
+      "operation_not_allowed": "L'authentification par e-mail/mot de passe n'est pas activée. Veuillez contacter le support.",
+      "weak_password": "Le mot de passe est trop faible. Veuillez choisir un mot de passe plus fort.",
+      "network_error": "Erreur réseau. Veuillez vérifier votre connexion Internet et réessayer.",
+      "too_many_requests": "Trop de demandes. Veuillez réessayer plus tard.",
+      "user_disabled": "Ce compte a été désactivé. Veuillez contacter le support.",
+      "requires_recent_login": "Veuillez vous reconnecter pour terminer cette action.",
+      "credential_already_in_use": "Ces identifiants sont déjà associés à un autre compte.",
+      "invalid_credentials": "E-mail ou mot de passe invalide. Veuillez vérifier vos informations et réessayer.",
+      "user_not_found": "Aucun compte trouvé avec cette adresse e-mail.",
+      "wrong_password": "Mot de passe incorrect. Veuillez réessayer.",
+      "general": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "tour": {
+    "skip": "Passer le tour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "finish": "Terminer",
+    "welcome": {
+      "title": "Bienvenue sur Qassama !",
+      "description": "Faisons un tour rapide pour vous aider à commencer à gérer vos dépenses partagées."
+    },
+    "profile": {
+      "title": "Votre profil",
+      "description": "Appuyez ici pour voir et modifier vos informations de profil."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Restez informé des notifications de dépenses et des activités de groupe."
+    },
+    "balance": {
+      "title": "Aperçu du solde",
+      "description": "Voyez combien vous devez et combien les autres vous doivent en un coup d'œil."
+    },
+    "overview": {
+      "title": "Aperçu mensuel",
+      "description": "Suivez vos dépenses mensuelles avec des graphiques visuels et des résumés."
+    },
+    "recent_activity": {
+      "title": "Activité récente",
+      "description": "Consultez vos dernières transactions et activités de dépenses."
+    },
+    "see_all": {
+      "title": "Voir toutes les dépenses",
+      "description": "Appuyez ici pour voir toutes vos dépenses en détail."
+    },
+    "bottom_navigation": {
+      "title": "Navigation",
+      "description": "Utilisez les onglets du bas pour naviguer entre Accueil, Nouvelle dépense, Groupes et Profil."
+    }
+  }
+}
