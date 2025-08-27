@@ -46,6 +46,24 @@ const NotificationsScreen = () => {
     }
   };
 
+  // function to mark all notifications as read
+  const handleMarkAllAsRead = async () => {
+    try {
+      // First update the local state immediately to hide the button
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, read: true }))
+      );
+      
+      // Then update the database
+      await Notification.markAllAsRead();
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+      // If there's an error, revert the local state changes
+      const userNotifications = await Notification.getNotificationsForUser();
+      setNotifications(userNotifications);
+    }
+  };
+
   const EmptyNotificationsState = () => (
     <View className="mt-20 flex-1 px-6 ">
       <View className="mb-8 items-center ">
@@ -75,6 +93,19 @@ const NotificationsScreen = () => {
     <SafeAreaView className="flex-1 bg-white">
       <View className="container">
         <Header title="Notifications" />
+
+        {/* Mark All as Read Button */}
+        {!loading && notifications.length > 0 && notifications.some(n => !n.read) && (
+          <View className="px-4 pb-3 pt-2">
+            <TouchableOpacity
+              className="bg-blue-500 rounded-lg py-3 px-4 flex-row items-center justify-center"
+              onPress={handleMarkAllAsRead}
+              activeOpacity={0.8}>
+              <Ionicons name="checkmark-done-outline" size={20} color="white" className="mr-2" />
+              <Text className="text-white font-medium text-base ml-2">Mark All as Read</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {loading ? (
           <View className="flex-1 items-center justify-center ">
