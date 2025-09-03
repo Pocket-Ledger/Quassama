@@ -309,13 +309,12 @@ const GroupsScreen = () => {
           ) : groups.length > 0 ? (
             <>
               {/* Input for search for a group */}
-              <View className="px-4 mb-4">
+              <View className="mb-4">
                 <TextInput
                   placeholder={t('group.search')}
                   className="input-field"
                   value={searchQuery}
                   onChangeText={handleSearch}
-                  returnKeyType="search"
                 />
               </View>
               <GroupsList

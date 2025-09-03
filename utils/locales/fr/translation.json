@@ -342,7 +342,8 @@
     "startByCreating": "Commencez par créer un groupe pour votre voyage, événement ou dépenses partagées. Cela ne prend que quelques secondes!",
     "createFirstGroup": "Créer votre premier groupe",
     "noExpensesYet": "Pas encore de dépenses",
-    "personal": "Personnel"
+    "personal": "Personnel",
+    "search": "Rechercher des groupes..."
   },
   "editGroup": {
     "title": "Modifier le Groupe",

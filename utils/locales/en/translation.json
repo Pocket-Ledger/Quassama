@@ -344,7 +344,8 @@
     "startByCreating": "Start by creating a group for your trip, event, or shared expenses. It only takes a few seconds!",
     "createFirstGroup": "Create Your First Group",
     "noExpensesYet": "No expenses yet",
-    "personal": "Personal"
+    "personal": "Personal",
+    "search": "Search groups..."
   },
   "editGroup": {
     "title": "Edit Group",
