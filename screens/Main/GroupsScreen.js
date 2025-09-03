@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -78,6 +78,8 @@ const GroupsScreen = () => {
   const [activeTab, setActiveTab] = useState(t('group.tabs.all'));
   const [isLoading, setIsLoading] = useState(true);
   const [groups, setGroups] = useState([]);
+  const [filteredGroups, setFilteredGroups] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [invitations, setInvitations] = useState([]);
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const [groupTotal, setGroupTotal] = useState(0);
@@ -106,6 +108,7 @@ const GroupsScreen = () => {
         try {
           const groupsData = await Group.getGroupsByUser(user);
           setGroups(groupsData);
+          setFilteredGroups(groupsData); // Initialize filtered groups
           Logger.info('Fetched groups:', groupsData);
         } catch (error) {
           console.error('Error fetching groups:', error);
@@ -196,18 +199,12 @@ const GroupsScreen = () => {
       // AUTO UPDATE UI - Refresh groups to show the new group
       const groupsData = await Group.getGroupsByUser(user);
       setGroups(groupsData);
+      setFilteredGroups(groupsData); // Update filtered groups as well
     } catch (err) {
       console.error('Accept failed', err);
     }
   };
 
-  /* const handleDeclineInvitation = async (invId) => {
-    try {
-      await Invitation.decline(invId);
-    } catch (err) {
-      console.error('Decline failed', err);
-    }
-  }; */
   const handleDeclineInvitation = async (invId) => {
     try {
       await Invitation.decline(invId);
@@ -216,6 +213,28 @@ const GroupsScreen = () => {
       setInvitations((prev) => prev.filter((inv) => inv.id !== invId));
     } catch (err) {
       console.error('Decline failed', err);
+    }
+  };
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    
+    try {
+      if (!query || query.trim() === '') {
+        // If search is empty, show all groups
+        setFilteredGroups(groups);
+      } else {
+        // Use the searchGroupsByName method
+        const searchResults = await Group.searchGroupsByName(user, query);
+        setFilteredGroups(searchResults);
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+      // Fallback to local filtering if search fails
+      const localFiltered = groups.filter(group =>
+        group.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredGroups(localFiltered);
     }
   };
 
@@ -229,6 +248,12 @@ const GroupsScreen = () => {
           })
         );
         setGroups(updatedGroups);
+        // Update filtered groups when amounts are fetched
+        if (searchQuery) {
+          handleSearch(searchQuery);
+        } else {
+          setFilteredGroups(updatedGroups);
+        }
       };
       fetchAmounts();
     }
@@ -236,8 +261,8 @@ const GroupsScreen = () => {
   }, [isLoadingGroups]);
 
   // Sort groups: favorites first, then others
-  const favoriteGroups = groups.filter((g) => favoriteGroupIds.includes(g.id));
-  const nonFavoriteGroups = groups.filter((g) => !favoriteGroupIds.includes(g.id));
+  const favoriteGroups = filteredGroups.filter((g) => favoriteGroupIds.includes(g.id));
+  const nonFavoriteGroups = filteredGroups.filter((g) => !favoriteGroupIds.includes(g.id));
   const sortedGroups = [...favoriteGroups, ...nonFavoriteGroups];
 
   return (
@@ -282,20 +307,32 @@ const GroupsScreen = () => {
               ))}
             </View>
           ) : groups.length > 0 ? (
-            <GroupsList
-              groups={sortedGroups.map((g) => ({
-                id: g.id,
-                name: g.name || '',
-                members: g.members || [],
-                additionalMembers: g.additionalMembers || 0,
-                amount: g.amount || `0 ${t('common.currency')}`,
-                lastExpense: g.lastExpense || '',
-                time: g.time || '',
-                isStarred: favoriteGroupIds.includes(g.id),
-              }))}
-              onGroupPress={handleGroupPress}
-              onStarPress={handleStarPress}
-            />
+            <>
+              {/* Input for search for a group */}
+              <View className="px-4 mb-4">
+                <TextInput
+                  placeholder={t('group.search')}
+                  className="input-field"
+                  value={searchQuery}
+                  onChangeText={handleSearch}
+                  returnKeyType="search"
+                />
+              </View>
+              <GroupsList
+                groups={sortedGroups.map((g) => ({
+                  id: g.id,
+                  name: g.name || '',
+                  members: g.members || [],
+                  additionalMembers: g.additionalMembers || 0,
+                  amount: g.amount || `0 ${t('common.currency')}`,
+                  lastExpense: g.lastExpense || '',
+                  time: g.time || '',
+                  isStarred: favoriteGroupIds.includes(g.id),
+                }))}
+                onGroupPress={handleGroupPress}
+                onStarPress={handleStarPress}
+              />
+            </>
           ) : (
             // Empty state
             <View className="items-center px-4 py-12">

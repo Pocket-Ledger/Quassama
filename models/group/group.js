@@ -754,6 +754,29 @@ class Group{
             throw error;
         }
     }
+
+    /**
+     * A function for search for groups by name or letter to give the best match
+     * @param {string} userId - The ID of the user whose groups to search
+     * @param {string} searchTerm - The search term to match against group names
+     * @return {Promise<Array>} - Array of matched groups
+     */
+    static async searchGroupsByName(userId, searchTerm) {
+        try {
+            if (!searchTerm || searchTerm.trim() === '') {
+                // If no search term, return all user's groups
+                return await this.getGroupsByUser(userId);
+            }
+            
+            const groups = await this.getGroupsByUser(userId);
+            return groups.filter(group => 
+                group.name.toLowerCase().includes(searchTerm.toLowerCase().trim())
+            );
+        } catch (error) {
+            console.error("Error searching groups:", error);
+            throw error;
+        }
+    }
 }
 
 export default Group;
