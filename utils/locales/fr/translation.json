@@ -463,7 +463,14 @@
     "termsAndConditions": "Conditions Générales",
     "privacyPolicy": "Politique de Confidentialité",
     "version": "Version",
-    "buildNumber": "Numéro de Build"
+    "buildNumber": "Numéro de Build",
+    "deleteAccount": "Supprimer le Compte",
+    "deleteAccountMessage": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action ne peut pas être annulée.",
+    "deleteAccountWarning": "Cette action ne peut pas être annulée.",
+    "deletingAccount": "Suppression du compte...",
+    "accountDeleted": "Compte supprimé avec succès",
+    "deleteAccountError": "Échec de la suppression du compte. Veuillez réessayer.",
+    "deleteAccountRecentLoginRequired": "Vous devez vous reconnecter avant de supprimer votre compte pour des raisons de sécurité."
   },
   "profileDetails": {
     "subtitle": "Consultez et mettez à jour vos informations personnelles.",

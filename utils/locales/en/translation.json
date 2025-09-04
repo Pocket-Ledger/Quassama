@@ -464,7 +464,14 @@
     "termsAndConditions": "Terms & Conditions",
     "privacyPolicy": "Privacy Policy",
     "version": "Version",
-    "buildNumber": "Build Number"
+    "buildNumber": "Build Number",
+    "deleteAccount": "Delete Account",
+    "deleteAccountMessage": "Are you sure you want to delete your account? This action cannot be undone.",
+    "deleteAccountWarning": "This action cannot be undone.",
+    "deletingAccount": "Deleting account...",
+    "accountDeleted": "Account deleted successfully",
+    "deleteAccountError": "Failed to delete account. Please try again.",
+    "deleteAccountRecentLoginRequired": "You need to sign in again before deleting your account for security reasons."
   },
   "profileDetails": {
     "subtitle": "View and update your personal information.",

@@ -462,7 +462,14 @@
     "termsAndConditions": "الشروط والأحكام",
     "privacyPolicy": "سياسة الخصوصية",
     "version": "الإصدار",
-    "buildNumber": "رقم البناء"
+    "buildNumber": "رقم البناء",
+    "deleteAccount": "حذف الحساب",
+    "deleteAccountMessage": "هل أنت متأكد من أنك تريد حذف حسابك؟ سيتم",
+    "deleteAccountWarning": "لا يمكن التراجع عن هذا الإجراء.",
+    "deletingAccount": "جاري حذف الحساب...",
+    "accountDeleted": "تم حذف الحساب بنجاح",
+    "deleteAccountError": "فشل في حذف الحساب. يرجى المحاولة مرة أخرى.",
+    "deleteAccountRecentLoginRequired": "تحتاج إلى تسجيل الدخول مرة أخرى قبل حذف حسابك لأسباب أمنية."
   },
   "profileDetails": {
     "subtitle": "عرض وتحديث معلوماتك الشخصية.",
