@@ -5,9 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import Logout from 'models/auth/Logout';
 import User from 'models/auth/user';
 import LogoutModal from 'components/LogoutModal';
+import DeleteAccountModal from 'components/DeleteAccountModal';
 import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
 import { useTranslation } from 'react-i18next';
+import deleteAccount from 'utils/deleteAccount';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -16,7 +18,9 @@ const ProfileScreen = () => {
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   console.log('User', user);
 
   // Add custom alert hook
@@ -117,6 +121,39 @@ const ProfileScreen = () => {
     setShowLogoutModal(false);
   };
 
+  const handleDeleteAccount = () => {
+    setShowDeleteAccountModal(true);
+  };
+
+  const confirmDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    
+    try {
+      await deleteAccount();
+      // Show success message
+      setShowDeleteAccountModal(false);
+      showSuccess(t('alerts.success'), t('profile.accountDeleted'));
+      // Navigation will be handled by auth state change
+    } catch (error) {
+      console.error('Delete account error:', error);
+      setShowDeleteAccountModal(false);
+      let errorMessage = t('profile.deleteAccountError');
+      
+      // Handle specific Firebase auth errors
+      if (error.code === 'auth/requires-recent-login') {
+        errorMessage = t('profile.deleteAccountRecentLoginRequired');
+      }
+      
+      showError(t('alerts.error'), errorMessage);
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
+  const handleDeleteAccountCancel = () => {
+    setShowDeleteAccountModal(false);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
@@ -197,6 +234,20 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           ))}
 
+          {/* delete acount Button */}
+          <TouchableOpacity 
+            className="mb-1 flex-row items-center py-4" 
+            onPress={handleDeleteAccount}
+            disabled={isDeletingAccount}
+          >
+            <View className="mr-4 h-10 w-10 items-center justify-center">
+              <Feather name="trash" size={20} color="#FF3B30" />
+            </View>
+            <Text className="text-lg font-normal text-error">
+              {t('profile.deleteAccount')}
+            </Text>
+          </TouchableOpacity>
+
           {/* Logout Button */}
           <TouchableOpacity className="mb-1 flex-row items-center py-4" onPress={handleLogoutPress}>
             <View className="mr-4 h-10 w-10 items-center justify-center">
@@ -216,6 +267,14 @@ const ProfileScreen = () => {
         onClose={handleLogoutCancel}
         onConfirm={handleLogoutConfirm}
         isLoading={isLoggingOut}
+      />
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        visible={showDeleteAccountModal}
+        onClose={handleDeleteAccountCancel}
+        onConfirm={confirmDeleteAccount}
+        isLoading={isDeletingAccount}
       />
 
       {/* Custom Alert - Add this for success/error messages */}
