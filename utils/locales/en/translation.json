@@ -30,6 +30,8 @@
     "username_required": "Username is required",
     "username_min_length": "Username must be at least 3 characters",
     "username_invalid": "Username can only contain letters, numbers, and underscores",
+    "username_taken": "This username is already taken",
+    "username_available": "Username is available",
     "email_required": "Email is required",
     "email_invalid": "Please enter a valid email address",
     "password_required": "Password is required",
