@@ -83,6 +83,19 @@ class User{
         return users;
     }
 
+    // Check if username is already taken
+    static async isUsernameAvailable(username) {
+        if (!username || username.trim() === "") {
+            throw new Error("Username is required for availability check");
+        }
+        
+        const usersCollection = collection(db, "users");
+        const userQuery = query(usersCollection, where("username", "==", username.trim()));
+        const querySnapshot = await getDocs(userQuery);
+        
+        return querySnapshot.empty; // Returns true if username is available (no documents found)
+    }
+
     static async getUsernameById(userId) {
     if (!userId) {
       throw new Error("User ID is required");

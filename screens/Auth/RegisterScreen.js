@@ -39,11 +39,54 @@ const RegisterScreen = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordRequirements, setPasswordRequirements] = useState({
     length: false,
     complexity: false, // Combined uppercase, lowercase, number, special
   });
+
+  // Debounced username availability check
+  const checkUsernameAvailability = async (usernameToCheck) => {
+    if (!usernameToCheck || usernameToCheck.length < 3) {
+      return;
+    }
+
+    setIsCheckingUsername(true);
+    try {
+      const isAvailable = await User.isUsernameAvailable(usernameToCheck);
+      if (!isAvailable) {
+        setErrors((prev) => ({
+          ...prev,
+          username: t('validation.username_taken', 'This username is already taken'),
+        }));
+      } else {
+        // Clear username error if it was a uniqueness error
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          if (newErrors.username && newErrors.username.includes('taken')) {
+            delete newErrors.username;
+          }
+          return newErrors;
+        });
+      }
+    } catch (error) {
+      console.error('Error checking username availability:', error);
+    } finally {
+      setIsCheckingUsername(false);
+    }
+  };
+
+  // Debounce the username check
+  useEffect(() => {
+    if (!username) return;
+
+    const timeoutId = setTimeout(() => {
+      checkUsernameAvailability(username);
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [username]);
 
   // Function to convert Firebase error codes to user-friendly messages
   const getFirebaseErrorMessage = (errorCode) => {
@@ -188,6 +231,12 @@ const RegisterScreen = () => {
     } catch (error) {
       console.error('Registration error:', error);
 
+      // Check if it's a username uniqueness error
+      if (error.message && error.message.includes('Username is already taken')) {
+        setErrors({ username: t('validation.username_taken', 'This username is already taken') });
+        return;
+      }
+
       // Extract Firebase error code
       let errorCode = '';
       let errorMessage = '';
@@ -287,8 +336,54 @@ const RegisterScreen = () => {
                       autoCapitalize="none"
                       autoCorrect={false}
                     />
+                    {/* Username availability indicator */}
+                    {username.length >= 3 && (
+                      <View style={{
+                        position: 'absolute',
+                        right: 16,
+                        top: '50%',
+                        transform: [{ translateY: -10 }],
+                        zIndex: 1,
+                      }}>
+                        {isCheckingUsername ? (
+                          <Ionicons
+                            name="refresh-outline"
+                            size={20}
+                            color="rgba(0, 0, 0, 0.4)"
+                            style={{ 
+                              animation: 'spin 1s linear infinite' // Note: This won't animate in React Native, just indicates checking
+                            }}
+                          />
+                        ) : errors.username && errors.username.includes('taken') ? (
+                          <Ionicons
+                            name="close-circle"
+                            size={20}
+                            color="#ff3b30"
+                          />
+                        ) : !errors.username ? (
+                          <Ionicons
+                            name="checkmark-circle"
+                            size={20}
+                            color="#34C759"
+                          />
+                        ) : null}
+                      </View>
+                    )}
                   </View>
                   {errors.username && <Text className="error-text">{errors.username}</Text>}
+                  {/* Username availability status */}
+                  {username.length >= 3 && !errors.username && !isCheckingUsername && (
+                    <View className="mt-1 flex-row items-center">
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={16}
+                        color="#34C759"
+                      />
+                      <Text className="ml-2 text-sm text-green-600">
+                        {t('validation.username_available', 'Username is available')}
+                      </Text>
+                    </View>
+                  )}
                 </View>
 
                 {/* Email Input */}
