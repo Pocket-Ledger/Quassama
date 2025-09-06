@@ -2,6 +2,7 @@ import { addDoc, collection, query, where, getDocs, or, updateDoc, doc, arrayUni
 import { app, db } from "../../firebase";
 import Notification from "models/notifications/notifications";
 import User from '../auth/user';
+import { getAuth } from "firebase/auth";
 
 class Group{
     name;
@@ -78,6 +79,21 @@ class Group{
             groups.push({ id: doc.id, ...doc.data() });
         });
         return groups;
+    }
+
+    /**
+     * A function to check if the user has any groups
+     * @return true or false
+     */
+    static async hasAnyGroups(){
+        const user = getAuth();
+        const currentUser = user.currentUser;
+        if(!currentUser){
+            throw new Error('User not authenticated');
+        }
+        const user_id = currentUser.uid;
+        const groups = await this.getGroupsByUser(user_id);
+        return groups.length > 0;
     }
 
     static async addMemberToGroup(groupId, member) {

@@ -43,6 +43,8 @@ const NewExpenseScreen = () => {
   const [errors, setErrors] = useState({});
   const [groups, setGroups] = useState([]);
   const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
+  const [userHasGroups, setUserHasGroups] = useState(false);
+
 
   const [selectedRepeat, setSelectedRepeat] = useState('oneTime');
   const [customDays, setCustomDays] = useState('');
@@ -58,6 +60,14 @@ const NewExpenseScreen = () => {
 
       async function fetchGroups() {
         try {
+          // Check if user has any groups first
+          const hasGroups = await Group.hasAnyGroups();
+          setUserHasGroups(hasGroups);
+
+          if (!hasGroups) {
+            return;
+          }
+
           const fetched = await Group.getGroupsByUser(userId);
           let list = [];
 
@@ -162,6 +172,20 @@ const NewExpenseScreen = () => {
 
   const handleAddExpense = async () => {
     if (!validateForm()) return;
+
+    // Check if user still has groups before saving
+    try {
+      const hasGroups = await Group.hasAnyGroups();
+      if (!hasGroups) {
+        showError('No Groups', 'You need to create a group first before adding expenses.');
+        navigation.navigate('AddNewGroupScreen');
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking user groups:', error);
+      showError('Error', 'Unable to verify groups. Please try again.');
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -306,6 +330,25 @@ const NewExpenseScreen = () => {
   const getCurrency = () => {
     return t('common.currency');
   };
+
+  // Show loading or redirect if user has no groups
+  if (!userHasGroups) {
+    return (
+      <SafeAreaView className="flex-1 bg-white justify-center items-center" edges={['top', 'left', 'right']}>
+        <View className="container px-4">
+          <Text className="text-xl font-semibold text-center mb-4">{t('group.createYourFirstGroup')}</Text>
+          <Text className="text-gray-600 text-center mb-6">{t('group.createYourFirstGroupDesc')}</Text>
+          <TouchableOpacity
+            className="btn-primary rounded-lg bg-primary py-4"
+            onPress={() => navigation.navigate('AddNewGroup')}>
+            <Text className="btn-primary-text text-center text-base font-semibold text-white">
+              {t('group.createNewGroup')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white " edges={['top', 'left', 'right']}>

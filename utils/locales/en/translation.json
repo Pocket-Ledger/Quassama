@@ -347,7 +347,9 @@
     "createFirstGroup": "Create Your First Group",
     "noExpensesYet": "No expenses yet",
     "personal": "Personal",
-    "search": "Search groups..."
+    "search": "Search groups...",
+    "createYourFirstGroup": "Create your first group",
+    "createYourFirstGroupDesc": "You need to create a group before you can add expenses."
   },
   "editGroup": {
     "title": "Edit Group",
