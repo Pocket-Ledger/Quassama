@@ -436,7 +436,27 @@
     "books": "Books",
     "hotel": "Hotel",
     "cleaning": "Cleaning",
-    "rent": "Rent"
+    "rent": "Rent",
+    "selectCategory": "Select Category",
+    "searchCategories": "Search categories...",
+    "noCategoriesFound": "No categories found",
+    "tryDifferentSearch": "Try a different search term",
+    "transportation": "Transportation",
+    "utilities": "Utilities",
+    "taxes": "Taxes",
+    "gifts": "Gifts",
+    "car": "Car",
+    "gadgets": "Gadgets",
+    "subscriptions": "Subscriptions",
+    "hobbies": "Hobbies",
+    "pets": "Pets",
+    "personalCare": "Personal Care",
+    "sports": "Sports",
+    "furniture": "Furniture",
+    "fuel": "Fuel",
+    "parking": "Parking",
+    "courses": "Courses",
+    "music": "Music"
   },
 
   "errors": {

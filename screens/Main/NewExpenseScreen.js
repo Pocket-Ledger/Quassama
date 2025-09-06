@@ -14,6 +14,8 @@ import Group from 'models/group/group';
 import CustomAlert from 'components/CustomALert';
 import { useAlert } from 'hooks/useAlert';
 import CategoryList from 'components/CategoryList';
+import CategoryItem from 'components/CategoryItem';
+import CategoryModel from 'components/CategoryModel';
 import { DEFAULT_CATEGORIES } from 'constants/category';
 import Header from 'components/Header';
 import FloatingPlusButton from 'components/FloatingPlusButton';
@@ -43,6 +45,7 @@ const NewExpenseScreen = () => {
   const [errors, setErrors] = useState({});
   const [groups, setGroups] = useState([]);
   const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [userHasGroups, setUserHasGroups] = useState(false);
 
 
@@ -342,7 +345,7 @@ const NewExpenseScreen = () => {
             className="btn-primary rounded-lg bg-primary py-4"
             onPress={() => navigation.navigate('AddNewGroup')}>
             <Text className="btn-primary-text text-center text-base font-semibold text-white">
-              {t('group.createNewGroup')}
+              {t('group.createYourFirstGroup')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -464,27 +467,80 @@ const NewExpenseScreen = () => {
             </View>
 
             {/* Split With Section */}
-            <SplitWithSection
-              selectedGroup={selectedGroup}
-              groupMembers={groupMembers}
-              splits={splits}
-              onSplitsChange={setSplits}
-              totalAmount={amount}
-              currentUserId={userId}
-              error={errors.splits}
-              isSplitEnabled={isSplitEnabled}
-              onSplitEnabledChange={handleSplitEnabledChange}
-            />
+            {groupMembers && groupMembers.length > 1 && (
+              <SplitWithSection
+                selectedGroup={selectedGroup}
+                groupMembers={groupMembers}
+                splits={splits}
+                onSplitsChange={setSplits}
+                totalAmount={amount}
+                currentUserId={userId}
+                error={errors.splits}
+                isSplitEnabled={isSplitEnabled}
+                onSplitEnabledChange={handleSplitEnabledChange}
+              />
+            )}
 
             {/* Category */}
-            <CategoryList
-              categories={DEFAULT_CATEGORIES}
-              selectedCategories={selectedCategory}
-              onCategorySelect={setSelectedCategory}
-              layout="grid"
-              numColumns={5}
-              title={t('expense.selectCategory')}
-            />
+            <View>
+              <Text className="input-label mb-3 text-base font-medium text-black">
+                {t('expense.selectCategory')}
+              </Text>
+              
+              {/* Show categories with selected category first */}
+              <View className="flex-row flex-wrap">
+                {(() => {
+                  // Get the selected category if it exists
+                  const selectedCategoryData = DEFAULT_CATEGORIES.find(cat => cat.id === selectedCategory);
+                  
+                  // Create categories array with selected category first
+                  let categoriesToShow = [];
+                  
+                  if (selectedCategoryData) {
+                    // Add selected category first
+                    categoriesToShow.push(selectedCategoryData);
+                    
+                    // Add remaining categories (excluding the selected one) up to 3 more
+                    const remainingCategories = DEFAULT_CATEGORIES
+                      .filter(cat => cat.id !== selectedCategory)
+                      .slice(0, 3);
+                    categoriesToShow = categoriesToShow.concat(remainingCategories);
+                  } else {
+                    // No category selected, show first 4 as usual
+                    categoriesToShow = DEFAULT_CATEGORIES.slice(0, 4);
+                  }
+                  
+                  return categoriesToShow.map((category) => (
+                    <View key={category.id} className="w-1/5 p-1">
+                      <CategoryItem
+                        id={category.id}
+                        name={t(`categories.${category.name.toLowerCase()}`, { defaultValue: category.name })}
+                        icon={category.icon}
+                        color={category.color}
+                        isSelected={selectedCategory === category.id}
+                        onPress={setSelectedCategory}
+                        variant="grid"
+                        size="medium"
+                      />
+                    </View>
+                  ));
+                })()}
+                
+                {/* Other button */}
+                <View className="w-1/5 p-1">
+                  <TouchableOpacity
+                    className="items-center p-2"
+                    onPress={() => setIsCategoryModalVisible(true)}>
+                    <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-2">
+                      <Feather name="plus" size={20} color="#666" />
+                    </View>
+                    <Text className="text-sm font-medium text-center text-black">
+                      {t('categories.other')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
             {errors.category && (
               <Text className="error-text mt-2 text-sm text-red-500">{errors.category}</Text>
             )}
@@ -559,6 +615,15 @@ const NewExpenseScreen = () => {
           </View>
         </SafeAreaView>
       </Modal>
+
+      {/* Category Selection Modal */}
+      <CategoryModel
+        visible={isCategoryModalVisible}
+        onClose={() => setIsCategoryModalVisible(false)}
+        onCategorySelect={setSelectedCategory}
+        selectedCategory={selectedCategory}
+        title={t('expense.selectCategory')}
+      />
 
       {/* Custom Alert */}
       <CustomAlert

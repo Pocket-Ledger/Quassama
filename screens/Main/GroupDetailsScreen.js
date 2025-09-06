@@ -347,7 +347,7 @@ const GroupDetailsScreen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Group Summary Card */}
-          <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+          <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6">
             <Text className="text-center font-dmsans-medium text-base text-black/75">
               {t('groupDetails.totalGroupExpenses')}
             </Text>
@@ -355,24 +355,27 @@ const GroupDetailsScreen = () => {
               {t('common.currency')} {TotalExpenses}
             </Text>
 
-            <View className="mt-6 flex-row justify-between ">
-              <View className="flex-1">
-                <Text className="font-dmsans-medium text-sm text-black/75">
-                  {t('groupDetails.youPaid')}
-                </Text>
-                <Text className="font-dmsans-medium text-lg text-black">
-                  {youPaid} {t('common.currency')}
-                </Text>
+            {members && members.length > 1 && (
+              <View className="mt-6 flex-row justify-between ">
+                <View className="flex-1">
+                  <Text className="font-dmsans-medium text-sm text-black/75">
+                    {t('groupDetails.youPaid')}
+                  </Text>
+                  <Text className="font-dmsans-medium text-lg text-black">
+                    {youPaid} {t('common.currency')}
+                  </Text>
+                </View>
+                <View className="flex-1 items-end">
+                  <Text className="font-dmsans-medium text-sm text-black/75">
+                    {t('groupDetails.youOwe')}
+                  </Text>
+                  <Text className="font-dmsans-medium text-lg text-red-500">
+                    -{youOwe} {t('common.currency')}
+                  </Text>
+                </View>
               </View>
-              <View className="flex-1 items-end">
-                <Text className="font-dmsans-medium text-sm text-black/75">
-                  {t('groupDetails.youOwe')}
-                </Text>
-                <Text className="font-dmsans-medium text-lg text-red-500">
-                  -{youOwe} {t('common.currency')}
-                </Text>
-              </View>
-            </View>
+            )}
+            
           </View>
 
           {/* Settle Up Button - Only show for group admin and when there are imbalances */}
@@ -394,45 +397,47 @@ const GroupDetailsScreen = () => {
             )}
 
           {/* Members List with Horizontal Scroll */}
-          <View className="mb-6">
-            <Text className="mb-3 text-lg font-medium text-black">Members</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 4 }}
-              className="flex-row">
-              {members
-                .filter((member) => typeof member === 'object' && member !== null)
-                .map((member, idx) => {
-                  const memberBalance = getMemberBalance(member.id);
-                  const formattedBalance = formatBalance(memberBalance);
+          {members && members.length > 1 && (
+            <View className="mb-6">
+              <Text className="mb-3 text-lg font-medium text-black">Members</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 4 }}
+                className="flex-row">
+                {members
+                  .filter((member) => typeof member === 'object' && member !== null)
+                  .map((member, idx) => {
+                    const memberBalance = getMemberBalance(member.id);
+                    const formattedBalance = formatBalance(memberBalance);
 
-                  return (
-                    <View
-                      key={member.id || `member-${idx}-${member.name || 'unknown'}`}
-                      className="mr-4 items-center">
-                      <Avatar
-                        initial={member.initial}
-                        name={member.name}
-                        color={member.color}
-                        size="medium"
-                        showName={true}
-                      />
-                      <Text
-                        className={`mt-1 text-xs font-medium ${
-                          memberBalance > 0
-                            ? 'text-green-500'
-                            : memberBalance < 0
-                              ? 'text-red-500'
-                              : 'text-gray-500'
-                        }`}>
-                        {formattedBalance} {t('common.currency')}
-                      </Text>
-                    </View>
-                  );
-                })}
-            </ScrollView>
-          </View>
+                    return (
+                      <View
+                        key={member.id || `member-${idx}-${member.name || 'unknown'}`}
+                        className="mr-4 items-center">
+                        <Avatar
+                          initial={member.initial}
+                          name={member.name}
+                          color={member.color}
+                          size="medium"
+                          showName={true}
+                        />
+                        <Text
+                          className={`mt-1 text-xs font-medium ${
+                            memberBalance > 0
+                              ? 'text-green-500'
+                              : memberBalance < 0
+                                ? 'text-red-500'
+                                : 'text-gray-500'
+                          }`}>
+                          {formattedBalance} {t('common.currency')}
+                        </Text>
+                      </View>
+                    );
+                  })}
+              </ScrollView>
+            </View>
+          )}
 
           {/* Recently Expenses Header */}
           <View className="mb-4 flex-row items-center justify-between">

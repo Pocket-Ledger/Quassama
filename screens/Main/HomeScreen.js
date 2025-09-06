@@ -595,49 +595,54 @@ const HomeScreen = () => {
               refreshing={refreshingGroups}
             />
 
-            {isLoadingGroupMembers ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 4 }}
-                className="flex-row">
-                {[...Array(4)].map((_, index) => (
-                  <View key={index} className="items-center mr-4">
-                    <View className="w-16 h-16 mb-2 bg-gray-200 rounded-full" />
-                    <View className="w-12 h-3 bg-gray-200 rounded" />
+            {/* Only show members list if there are more than one member */}
+            {groupMembers && groupMembers.length > 1 && (
+              <>
+                {isLoadingGroupMembers ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 4 }}
+                    className="flex-row">
+                    {[...Array(4)].map((_, index) => (
+                      <View key={index} className="items-center mr-4">
+                        <View className="w-16 h-16 mb-2 bg-gray-200 rounded-full" />
+                        <View className="w-12 h-3 bg-gray-200 rounded" />
+                      </View>
+                    ))}
+                  </ScrollView>
+                ) : friends?.length === 0 ? (
+                  <View className="items-center w-full gap-4 space-y-4">
+                    <Feather name="users" size={48} color="#ccc" />
+                    <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
+                    <TouchableOpacity
+                      className="mb-8 rounded-lg btn-primary bg-primary "
+                      onPress={() => navigation.navigate('AddNewGroup')}>
+                      <Text className="text-base font-semibold text-center text-white btn-primary-text">
+                        {t('addGroup.title')}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                ))}
-              </ScrollView>
-            ) : friends?.length === 0 ? (
-              <View className="items-center w-full gap-4 space-y-4">
-                <Feather name="users" size={48} color="#ccc" />
-                <Text className="text-gray-500 ">{t('home.noGroupMembers')}</Text>
-                <TouchableOpacity
-                  className="mb-8 rounded-lg btn-primary bg-primary "
-                  onPress={() => navigation.navigate('AddNewGroup')}>
-                  <Text className="text-base font-semibold text-center text-white btn-primary-text">
-                    {t('addGroup.title')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 4 }}
-                className="flex-row">
-                {friends?.map((friend, index) => (
-                  <View key={index} className="mr-4">
-                    <Avatar
-                      initial={friend.initial}
-                      name={friend.name}
-                      color={friend.color}
-                      size="medium"
-                      showName={true}
-                    />
-                  </View>
-                ))}
-              </ScrollView>
+                ) : (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 4 }}
+                    className="flex-row">
+                    {friends?.map((friend, index) => (
+                      <View key={index} className="mr-4">
+                        <Avatar
+                          initial={friend.initial}
+                          name={friend.name}
+                          color={friend.color}
+                          size="medium"
+                          showName={true}
+                        />
+                      </View>
+                    ))}
+                  </ScrollView>
+                )}
+              </>
             )}
           </View>
         </View>
