@@ -435,7 +435,22 @@
     "books": "Livres",
     "hotel": "Hôtel",
     "cleaning": "Ménage",
-    "rent": "Loyer"
+    "rent": "Loyer",
+    "selectCategory": "Sélectionner une catégorie",
+    "searchCategories": "Rechercher des catégories...",
+    "noCategoriesFound": "Aucune catégorie trouvée",
+    "tryDifferentSearch": "Essayez un terme de recherche différent",
+    "transportation": "Transport",
+    "utilities": "Services publics",
+    "taxes": "Impôts",
+    "gifts": "Cadeaux",
+    "car": "Voiture",
+    "pets": "Animaux",
+    "subscriptions": "Abonnements",
+    "fitness": "Fitness",
+    "phone": "Téléphone",
+    "sports": "Sports",
+    "hobbies": "Loisirs"
   },
 
   "errors": {

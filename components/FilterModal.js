@@ -207,8 +207,10 @@ const FilterModal = ({
                         localFilter.selectedCategories.includes(category.id)
                           ? 'text-primary'
                           : 'text-gray-600'
-                      }`}>
-                      {t(`categories.${category.name.toLowerCase()}`)}
+                      }`}
+                      numberOfLines={1}
+                      ellipsizeMode="tail">
+                      {t(`categories.${category.name.toLowerCase()}`).slice(0, 5) + '...'}
                     </Text>
                   </TouchableOpacity>
                 ))}
