@@ -236,7 +236,7 @@ const ProfileScreen = () => {
 
           {/* delete acount Button */}
           <TouchableOpacity 
-            className="mb-1 flex-row items-center py-4" 
+            className="mb-1 flex-row items-center py-4 border-b border-gray-250" 
             onPress={handleDeleteAccount}
             disabled={isDeletingAccount}
           >

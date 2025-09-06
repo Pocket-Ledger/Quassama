@@ -345,7 +345,9 @@
     "createFirstGroup": "Créer votre premier groupe",
     "noExpensesYet": "Pas encore de dépenses",
     "personal": "Personnel",
-    "search": "Rechercher des groupes..."
+    "search": "Rechercher des groupes...",
+    "createYourFirstGroup": "Créez votre premier groupe",
+    "createYourFirstGroupDesc": "Vous devez créer un groupe avant de pouvoir ajouter des dépenses."
   },
   "editGroup": {
     "title": "Modifier le Groupe",

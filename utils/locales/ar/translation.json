@@ -345,7 +345,9 @@
     "createFirstGroup": "إنشاء مجموعتك الأولى",
     "noExpensesYet": "لا توجد نفقات بعد",
     "personal": "شخصي",
-    "search": "ابحث عن المجموعات..."
+    "search": "ابحث عن المجموعات...",
+    "createYourFirstGroup": "أنشئ مجموعتك الأولى",
+    "createYourFirstGroupDesc": "تحتاج إلى إنشاء مجموعة قبل أن تتمكن من إضافة المصاريف."
   },
   "editGroup": {
     "title": "تعديل المجموعة",
