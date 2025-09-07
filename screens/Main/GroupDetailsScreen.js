@@ -452,21 +452,32 @@ const GroupDetailsScreen = () => {
           {/* Recent Expenses List */}
           <View className="gap-4">
             {recentExpenses.length > 0 ? (
-              recentExpenses.map((expense) => (
-                <ExpenseListItem
-                  key={expense.id}
-                  id={expense.id}
-                  name={expense.name}
-                  amount={expense.amount}
-                  category={expense.category}
-                  time={expense.time}
-                  paidBy={expense.paidBy}
-                  categories={DEFAULT_CATEGORIES}
-                  onPress={() => console.log('Expense pressed:', expense)}
-                  showBorder={true}
-                  currency={t('common.currency')}
-                />
-              ))
+              <>
+                {recentExpenses.map((expense) => (
+                  <ExpenseListItem
+                    key={expense.id}
+                    id={expense.id}
+                    name={expense.name}
+                    amount={expense.amount}
+                    category={expense.category}
+                    time={expense.time}
+                    paidBy={expense.paidBy}
+                    categories={DEFAULT_CATEGORIES}
+                    onPress={() => console.log('Expense pressed:', expense)}
+                    showBorder={true}
+                    currency={t('common.currency')}
+                  />
+                ))}
+                
+                {/* View All Expenses Button */}
+                <TouchableOpacity
+                  className="rounded-lg border border-primary bg-transparent py-3"
+                  onPress={() => navigation.navigate('AllExpenses', { groupId })}>
+                  <Text className="text-center text-base font-medium text-primary">
+                    {t('common.seeAll')} {t('groupDetails.recentExpenses')}
+                  </Text>
+                </TouchableOpacity>
+              </>
             ) : (
               <View className="items-center justify-center py-8">
                 <Feather name="receipt" size={48} color="#D1D5DB" />
