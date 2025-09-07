@@ -399,7 +399,7 @@ const HomeScreen = () => {
 
         {/* Balance Cards */}
         <View className="flex gap-8 pb-4">
-          <View className="flex-row px-4 py-2 border border-gray-100 rounded-md">
+          {/* <View className="flex-row px-4 py-2 border border-gray-100 rounded-md">
             <View className="flex-1 mr-2">
               <View className="flex-row items-center mb-2">
                 <View className="p-2 mr-2 bg-green-100 rounded-full">
@@ -429,9 +429,9 @@ const HomeScreen = () => {
                 {t('home.youOweFriends')}
               </Text>
             </View>
-          </View>
+          </View> */}
           {/* Overview Section */}
-          <View className="p-4 bg-white border border-gray-100 shadow-sm rounded-xl">
+          <View className="p-4 bg-white border border-gray-100 rounded-xl">
             <Text className="mb-4 text-lg font-medium text-black">
               {t('home.monthlyOverview', {
                 month: overviewData.monthName,
