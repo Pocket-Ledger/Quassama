@@ -196,7 +196,7 @@ const LoginScreen = () => {
                     }}
                   />
                   <TextInput
-                    className={`input-field ${errors.password ? 'input-field-error' : ''}`}
+                    className={`input-field  ${errors.password ? 'input-field-error' : ''}`}
                     placeholder="••••••••••••••••"
                     placeholderTextColor="rgba(0, 0, 0, 0.2)"
                     value={password}

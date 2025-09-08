@@ -700,5 +700,14 @@
   "achievements": {
     "title": "الإنجازات",
     "description": "تتبع إنجازاتك والمعالم الهامة."
+  },
+  "memberDrawer": {
+    "expenseHistory": "تاريخ المصروفات",
+    "totalPaid": "إجمالي المدفوع",
+    "totalOwed": "إجمالي المستحق",
+    "expenses": "المصروفات",
+    "recentExpenses": "المصروفات الأخيرة",
+    "noExpenses": "لا توجد مصروفات",
+    "noExpensesDescription": "لم يضف هذا العضو أي مصروفات بعد"
   }
 }

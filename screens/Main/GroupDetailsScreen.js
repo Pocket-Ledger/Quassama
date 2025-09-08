@@ -1,5 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Feather } from '@expo/vector-icons';
@@ -21,6 +28,7 @@ import { getAuth } from 'firebase/auth';
 import CustomAlert from 'components/CustomALert';
 import Logger from 'utils/looger';
 import { cleanupAllUserGroups } from 'utils/cleanup';
+import MemberExpensesDrawer from 'components/MemberExpensesDrawer';
 
 const LIMIT = 5;
 
@@ -40,7 +48,8 @@ const GroupDetailsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
-
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
   // Use the alert hook
   const { alertConfig, hideAlert, showSuccess, showError, showConfirm } = useAlert();
 
@@ -298,6 +307,16 @@ const GroupDetailsScreen = () => {
     console.log('Expense pressed:', expense);
   };
 
+  const handleMemberPress = (member) => {
+    setSelectedMember(member);
+    setDrawerVisible(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerVisible(false);
+    setSelectedMember(null);
+  };
+
   const auth = getAuth();
   const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
   const isGroupCreator = groupData && groupData.created_by === currentUserId;
@@ -387,7 +406,6 @@ const GroupDetailsScreen = () => {
                 </View>
               </View>
             )}
-            
           </View>
 
           {/* Settle Up Button - Only show for group admin and when there are imbalances */}
@@ -424,9 +442,11 @@ const GroupDetailsScreen = () => {
                     const formattedBalance = formatBalance(memberBalance);
 
                     return (
-                      <View
+                      <TouchableOpacity
                         key={member.id || `member-${idx}-${member.name || 'unknown'}`}
-                        className="mr-4 items-center">
+                        className="mr-4 items-center"
+                        onPress={() => handleMemberPress(member)}
+                        activeOpacity={0.7}>
                         <Avatar
                           initial={member.initial}
                           name={member.name}
@@ -444,7 +464,7 @@ const GroupDetailsScreen = () => {
                           }`}>
                           {formattedBalance} {t('common.currency')}
                         </Text>
-                      </View>
+                      </TouchableOpacity>
                     );
                   })}
               </ScrollView>
@@ -480,7 +500,7 @@ const GroupDetailsScreen = () => {
                     currency={t('common.currency')}
                   />
                 ))}
-                
+
                 {/* View All Expenses Button */}
                 <TouchableOpacity
                   className="rounded-lg border border-primary bg-transparent py-3"
@@ -521,9 +541,17 @@ const GroupDetailsScreen = () => {
       <FloatingPlusButton
         navigateTo="NewExpense"
         size={48}
-        bottom={10}
+        bottom={20}
         right={10}
         groupId={groupId}
+      />
+
+      <MemberExpensesDrawer
+        visible={drawerVisible}
+        onClose={handleDrawerClose}
+        groupId={groupId}
+        userId={selectedMember?.id}
+        memberInfo={selectedMember}
       />
     </SafeAreaView>
   );

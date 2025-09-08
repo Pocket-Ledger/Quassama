@@ -693,5 +693,14 @@
   "achievements": {
     "title": "Réalisations",
     "description": "Suivez vos réalisations et vos étapes importantes."
+  },
+  "memberDrawer": {
+    "expenseHistory": "Historique des dépenses",
+    "totalPaid": "Total payé",
+    "totalOwed": "Total dû",
+    "expenses": "Dépenses",
+    "recentExpenses": "Dépenses récentes",
+    "noExpenses": "Aucune dépense trouvée",
+    "noExpensesDescription": "Ce membre n'a pas encore ajouté de dépenses"
   }
 }

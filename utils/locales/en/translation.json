@@ -699,5 +699,14 @@
   "achievements": {
     "title": "Achievements",
     "description": "Track your achievements and milestones."
+  },
+  "memberDrawer": {
+    "expenseHistory": "Expense History",
+    "totalPaid": "Total Paid",
+    "totalOwed": "Total Owed",
+    "expenses": "Expenses",
+    "recentExpenses": "Recent Expenses",
+    "noExpenses": "No expenses found",
+    "noExpensesDescription": "This member hasn't added any expenses yet"
   }
 }
