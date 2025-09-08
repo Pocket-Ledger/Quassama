@@ -11,7 +11,15 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": ["expo-splash-screen"],
+    "plugins": [
+      "expo-splash-screen",
+      [
+        "expo-notifications",
+        {
+          "iosDisplayInForeground": true
+        }
+      ]
+    ],
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
@@ -24,15 +32,24 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.quassama.app"
+      "bundleIdentifier": "com.quassama.app",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
     },
     "android": {
       "package": "com.quassama.app",
-      "versionCode": 11,
+      "versionCode": 12,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "WAKE_LOCK"
+      ],
+      "useNextNotificationsApi": true
     },
     "extra": {
       "eas": {

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Feather } from '@expo/vector-icons';
@@ -37,6 +37,7 @@ const GroupDetailsScreen = () => {
   const [recentExpenses, setRecentExpenses] = useState([]);
   const [balanceByAllUsers, setBalanceByAllUsers] = useState({});
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
@@ -50,97 +51,105 @@ const GroupDetailsScreen = () => {
     // Refresh your group data after cleanup
   };
 
+  const fetchGroupAndExpenses = async (isRefresh = false) => {
+    try {
+      const groupRef = doc(db, 'groups', groupId);
+
+      // 1) Fire four independent calls in parallel:
+      const [
+        snap,
+        rawExpenses,
+        allExpenses,
+        userPaidAmount,
+        totalsByUser,
+        balanceByUser,
+        balanceByAllUsersInGroup,
+      ] = await Promise.all([
+        getDoc(groupRef),
+        Expense.getExpensesByGroupWithLimit(groupId, LIMIT),
+        Expense.getExpensesByGroup(groupId),
+        Expense.getTotalExpensesByUserAndGroup(groupId),
+        Expense.getTotalExpensesPerUserByGroup(groupId),
+        Expense.getBalanceByUserAndGroup(groupId),
+        Expense.getBalanceByAllUsersInGroup(groupId),
+      ]);
+
+      console.log('Total spent by each user:', totalsByUser);
+      console.log('Balance by user:', balanceByUser);
+      console.log('Balance by all users in group:', balanceByAllUsersInGroup);
+
+      // 2) If group exists, set its basic data
+      if (snap.exists()) {
+        const data = snap.data();
+        setGroupData({
+          id: snap.id,
+          name: data.name,
+          totalExpenses: data.totalExpenses,
+          youPaid: data.youPaid,
+          youOwe: data.youOwe,
+          members: data.members || [],
+          created_by: data.created_by,
+        });
+      }
+
+      // 3) Build a map of user_id → username (fetching each only once)
+      const uniqueUserIds = [...new Set(rawExpenses.map((e) => e.user_id))];
+      const usernameMap = {};
+      await Promise.all(
+        uniqueUserIds.map(async (id) => {
+          usernameMap[id] = await User.getUsernameById(id).catch(() => id);
+        })
+      );
+
+      // 4) Merge in usernames
+      const expensesWithUsernames = rawExpenses.map((exp) => ({
+        id: exp.id,
+        name: exp.title,
+        amount: exp.amount,
+        category: exp.category,
+        time: exp.incurred_at.toDate().toLocaleString(),
+        paidBy: usernameMap[exp.user_id],
+      }));
+
+      // 5) Compute totals
+      const totalAmount = allExpenses.reduce((sum, { amount }) => sum + amount, 0);
+
+      // Get current user's balance to determine what they owe
+      const auth = getAuth();
+      const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+      const userBalance = balanceByAllUsersInGroup[currentUserId] || 0;
+      const actualOwe = userBalance < 0 ? Math.abs(userBalance) : 0;
+
+      // 6) Update state in one go
+      setTotalExpenses(totalAmount);
+      setYouPaid(userPaidAmount);
+      setYouOwe(actualOwe);
+      setRecentExpenses(expensesWithUsernames);
+      setBalanceByAllUsers(balanceByAllUsersInGroup); // Store the balance data
+    } catch (err) {
+      console.error('Error fetching group details or expenses', err);
+    }
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await handleCleanup();
+    await fetchGroupAndExpenses(true);
+    setRefreshing(false);
+  }, [groupId]);
+
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
       setLoading(true);
       handleCleanup();
 
-      const fetchGroupAndExpenses = async () => {
-        try {
-          const groupRef = doc(db, 'groups', groupId);
-
-          // 1) Fire four independent calls in parallel:
-          const [
-            snap,
-            rawExpenses,
-            allExpenses,
-            userPaidAmount,
-            totalsByUser,
-            balanceByUser,
-            balanceByAllUsersInGroup,
-          ] = await Promise.all([
-            getDoc(groupRef),
-            Expense.getExpensesByGroupWithLimit(groupId, LIMIT),
-            Expense.getExpensesByGroup(groupId),
-            Expense.getTotalExpensesByUserAndGroup(groupId),
-            Expense.getTotalExpensesPerUserByGroup(groupId),
-            Expense.getBalanceByUserAndGroup(groupId),
-            Expense.getBalanceByAllUsersInGroup(groupId),
-          ]);
-
-          console.log('Total spent by each user:', totalsByUser);
-          console.log('Balance by user:', balanceByUser);
-          console.log('Balance by all users in group:', balanceByAllUsersInGroup);
-
-          // 2) If group exists, set its basic data
-          if (snap.exists() && mounted) {
-            const data = snap.data();
-            setGroupData({
-              id: snap.id,
-              name: data.name,
-              totalExpenses: data.totalExpenses,
-              youPaid: data.youPaid,
-              youOwe: data.youOwe,
-              members: data.members || [],
-              created_by: data.created_by,
-            });
-          }
-
-          // 3) Build a map of user_id → username (fetching each only once)
-          const uniqueUserIds = [...new Set(rawExpenses.map((e) => e.user_id))];
-          const usernameMap = {};
-          await Promise.all(
-            uniqueUserIds.map(async (id) => {
-              usernameMap[id] = await User.getUsernameById(id).catch(() => id);
-            })
-          );
-
-          // 4) Merge in usernames
-          const expensesWithUsernames = rawExpenses.map((exp) => ({
-            id: exp.id,
-            name: exp.title,
-            amount: exp.amount,
-            category: exp.category,
-            time: exp.incurred_at.toDate().toLocaleString(),
-            paidBy: usernameMap[exp.user_id],
-          }));
-
-          // 5) Compute totals
-          const totalAmount = allExpenses.reduce((sum, { amount }) => sum + amount, 0);
-
-          // Get current user's balance to determine what they owe
-          const auth = getAuth();
-          const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
-          const userBalance = balanceByAllUsersInGroup[currentUserId] || 0;
-          const actualOwe = userBalance < 0 ? Math.abs(userBalance) : 0;
-
-          // 6) Update state in one go
-          if (mounted) {
-            setTotalExpenses(totalAmount);
-            setYouPaid(userPaidAmount);
-            setYouOwe(actualOwe);
-            setRecentExpenses(expensesWithUsernames);
-            setBalanceByAllUsers(balanceByAllUsersInGroup); // Store the balance data
-          }
-        } catch (err) {
-          console.error('Error fetching group details or expenses', err);
-        } finally {
-          if (mounted) setLoading(false);
-        }
+      const loadData = async () => {
+        await fetchGroupAndExpenses();
+        if (mounted) setLoading(false);
       };
 
-      fetchGroupAndExpenses();
+      loadData();
       return () => {
         mounted = false;
       };
@@ -345,7 +354,10 @@ const GroupDetailsScreen = () => {
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}>
+          contentContainerStyle={{ paddingBottom: 20 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2979FF']} />
+          }>
           {/* Group Summary Card */}
           <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6">
             <Text className="text-center font-dmsans-medium text-base text-black/75">

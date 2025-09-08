@@ -5,7 +5,7 @@ import { Image } from 'react-native';
 export const Logo = ({ width, height }) => {
   return (
     <Image
-      source={require('../assets/logo-icon.png')}
+      source={require('../assets/adaptive-icon.png')}
       resizeMode="fill"
       className={`
         ${width ? `w-[${width}px]` : 'w-[87px]'}
