@@ -218,7 +218,7 @@ const GroupsScreen = () => {
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
-    
+
     try {
       if (!query || query.trim() === '') {
         // If search is empty, show all groups
@@ -231,7 +231,7 @@ const GroupsScreen = () => {
     } catch (error) {
       console.error('Search failed:', error);
       // Fallback to local filtering if search fails
-      const localFiltered = groups.filter(group =>
+      const localFiltered = groups.filter((group) =>
         group.name.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredGroups(localFiltered);
@@ -312,7 +312,7 @@ const GroupsScreen = () => {
               <View className="mb-4">
                 <TextInput
                   placeholder={t('group.search')}
-                  className="input-field"
+                  className="input-field pl-4 "
                   value={searchQuery}
                   onChangeText={handleSearch}
                 />

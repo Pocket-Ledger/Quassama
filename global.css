@@ -85,7 +85,7 @@
   }
 
   .input-field {
-    @apply h-14 w-full rounded-input border border-border-light bg-white px-4 text-body text-text-primary shadow-input placeholder:text-placeholder focus:border-primary focus:outline-none;
+    @apply h-14 w-full rounded-input border border-border-light bg-white px-4 pl-12 text-body text-text-primary shadow-input placeholder:text-placeholder focus:border-primary focus:outline-none;
   }
 
   .input-field-error {
