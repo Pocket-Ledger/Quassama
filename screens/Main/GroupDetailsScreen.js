@@ -30,7 +30,7 @@ import Logger from 'utils/looger';
 import { cleanupAllUserGroups } from 'utils/cleanup';
 import MemberExpensesDrawer from 'components/MemberExpensesDrawer';
 
-const LIMIT = 5;
+const LIMIT = 10;
 
 const GroupDetailsScreen = () => {
   const navigation = useNavigation();
