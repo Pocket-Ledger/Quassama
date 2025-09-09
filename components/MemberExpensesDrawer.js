@@ -140,28 +140,47 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
 
         {/* Member Statistics */}
         <View className="border-b border-gray-100 px-6 py-4">
-          <View className="flex-row justify-between">
-            <View className="flex-1">
-              <Text className="text-sm text-gray-500">{t('memberDrawer.totalPaid')}</Text>
-              <Text className="font-dmsans-medium text-lg text-green-600">
-                {memberStats.totalPaid.toFixed(1)} {t('common.currency')}
-              </Text>
-            </View>
+          {loading ? (
+            <View className="flex-row justify-between">
+              <View className="flex-1">
+                <Text className="text-sm text-gray-500">{t('memberDrawer.totalPaid')}</Text>
+                <View className="mt-1 h-6 w-20 rounded bg-gray-200" />
+              </View>
 
-            <View className="flex-1 items-center">
-              <Text className="text-sm text-gray-500">{t('memberDrawer.totalOwed')}</Text>
-              <Text className="font-dmsans-medium text-lg text-red-500">
-                {memberStats.totalOwed.toFixed(1)} {t('common.currency')}
-              </Text>
-            </View>
+              <View className="flex-1 items-center">
+                <Text className="text-sm text-gray-500">{t('memberDrawer.totalOwed')}</Text>
+                <View className="mt-1 h-6 w-20 rounded bg-gray-200" />
+              </View>
 
-            <View className="flex-1 items-end">
-              <Text className="text-sm text-gray-500">{t('memberDrawer.expenses')}</Text>
-              <Text className="font-dmsans-medium text-lg text-blue-600">
-                {memberStats.expenseCount}
-              </Text>
+              <View className="flex-1 items-end">
+                <Text className="text-sm text-gray-500">{t('memberDrawer.expenses')}</Text>
+                <View className="mt-1 h-6 w-12 rounded bg-gray-200" />
+              </View>
             </View>
-          </View>
+          ) : (
+            <View className="flex-row justify-between">
+              <View className="flex-1">
+                <Text className="text-sm text-gray-500">{t('memberDrawer.totalPaid')}</Text>
+                <Text className="font-dmsans-medium text-lg text-green-600">
+                  {memberStats.totalPaid.toFixed(1)} {t('common.currency')}
+                </Text>
+              </View>
+
+              <View className="flex-1 items-center">
+                <Text className="text-sm text-gray-500">{t('memberDrawer.totalOwed')}</Text>
+                <Text className="font-dmsans-medium text-lg text-red-500">
+                  {memberStats.totalOwed.toFixed(1)} {t('common.currency')}
+                </Text>
+              </View>
+
+              <View className="flex-1 items-end">
+                <Text className="text-sm text-gray-500">{t('memberDrawer.expenses')}</Text>
+                <Text className="font-dmsans-medium text-lg text-blue-600">
+                  {memberStats.expenseCount}
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Expenses List */}
@@ -171,9 +190,28 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
           </Text>
 
           {loading ? (
-            <View className="flex-1 items-center justify-center">
-              <ActivityIndicator size="large" color="#2979FF" />
-              <Text className="mt-2 text-gray-500">{t('common.loading')}</Text>
+            <View className="flex-1">
+              <Text className="py-4 font-dmsans-medium text-base text-black">
+                {t('memberDrawer.recentExpenses')}
+              </Text>
+              
+              {/* Skeleton loading for expenses list */}
+              <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+                {[1, 2, 3, 4].map((index) => (
+                  <View key={index} className="mb-4 rounded-lg border border-gray-100 bg-white p-4">
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-1">
+                        <View className="h-5 w-32 rounded bg-gray-200" />
+                        <View className="mt-2 h-4 w-20 rounded bg-gray-200" />
+                      </View>
+                      <View className="items-end">
+                        <View className="h-5 w-16 rounded bg-gray-200" />
+                        <View className="mt-2 h-4 w-12 rounded bg-gray-200" />
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
             </View>
           ) : expenses.length > 0 ? (
             <ScrollView
