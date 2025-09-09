@@ -56,8 +56,11 @@ const GroupDetailsScreen = () => {
   console.log('groupData', groupData);
 
   const handleCleanup = async () => {
-    await cleanupAllGroups();
-    // Refresh your group data after cleanup
+    try {
+      await cleanupAllUserGroups();
+    } catch (error) {
+      console.error('Error during cleanup:', error);
+    }
   };
 
   const fetchGroupAndExpenses = async (isRefresh = false) => {
@@ -120,8 +123,14 @@ const GroupDetailsScreen = () => {
         paidBy: usernameMap[exp.user_id],
       }));
 
-      // 5) Compute totals
-      const totalAmount = allExpenses.reduce((sum, { amount }) => sum + amount, 0);
+      // 5) Compute totals - exclude settlement transactions from total expenses
+      const totalAmount = allExpenses.reduce((sum, expense) => {
+        // Only count regular expenses, not settlement transactions
+        if (!expense.is_settlement) {
+          return sum + expense.amount;
+        }
+        return sum;
+      }, 0);
 
       // Get current user's balance to determine what they owe
       const auth = getAuth();
@@ -142,20 +151,30 @@ const GroupDetailsScreen = () => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await handleCleanup();
-    await fetchGroupAndExpenses(true);
-    setRefreshing(false);
+    try {
+      await handleCleanup();
+      await fetchGroupAndExpenses(true);
+    } catch (error) {
+      console.error('Error during refresh:', error);
+    } finally {
+      setRefreshing(false);
+    }
   }, [groupId]);
 
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
       setLoading(true);
-      handleCleanup();
 
       const loadData = async () => {
-        await fetchGroupAndExpenses();
-        if (mounted) setLoading(false);
+        try {
+          await handleCleanup();
+          await fetchGroupAndExpenses();
+        } catch (error) {
+          console.error('Error loading data:', error);
+        } finally {
+          if (mounted) setLoading(false);
+        }
       };
 
       loadData();
