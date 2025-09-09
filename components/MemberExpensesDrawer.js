@@ -51,9 +51,17 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
         paidBy: username,
       }));
 
-      // Calculate member statistics
-      const totalPaid = userExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-      const expenseCount = userExpenses.length;
+      // Calculate member statistics - exclude settlement transactions
+      const totalPaid = userExpenses.reduce((sum, exp) => {
+        // Only count regular expenses, not settlement transactions
+        if (!exp.is_settlement) {
+          return sum + exp.amount;
+        }
+        return sum;
+      }, 0);
+      
+      // Count only non-settlement expenses
+      const expenseCount = userExpenses.filter(exp => !exp.is_settlement).length;
 
       // Get member's balance in the group
       const balances = await Expense.getBalanceByAllUsersInGroup(groupId);
