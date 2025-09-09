@@ -1353,6 +1353,40 @@ class Expense {
   }
 
   /**
+   * A function that get expense by group and user
+   * @param {groupId}
+   * @param {userId}
+   * @returns {Promise<Array>} - Array of expenses
+   */
+  static async getExpensesByUserAndGroup(userId, groupId){
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('A valid groupId (string) is required');
+    }
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('A valid userId (string) is required');
+    }
+
+    try {
+      const expensesCol = collection(db, 'expenses');
+      const q = query(
+        expensesCol,
+        where('group_id', '==', groupId),
+        where('user_id', '==', userId),
+        orderBy('incurred_at', 'desc')
+      );
+
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+    } catch (error) {
+      console.error('Error fetching expenses by user and group:', error);
+      throw new Error(`Failed to fetch expenses: ${error.message}`);
+    }
+  }
+
+  /**
    * Alternative implementation using startAfter for better performance with large datasets
    * @param {string} groupId - The group ID
    * @param {number} pageSize - Number of items per page

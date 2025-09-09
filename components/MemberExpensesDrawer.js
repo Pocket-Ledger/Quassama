@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Modal,
-  Animated,
   Dimensions,
-  PanResponder,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -31,37 +29,8 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
     expenseCount: 0,
   });
 
-  // Animation values
-  const [slideAnim] = useState(new Animated.Value(DRAWER_HEIGHT));
-  const [overlayOpacity] = useState(new Animated.Value(0));
-
-  // Pan responder for swipe to close
-  const panResponder = PanResponder.create({
-    onMoveShouldSetPanResponder: (evt, gestureState) => {
-      return gestureState.dy > 0 && gestureState.vy > 0;
-    },
-    onPanResponderMove: (evt, gestureState) => {
-      if (gestureState.dy > 0) {
-        slideAnim.setValue(gestureState.dy);
-      }
-    },
-    onPanResponderRelease: (evt, gestureState) => {
-      if (gestureState.dy > DRAWER_HEIGHT * 0.3 || gestureState.vy > 0.5) {
-        closeDrawer();
-      } else {
-        // Snap back to open position
-        Animated.spring(slideAnim, {
-          toValue: 0,
-          useNativeDriver: false,
-          tension: 100,
-          friction: 8,
-        }).start();
-      }
-    },
-  });
-
   // Fetch member expenses
-  const fetchMemberExpenses = async () => {
+  const fetchMemberExpenses = useCallback(async () => {
     if (!groupId || !userId) return;
 
     setLoading(true);
@@ -102,75 +71,34 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
     } finally {
       setLoading(false);
     }
-  };
+  }, [groupId, userId]);
 
-  // Open drawer animation
-  const openDrawer = () => {
-    Animated.parallel([
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: false,
-        tension: 100,
-        friction: 8,
-      }),
-      Animated.timing(overlayOpacity, {
-        toValue: 0.5,
-        duration: 300,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  };
-
-  // Close drawer animation
-  const closeDrawer = () => {
-    Animated.parallel([
-      Animated.spring(slideAnim, {
-        toValue: DRAWER_HEIGHT,
-        useNativeDriver: false,
-        tension: 100,
-        friction: 8,
-      }),
-      Animated.timing(overlayOpacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
-      onClose();
-    });
-  };
-
-  // Effect to handle visibility changes
+  // Effect to fetch data when drawer becomes visible
   useEffect(() => {
     if (visible) {
       fetchMemberExpenses();
-      openDrawer();
-    } else {
-      slideAnim.setValue(DRAWER_HEIGHT);
-      overlayOpacity.setValue(0);
     }
-  }, [visible, groupId, userId]);
+  }, [visible, groupId, userId, fetchMemberExpenses]);
 
   if (!visible) return null;
 
   return (
-    <Modal transparent visible={visible} animationType="none" onRequestClose={closeDrawer}>
+    <Modal transparent visible={visible} animationType="slide" onRequestClose={onClose}>
       {/* Overlay */}
-      <Animated.View
+      <View
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'black',
-          opacity: overlayOpacity,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
         }}>
-        <TouchableOpacity style={{ flex: 1 }} onPress={closeDrawer} activeOpacity={1} />
-      </Animated.View>
+        <TouchableOpacity style={{ flex: 1 }} onPress={onClose} activeOpacity={1} />
+      </View>
 
       {/* Drawer */}
-      <Animated.View
+      <View
         style={{
           position: 'absolute',
           left: 0,
@@ -180,7 +108,6 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
           backgroundColor: 'white',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          transform: [{ translateY: slideAnim }],
           shadowColor: '#000',
           shadowOffset: {
             width: 0,
@@ -189,11 +116,9 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
           shadowOpacity: 0.25,
           shadowRadius: 3.84,
           elevation: 5,
-        }}
-        {...panResponder.panHandlers}>
+        }}>
         {/* Handle bar */}
-
-        <TouchableOpacity onPress={closeDrawer} className="items-center py-3">
+        <TouchableOpacity onPress={onClose} className="items-center py-3">
           <View className="h-1 w-10 rounded-full bg-gray-300" />
         </TouchableOpacity>
 
@@ -283,9 +208,9 @@ const MemberExpensesDrawer = ({ visible, onClose, groupId, userId, memberInfo })
             </View>
           )}
         </View>
-      </Animated.View>
+      </View>
     </Modal>
   );
 };
 
-export default MemberExpensesDrawer;
+export default React.memo(MemberExpensesDrawer);
