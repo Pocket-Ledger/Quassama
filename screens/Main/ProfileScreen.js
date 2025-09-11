@@ -161,7 +161,7 @@ const ProfileScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header - Profile Info */}
-        <View className="items-center px-4 pb-8 pt-12">
+        <View className="items-center px-4 pb-8 pt-12 ">
           {/* Profile Avatar */}
           <View
             className="mb-4 h-20 w-20 items-center justify-center rounded-full"
@@ -199,7 +199,7 @@ const ProfileScreen = () => {
               disabled={item.hasSwitch}>
               <View className="flex-row items-center">
                 {/* Icon */}
-                <View className="mr-4 h-10 w-10 items-center justify-center">
+                <View className="mr-4 h-10 w-10 items-center justify-center bg-gray-100 rounded-full">
                   <Feather name={item.icon} size={20} color="#666" />
                 </View>
 
@@ -240,7 +240,7 @@ const ProfileScreen = () => {
             onPress={handleDeleteAccount}
             disabled={isDeletingAccount}
           >
-            <View className="mr-4 h-10 w-10 items-center justify-center">
+            <View className="mr-4 h-10 w-10 items-center justify-center bg-red-100 rounded-full">
               <Feather name="trash" size={20} color="#FF3B30" />
             </View>
             <Text className="text-lg font-normal text-error">
@@ -250,7 +250,7 @@ const ProfileScreen = () => {
 
           {/* Logout Button */}
           <TouchableOpacity className="mb-1 flex-row items-center py-4" onPress={handleLogoutPress}>
-            <View className="mr-4 h-10 w-10 items-center justify-center">
+            <View className="mr-4 h-10 w-10 items-center justify-center bg-red-100 rounded-full">
               <Feather name="log-out" size={20} color="#FF3B30" />
             </View>
             <Text className="text-lg font-normal text-error">{t('profile.logout')}</Text>
