@@ -107,9 +107,23 @@ const GroupsScreen = () => {
         setIsLoadingGroups(true);
         try {
           const groupsData = await Group.getGroupsByUser(user);
-          setGroups(groupsData);
-          setFilteredGroups(groupsData); // Initialize filtered groups
-          Logger.info('Fetched groups:', groupsData);
+          
+          // Fetch amounts for each group immediately
+          const groupsWithAmounts = await Promise.all(
+            groupsData.map(async (group) => {
+              try {
+                const total = await Expense.getTotalExpensesByGroup(group.id);
+                return { ...group, amount: `${total} ${t('common.currency')}` };
+              } catch (error) {
+                console.error(`Error fetching amount for group ${group.id}:`, error);
+                return { ...group, amount: `0 ${t('common.currency')}` };
+              }
+            })
+          );
+          
+          setGroups(groupsWithAmounts);
+          setFilteredGroups(groupsWithAmounts); // Initialize filtered groups with amounts
+          Logger.info('Fetched groups with amounts:', groupsWithAmounts);
         } catch (error) {
           console.error('Error fetching groups:', error);
         } finally {
@@ -117,7 +131,7 @@ const GroupsScreen = () => {
         }
       };
       fetchGroups();
-    }, [user])
+    }, [user, t])
   );
 
   console.log('Groups:', groups.length > 0 ? groups[0] : 'No groups found');
@@ -168,25 +182,6 @@ const GroupsScreen = () => {
 
   const userId = getAuth().currentUser.uid;
 
-  /* const handleAcceptInvitation = async (invId, groupId) => {
-    try {
-      const username = await User.getUsernameById(userId);
-      const memberObj = {
-        id: userId,
-        name: username,
-        initial: username ? username[0].toUpperCase() : '',
-        color: '#2979FF',
-      };
-
-      await Group.addMemberToGroup(groupId, memberObj);
-
-      await Invitation.accept(invId);
-
-      
-    } catch (err) {
-      console.error('Accept failed', err);
-    }
-  }; */
   const handleAcceptInvitation = async (invId, groupId) => {
     try {
       // The Invitation.accept method will handle adding the member to the group
@@ -196,10 +191,21 @@ const GroupsScreen = () => {
       // AUTO UPDATE UI - Remove invitation from the list
       setInvitations((prev) => prev.filter((inv) => inv.id !== invId));
 
-      // AUTO UPDATE UI - Refresh groups to show the new group
+      // AUTO UPDATE UI - Refresh groups to show the new group with amounts
       const groupsData = await Group.getGroupsByUser(user);
-      setGroups(groupsData);
-      setFilteredGroups(groupsData); // Update filtered groups as well
+      const groupsWithAmounts = await Promise.all(
+        groupsData.map(async (group) => {
+          try {
+            const total = await Expense.getTotalExpensesByGroup(group.id);
+            return { ...group, amount: `${total} ${t('common.currency')}` };
+          } catch (error) {
+            console.error(`Error fetching amount for group ${group.id}:`, error);
+            return { ...group, amount: `0 ${t('common.currency')}` };
+          }
+        })
+      );
+      setGroups(groupsWithAmounts);
+      setFilteredGroups(groupsWithAmounts); // Update filtered groups as well
     } catch (err) {
       console.error('Accept failed', err);
     }
@@ -221,16 +227,30 @@ const GroupsScreen = () => {
     
     try {
       if (!query || query.trim() === '') {
-        // If search is empty, show all groups
+        // If search is empty, show all groups (already with amounts)
         setFilteredGroups(groups);
       } else {
         // Use the searchGroupsByName method
         const searchResults = await Group.searchGroupsByName(user, query);
-        setFilteredGroups(searchResults);
+        
+        // Add amounts to search results
+        const searchResultsWithAmounts = await Promise.all(
+          searchResults.map(async (group) => {
+            try {
+              const total = await Expense.getTotalExpensesByGroup(group.id);
+              return { ...group, amount: `${total} ${t('common.currency')}` };
+            } catch (error) {
+              console.error(`Error fetching amount for group ${group.id}:`, error);
+              return { ...group, amount: `0 ${t('common.currency')}` };
+            }
+          })
+        );
+        
+        setFilteredGroups(searchResultsWithAmounts);
       }
     } catch (error) {
       console.error('Search failed:', error);
-      // Fallback to local filtering if search fails
+      // Fallback to local filtering if search fails (using groups that already have amounts)
       const localFiltered = groups.filter(group =>
         group.name.toLowerCase().includes(query.toLowerCase())
       );
@@ -238,27 +258,8 @@ const GroupsScreen = () => {
     }
   };
 
-  useEffect(() => {
-    if (!isLoadingGroups && groups.length > 0) {
-      const fetchAmounts = async () => {
-        const updatedGroups = await Promise.all(
-          groups.map(async (g) => {
-            const total = await Expense.getTotalExpensesByGroup(g.id);
-            return { ...g, amount: `${total} ${t('common.currency')}` };
-          })
-        );
-        setGroups(updatedGroups);
-        // Update filtered groups when amounts are fetched
-        if (searchQuery) {
-          handleSearch(searchQuery);
-        } else {
-          setFilteredGroups(updatedGroups);
-        }
-      };
-      fetchAmounts();
-    }
-    // eslint-disable-next-line
-  }, [isLoadingGroups]);
+  // Remove the useEffect that was causing the issue
+  // Since we now fetch amounts immediately in useFocusEffect
 
   // Sort groups: favorites first, then others
   const favoriteGroups = filteredGroups.filter((g) => favoriteGroupIds.includes(g.id));
