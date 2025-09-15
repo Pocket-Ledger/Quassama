@@ -22,6 +22,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -58,7 +59,7 @@ async function registerForPushNotificationsAsync() {
 async function scheduleExpenseReminder() {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "Expense Reminder 💰",
+      title: 'Expense Reminder 💰',
       body: "Don't forget to add your expense!",
     },
     trigger: {
@@ -120,7 +121,7 @@ export default function App() {
 
         // Request notification permissions
         await registerForPushNotificationsAsync();
-        
+
         // Schedule expense reminder
         await scheduleExpenseReminder();
 
@@ -164,11 +165,13 @@ export default function App() {
       <SafeAreaProvider>
         <AuthProvider>
           <GestureHandlerRootView style={{ flex: 1 }}>
-            <I18nextProvider i18n={i18n}>
-              <NavigationContainer>
-                <AppNavigator />
-              </NavigationContainer>
-            </I18nextProvider>
+            <BottomSheetModalProvider>
+              <I18nextProvider i18n={i18n}>
+                <NavigationContainer>
+                  <AppNavigator />
+                </NavigationContainer>
+              </I18nextProvider>
+            </BottomSheetModalProvider>
           </GestureHandlerRootView>
         </AuthProvider>
       </SafeAreaProvider>

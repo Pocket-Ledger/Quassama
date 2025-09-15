@@ -4,10 +4,7 @@
     "slug": "quassama",
     "version": "1.0.2",
     "scheme": "quassama",
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "platforms": ["ios", "android"],
     "web": {
       "favicon": "./assets/logo.png"
     },
@@ -16,6 +13,12 @@
     },
     "plugins": [
       "expo-splash-screen",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
       [
         "expo-notifications",
         {
@@ -32,16 +35,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.quassama.app",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification"
-        ]
+        "UIBackgroundModes": ["remote-notification"],
+        "NSMicrophoneUsageDescription": "This app needs access to microphone to record expense notes."
       }
     },
     "android": {
@@ -51,11 +51,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "RECEIVE_BOOT_COMPLETED",
-        "VIBRATE",
-        "WAKE_LOCK"
-      ],
+      "permissions": ["RECEIVE_BOOT_COMPLETED", "VIBRATE", "WAKE_LOCK", "RECORD_AUDIO"],
       "useNextNotificationsApi": true
     },
     "extra": {

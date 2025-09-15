@@ -22,6 +22,7 @@ import ExpenseSearchService from 'services/expense/searchForExpense';
 import { useTranslation } from 'react-i18next';
 import { dateToTimestamp } from 'utils/time';
 import filterExpenses from 'services/expense/filterExpense';
+import VoiceRecordingButton from 'components/audioRecording/VoiceRecordingButton';
 
 const AllExpensesScreen = () => {
   const navigation = useNavigation();
@@ -316,7 +317,7 @@ const AllExpensesScreen = () => {
     return (
       <View className="py-4">
         <ActivityIndicator size="small" color="#2979FF" />
-        <Text className="mt-2 text-center text-sm text-gray-500">{t('expense.loadingMore')}</Text>
+        <Text className="mt-2 text-sm text-center text-gray-500">{t('expense.loadingMore')}</Text>
       </View>
     );
   };
@@ -367,7 +368,7 @@ const AllExpensesScreen = () => {
 
     return (
       <View className="items-center px-4 py-12">
-        <View className="mb-4 items-center justify-center">
+        <View className="items-center justify-center mb-4">
           <Ionicons name="receipt" size={70} color="#2979FF" />
         </View>
         <Text className="mb-2 font-dmsans-bold text-[24px]">
@@ -382,7 +383,7 @@ const AllExpensesScreen = () => {
         </Text>
         {!isSearchActive && !isFilterActive && (
           <TouchableOpacity
-            className="rounded-lg bg-primary px-6 py-3"
+            className="px-6 py-3 rounded-lg bg-primary"
             onPress={() => navigation.navigate('NewExpense', { groupId })}>
             <Text className="font-semibold text-white">{t('expense.empty.addFirstExpense')}</Text>
           </TouchableOpacity>
@@ -394,13 +395,13 @@ const AllExpensesScreen = () => {
   // Render error state
   const renderErrorState = () => (
     <View className="items-center px-4 py-12">
-      <View className="mb-4 items-center justify-center">
+      <View className="items-center justify-center mb-4">
         <Ionicons name="alert-circle" size={70} color="#FF6B6B" />
       </View>
       <Text className="mb-2 font-dmsans-bold text-[24px]">{t('expense.error.title')}</Text>
       <Text className="mb-6 text-center text-gray-500">{error}</Text>
       <TouchableOpacity
-        className="rounded-lg bg-primary px-6 py-3"
+        className="px-6 py-3 rounded-lg bg-primary"
         onPress={() => loadExpenses(1, false)}>
         <Text className="font-semibold text-white">{t('expense.error.tryAgain')}</Text>
       </TouchableOpacity>
@@ -414,8 +415,8 @@ const AllExpensesScreen = () => {
     // If searching, show search results count
     if (searchText.trim()) {
       return (
-        <View className="bg-gray-50 px-4 py-2">
-          <Text className="text-center text-sm text-gray-600">
+        <View className="px-4 py-2 bg-gray-50">
+          <Text className="text-sm text-center text-gray-600">
             {t('expense.search.resultsCount', { count: filteredExpenses.length })}
           </Text>
         </View>
@@ -424,8 +425,8 @@ const AllExpensesScreen = () => {
 
     // Otherwise show pagination info
     return (
-      <View className="bg-gray-50 px-4 py-2">
-        <Text className="text-center text-sm text-gray-600">
+      <View className="px-4 py-2 bg-gray-50">
+        <Text className="text-sm text-center text-gray-600">
           {t('expense.pagination.showing', {
             start: pagination.startIndex,
             end: pagination.endIndex,
@@ -439,7 +440,6 @@ const AllExpensesScreen = () => {
   return (
     <SafeAreaView className="container flex-1 bg-white">
       <Header title={t('expense.title')} />
-
       <View className="mb-4">
         <SearchBar
           searchText={searchText}
@@ -450,25 +450,23 @@ const AllExpensesScreen = () => {
 
         {/* Filter Active Indicator */}
         {filterConfig.checkedFilter && (
-          <View className="mx-4 mt-2 flex-row items-center rounded-lg bg-blue-50 px-3 py-2">
+          <View className="flex-row items-center px-3 py-2 mx-4 mt-2 rounded-lg bg-blue-50">
             <Feather name="filter" size={16} color="#2979FF" />
-            <Text className="ml-2 flex-1 text-sm text-blue-700">{t('expense.filtersActive')}</Text>
+            <Text className="flex-1 ml-2 text-sm text-blue-700">{t('expense.filtersActive')}</Text>
             <TouchableOpacity onPress={handleResetFilter}>
               <Text className="text-sm font-medium text-blue-700">{t('filters.clear')}</Text>
             </TouchableOpacity>
           </View>
         )}
       </View>
-
       {renderPaginationInfo()}
-
       {loading && expenses.length === 0 ? (
-        <View className="flex-1 items-center justify-center">
+        <View className="items-center justify-center flex-1">
           <ActivityIndicator size="large" color="#2979FF" />
           <Text className="mt-2 text-gray-500">{t('expense.loading')}</Text>
         </View>
       ) : isSearching ? (
-        <View className="flex-1 items-center justify-center">
+        <View className="items-center justify-center flex-1">
           <ActivityIndicator size="large" color="#2979FF" />
           <Text className="mt-2 text-gray-500">{t('expense.searching')}</Text>
         </View>
@@ -497,7 +495,6 @@ const AllExpensesScreen = () => {
       ) : (
         renderEmptyState()
       )}
-
       <FilterModal
         visible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}
@@ -509,6 +506,7 @@ const AllExpensesScreen = () => {
         currency={t('common.currency')}
         resultCount={pagination.totalItems}
       />
+      <VoiceRecordingButton />
     </SafeAreaView>
   );
 };
