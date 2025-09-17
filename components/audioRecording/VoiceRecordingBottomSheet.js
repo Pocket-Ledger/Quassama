@@ -12,6 +12,9 @@ import { Ionicons } from '@expo/vector-icons';
 import AudioWaveform from './AudioWaveform';
 import Timer from './Timer';
 import * as Sharing from 'expo-sharing';
+import transcribeAudio from '../../models/expens_Ai/transcribeAudio';
+import extractExpensesFromText from '../../models/expens_Ai/extractExpensesFromText';
+import ProcessExpenses from '../../models/expens_Ai/processExpenses';
 
 const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
   const [recordingState, setRecordingState] = useState('idle');
@@ -154,27 +157,50 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
     }
   };
 
-  const handleRecordingStopped = () => {
+  const handleRecordingStopped = async () => {
     setRecordingState('processing');
 
-    // Simulate processing time
-    setTimeout(() => {
-      // Mock extracted expenses - replace with actual API call
-      // You can use audioRecorder.uri to get the recording file path
+    try {
       console.log('Recording saved to:', audioRecorder.uri);
+      
+      if (!audioRecorder.uri) {
+        throw new Error('No audio recording found');
+      }
 
-      const mockExpenses = [
-        { expense: 'Breakfast', amount: 100 },
-        { expense: 'Lunch', amount: 250 },
-        { expense: 'Dinner', amount: 90 },
-        { expense: 'Wifi', amount: 180 },
-        { expense: 'Rent', amount: 1200 },
-      ];
+      // Step 1: Transcribe the audio
+      console.log('Starting transcription...');
+      const transcriptionText = await transcribeAudio(audioRecorder.uri);
+      console.log('Transcription result:', transcriptionText);
 
-      setExtractedExpenses(mockExpenses);
+      // Step 2: Extract expenses from transcription
+      console.log('Extracting expenses from text...');
+      const extractedExpensesData = await extractExpensesFromText(transcriptionText);
+      console.log('Extracted expenses:', extractedExpensesData);
+
+      // Step 3: Process the expenses and log the data
+      console.log('Processing expenses...');
+      const expensesProcessor = new ProcessExpenses(extractedExpensesData);
+      const processedData = expensesProcessor.processAndLog();
+
+      // Convert to the format expected by the UI
+      const formattedExpenses = extractedExpensesData.map(expense => ({
+        expense: expense.title,
+        amount: expense.amount
+      }));
+
+      setExtractedExpenses(formattedExpenses);
       setRecordingState('completed');
-      onExpensesExtracted?.(mockExpenses);
-    }, 2000);
+      onExpensesExtracted?.(formattedExpenses);
+
+    } catch (error) {
+      console.error('Error processing audio:', error.message);
+      Alert.alert(
+        'Processing Error',
+        'Failed to process your recording. Please try again.',
+        [{ text: 'OK', onPress: handleRetry }]
+      );
+      setRecordingState('idle');
+    }
   };
 
   const pauseRecording = async () => {
