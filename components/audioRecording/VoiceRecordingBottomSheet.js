@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AudioWaveform from './AudioWaveform';
 import Timer from './Timer';
+import * as Sharing from 'expo-sharing';
 
 const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
   const [recordingState, setRecordingState] = useState('idle');
@@ -18,7 +19,28 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
   const [extractedExpenses, setExtractedExpenses] = useState([]);
   const [permissionGranted, setPermissionGranted] = useState(false);
 
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const customRecordingOptions = {
+    android: {
+      extension: '.wav',
+      outputFormat: 'default',
+      audioEncoder: 'default',
+      sampleRate: 44100,
+      numberOfChannels: 1,
+      bitRate: 128000,
+    },
+    ios: {
+      extension: '.wav',
+      outputFormat: 'linearPCM',
+      audioQuality: 'max',
+      sampleRate: 44100,
+      numberOfChannels: 1,
+      linearPCMBitDepth: 16,
+      linearPCMIsBigEndian: false,
+      linearPCMIsFloat: false,
+    },
+  };
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY); //M4A type
+  // const audioRecorder = useAudioRecorder(customRecordingOptions);//WAV type
   const recorderState = useAudioRecorderState(audioRecorder);
 
   const intervalRef = useRef(null);
@@ -215,14 +237,14 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
 
   const renderIdleState = () => (
     <View className="items-center py-8">
-      <View className="items-center justify-center w-32 h-32 mb-6 bg-blue-500 rounded-full">
+      <View className="mb-6 h-32 w-32 items-center justify-center rounded-full bg-blue-500">
         <Ionicons name="mic" size={48} color="white" />
       </View>
-      <Text className="px-4 mb-2 text-center text-gray-600">Say Something like</Text>
+      <Text className="mb-2 px-4 text-center text-gray-600">Say Something like</Text>
       <Text className="mb-8 text-lg font-semibold text-black">"Pizza 50dhs"</Text>
       <TouchableOpacity
         onPress={startRecording}
-        className="px-8 py-4 bg-blue-500 rounded-full"
+        className="rounded-full bg-blue-500 px-8 py-4"
         activeOpacity={0.8}>
         <Text className="text-lg font-semibold text-white">Start Recording</Text>
       </TouchableOpacity>
@@ -231,9 +253,9 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
 
   const renderRecordingState = () => (
     <View className="items-center py-8">
-      <View className="relative items-center justify-center w-32 h-32 mb-6 bg-blue-500 rounded-full">
+      <View className="relative mb-6 h-32 w-32 items-center justify-center rounded-full bg-blue-500">
         <Ionicons name="mic" size={48} color="white" />
-        <View className="absolute border-4 border-blue-300 rounded-full opacity-75 -inset-4" />
+        <View className="absolute -inset-4 rounded-full border-4 border-blue-300 opacity-75" />
       </View>
 
       <Text className="mb-4 text-lg font-medium text-gray-800">Listening ...</Text>
@@ -245,17 +267,17 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
 
       <Timer seconds={seconds} maxSeconds={maxRecordingTime} />
 
-      <View className="flex-row items-center gap-4 mt-8">
+      <View className="mt-8 flex-row items-center gap-4">
         <TouchableOpacity
           onPress={recordingState === 'paused' ? resumeRecording : pauseRecording}
-          className="items-center justify-center w-16 h-16 bg-blue-500 rounded-full"
+          className="h-16 w-16 items-center justify-center rounded-full bg-blue-500"
           activeOpacity={0.8}>
           <Ionicons name={recordingState === 'paused' ? 'play' : 'pause'} size={24} color="white" />
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={handleStopRecording}
-          className="flex-row items-center px-6 py-3 bg-green-500 rounded-full"
+          className="flex-row items-center rounded-full bg-green-500 px-6 py-3"
           activeOpacity={0.8}>
           <Ionicons name="checkmark" size={20} color="white" />
           <Text className="ml-2 font-medium text-white">Save</Text>
@@ -273,33 +295,33 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
 
   const renderCompletedState = () => (
     <View className="py-6">
-      <Text className="px-6 mb-4 text-lg text-gray-600">That's what we found :</Text>
+      <Text className="mb-4 px-6 text-lg text-gray-600">That's what we found :</Text>
 
       <View className="px-6">
-        <View className="flex-row justify-between py-3 border-b border-gray-200">
+        <View className="flex-row justify-between border-b border-gray-200 py-3">
           <Text className="font-medium text-gray-600">Expense</Text>
           <Text className="font-medium text-gray-600">Amount</Text>
         </View>
 
         {extractedExpenses.map((expense, index) => (
-          <View key={index} className="flex-row justify-between py-4 border-b border-gray-100">
+          <View key={index} className="flex-row justify-between border-b border-gray-100 py-4">
             <Text className="font-medium text-gray-800">{expense.expense}</Text>
             <Text className="text-gray-800">{expense.amount}</Text>
           </View>
         ))}
       </View>
 
-      <View className="flex-row gap-2 px-6 mt-8">
+      <View className="mt-8 flex-row gap-2 px-6">
         <TouchableOpacity
           onPress={handleRetry}
-          className="items-center flex-1 py-4 border border-red-400 rounded-lg"
+          className="flex-1 items-center rounded-lg border border-red-400 py-4"
           activeOpacity={0.8}>
           <Text className="font-medium text-red-500">🔄 Retry</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={handleConfirmAndSave}
-          className="items-center flex-1 py-4 bg-blue-500 rounded-lg"
+          className="flex-1 items-center rounded-lg bg-blue-500 py-4"
           activeOpacity={0.8}>
           <Text className="font-medium text-white">Confirm & save</Text>
         </TouchableOpacity>
@@ -330,7 +352,7 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
       enablePanDownToClose={recordingState === 'idle' || recordingState === 'completed'}
       onDismiss={handleRetry}>
       <BottomSheetView className="flex-1">
-        <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
+        <View className="flex-row items-center justify-between border-b border-gray-200 px-6 py-4">
           <TouchableOpacity onPress={handleCloseModal}>
             <Ionicons name="close" size={24} color="black" />
           </TouchableOpacity>
