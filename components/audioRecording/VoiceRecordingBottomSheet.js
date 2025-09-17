@@ -26,16 +26,16 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
 
   const customRecordingOptions = {
     android: {
-      extension: '.wav',
-      outputFormat: 'default',
-      audioEncoder: 'default',
+      extension: '.m4a', // Changed from .wav to .m4a for better Android compatibility
+      outputFormat: 'MPEG_4',
+      audioEncoder: 'AAC',
       sampleRate: 44100,
       numberOfChannels: 1,
       bitRate: 128000,
     },
     ios: {
-      extension: '.wav',
-      outputFormat: 'linearPCM',
+      extension: '.m4a',
+      outputFormat: 'MPEG4AAC',
       audioQuality: 'max',
       sampleRate: 44100,
       numberOfChannels: 1,
@@ -170,29 +170,29 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
       }
 
       // Step 1: Transcribe the audio
-      /* console.log('Starting transcription...');
+      console.log('Starting transcription...');
       const transcriptionText = await transcribeAudio(audioRecorder.uri);
-      console.log('Transcription result:', transcriptionText); */
+      console.log('Transcription result:', transcriptionText);
 
       // Step 2: Extract expenses from transcription
-      /* console.log('Extracting expenses from text...');
+      console.log('Extracting expenses from text...');
       const extractedExpensesData = await extractExpensesFromText(transcriptionText);
-      console.log('Extracted expenses:', extractedExpensesData); */
+      console.log('Extracted expenses:', extractedExpensesData);
 
       // Step 3: Process the expenses and log the data
       console.log('Processing expenses...');
-      /*  const expensesProcessor = new ProcessExpenses(extractedExpensesData);
-      const processedData = expensesProcessor.processAndLog(); */
+      const expensesProcessor = new ProcessExpenses(extractedExpensesData);
+      const processedData = expensesProcessor.processAndLog();
 
       // Convert to the format expected by the UI with id, checked status, and original data
-      /*  const formattedExpenses = extractedExpensesData.map((expense, index) => ({
-        id: Date.now() + index, 
+      const formattedExpenses = extractedExpensesData.map((expense, index) => ({
+        id: Date.now() + index,
         expense: expense.title,
         amount: expense.amount,
-        checked: true, 
-      })); */
+        checked: true,
+      }));
 
-      const formattedExpenses = [
+      /*   const formattedExpenses = [
         {
           id: Date.now() + 1,
           expense: 'Breakfast',
@@ -223,7 +223,7 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
           amount: '1200',
           checked: true,
         },
-      ];
+      ]; */
 
       setExtractedExpenses(formattedExpenses);
       setRecordingState('completed');
