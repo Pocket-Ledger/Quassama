@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ActivityIndicator, TextInput } from 'react-native';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import {
   useAudioRecorder,
@@ -21,6 +21,8 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
   const [seconds, setSeconds] = useState(0);
   const [extractedExpenses, setExtractedExpenses] = useState([]);
   const [permissionGranted, setPermissionGranted] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingExpense, setEditingExpense] = useState({ expense: '', amount: '' });
 
   const customRecordingOptions = {
     android: {
@@ -54,7 +56,7 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
     present: () => bottomSheetModalRef.current?.present(),
     dismiss: () => bottomSheetModalRef.current?.dismiss(),
   }));
-  const snapPoints = ['60%'];
+  const snapPoints = ['70%']; // Increased height to accommodate edit functionality
 
   useEffect(() => {
     // Request permissions and setup audio mode on component mount
@@ -162,43 +164,74 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
 
     try {
       console.log('Recording saved to:', audioRecorder.uri);
-      
+
       if (!audioRecorder.uri) {
         throw new Error('No audio recording found');
       }
 
       // Step 1: Transcribe the audio
-      console.log('Starting transcription...');
+      /* console.log('Starting transcription...');
       const transcriptionText = await transcribeAudio(audioRecorder.uri);
-      console.log('Transcription result:', transcriptionText);
+      console.log('Transcription result:', transcriptionText); */
 
       // Step 2: Extract expenses from transcription
-      console.log('Extracting expenses from text...');
+      /* console.log('Extracting expenses from text...');
       const extractedExpensesData = await extractExpensesFromText(transcriptionText);
-      console.log('Extracted expenses:', extractedExpensesData);
+      console.log('Extracted expenses:', extractedExpensesData); */
 
       // Step 3: Process the expenses and log the data
       console.log('Processing expenses...');
-      const expensesProcessor = new ProcessExpenses(extractedExpensesData);
-      const processedData = expensesProcessor.processAndLog();
+      /*  const expensesProcessor = new ProcessExpenses(extractedExpensesData);
+      const processedData = expensesProcessor.processAndLog(); */
 
-      // Convert to the format expected by the UI
-      const formattedExpenses = extractedExpensesData.map(expense => ({
+      // Convert to the format expected by the UI with id, checked status, and original data
+      /*  const formattedExpenses = extractedExpensesData.map((expense, index) => ({
+        id: Date.now() + index, 
         expense: expense.title,
-        amount: expense.amount
-      }));
+        amount: expense.amount,
+        checked: true, 
+      })); */
+
+      const formattedExpenses = [
+        {
+          id: Date.now() + 1,
+          expense: 'Breakfast',
+          amount: '100',
+          checked: true,
+        },
+        {
+          id: Date.now() + 2,
+          expense: 'Lunch',
+          amount: '250',
+          checked: true,
+        },
+        {
+          id: Date.now() + 3,
+          expense: 'Dinner',
+          amount: '90',
+          checked: true,
+        },
+        {
+          id: Date.now() + 4,
+          expense: 'Wifi',
+          amount: '180',
+          checked: true,
+        },
+        {
+          id: Date.now() + 5,
+          expense: 'Rent',
+          amount: '1200',
+          checked: true,
+        },
+      ];
 
       setExtractedExpenses(formattedExpenses);
       setRecordingState('completed');
-      onExpensesExtracted?.(formattedExpenses);
-
     } catch (error) {
       console.error('Error processing audio:', error.message);
-      Alert.alert(
-        'Processing Error',
-        'Failed to process your recording. Please try again.',
-        [{ text: 'OK', onPress: handleRetry }]
-      );
+      Alert.alert('Processing Error', 'Failed to process your recording. Please try again.', [
+        { text: 'OK', onPress: handleRetry },
+      ]);
       setRecordingState('idle');
     }
   };
@@ -223,16 +256,90 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
     }
   };
 
+  // New functions for expense management
+  const handleCheckboxToggle = (id) => {
+    setExtractedExpenses((prev) =>
+      prev.map((expense) =>
+        expense.id === id ? { ...expense, checked: !expense.checked } : expense
+      )
+    );
+  };
+
+  const handleDeleteExpense = (id) => {
+    Alert.alert('Delete Expense', 'Are you sure you want to delete this expense?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          setExtractedExpenses((prev) => prev.filter((expense) => expense.id !== id));
+        },
+      },
+    ]);
+  };
+
+  const handleEditExpense = (index) => {
+    const expense = extractedExpenses[index];
+    setEditingIndex(index);
+    setEditingExpense({
+      expense: expense.expense,
+      amount: expense.amount.toString(),
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingExpense.expense.trim() || !editingExpense.amount.trim()) {
+      Alert.alert('Error', 'Please fill in both expense name and amount');
+      return;
+    }
+
+    setExtractedExpenses((prev) =>
+      prev.map((expense, index) =>
+        index === editingIndex
+          ? {
+              ...expense,
+              expense: editingExpense.expense.trim(),
+              amount: editingExpense.amount.trim(),
+            }
+          : expense
+      )
+    );
+
+    setEditingIndex(null);
+    setEditingExpense({ expense: '', amount: '' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    setEditingExpense({ expense: '', amount: '' });
+  };
+
   const handleRetry = () => {
     if (recorderState.isRecording) {
       audioRecorder.stop().catch(console.error);
     }
     setRecordingState('idle');
     setExtractedExpenses([]);
+    setEditingIndex(null);
+    setEditingExpense({ expense: '', amount: '' });
     resetTimer();
   };
 
   const handleConfirmAndSave = () => {
+    // Only pass checked expenses to parent component
+    const checkedExpenses = extractedExpenses
+      .filter((expense) => expense.checked)
+      .map((expense) => ({
+        expense: expense.expense,
+        amount: expense.amount,
+      }));
+
+    if (checkedExpenses.length === 0) {
+      Alert.alert('No Expenses Selected', 'Please select at least one expense to save.');
+      return;
+    }
+
+    onExpensesExtracted?.(checkedExpenses);
     bottomSheetModalRef.current?.dismiss();
     setTimeout(() => {
       handleRetry();
@@ -319,41 +426,139 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
     </View>
   );
 
-  const renderCompletedState = () => (
-    <View className="py-6">
-      <Text className="mb-4 px-6 text-lg text-gray-600">That's what we found :</Text>
+  const renderExpenseItem = (expense, index) => {
+    const isEditing = editingIndex === index;
 
-      <View className="px-6">
-        <View className="flex-row justify-between border-b border-gray-200 py-3">
-          <Text className="font-medium text-gray-600">Expense</Text>
-          <Text className="font-medium text-gray-600">Amount</Text>
+    if (isEditing) {
+      return (
+        <View key={expense.id} className="border-b border-gray-100 px-6 py-4">
+          <View className="flex-row items-center gap-4">
+            {/* Checkbox (disabled during editing) */}
+            <TouchableOpacity disabled className="opacity-50">
+              <View
+                className={`h-6 w-6 rounded border-2 ${expense.checked ? 'border-blue-500 bg-blue-500' : 'border-gray-300'} items-center justify-center`}>
+                {expense.checked && <Ionicons name="checkmark" size={16} color="white" />}
+              </View>
+            </TouchableOpacity>
+
+            {/* Edit inputs */}
+            <View className="flex-1 gap-2">
+              <TextInput
+                value={editingExpense.expense}
+                onChangeText={(text) => setEditingExpense((prev) => ({ ...prev, expense: text }))}
+                className="rounded border border-gray-300 px-3 py-2 text-gray-800"
+                placeholder="Expense name"
+              />
+              <TextInput
+                value={editingExpense.amount}
+                onChangeText={(text) => setEditingExpense((prev) => ({ ...prev, amount: text }))}
+                className="rounded border border-gray-300 px-3 py-2 text-gray-800"
+                placeholder="Amount"
+                keyboardType="numeric"
+              />
+            </View>
+
+            {/* Save/Cancel buttons */}
+            <View className="flex-row gap-2">
+              <TouchableOpacity
+                onPress={handleSaveEdit}
+                className="rounded-full bg-green-500 p-2"
+                activeOpacity={0.8}>
+                <Ionicons name="checkmark" size={16} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleCancelEdit}
+                className="rounded-full bg-gray-500 p-2"
+                activeOpacity={0.8}>
+                <Ionicons name="close" size={16} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <View
+        key={expense.id}
+        className="flex-row items-center justify-between border-b border-gray-100 px-6 py-4">
+        {/* Checkbox */}
+        <TouchableOpacity
+          onPress={() => handleCheckboxToggle(expense.id)}
+          className="mr-3"
+          activeOpacity={0.8}>
+          <View
+            className={`h-6 w-6 rounded border-2 ${expense.checked ? 'border-blue-500 bg-blue-500' : 'border-gray-300'} items-center justify-center`}>
+            {expense.checked && <Ionicons name="checkmark" size={16} color="white" />}
+          </View>
+        </TouchableOpacity>
+
+        {/* Expense details */}
+        <View className="flex-1">
+          <Text className={`font-medium ${expense.checked ? 'text-gray-800' : 'text-gray-400'}`}>
+            {expense.expense}
+          </Text>
+          <Text className={`${expense.checked ? 'text-gray-600' : 'text-gray-400'}`}>
+            {expense.amount}
+          </Text>
         </View>
 
-        {extractedExpenses.map((expense, index) => (
-          <View key={index} className="flex-row justify-between border-b border-gray-100 py-4">
-            <Text className="font-medium text-gray-800">{expense.expense}</Text>
-            <Text className="text-gray-800">{expense.amount}</Text>
+        {/* Action buttons */}
+        <View className="ml-3 flex-row gap-2">
+          <TouchableOpacity
+            onPress={() => handleEditExpense(index)}
+            className="rounded-full bg-blue-500 p-2"
+            activeOpacity={0.8}>
+            <Ionicons name="create-outline" size={16} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleDeleteExpense(expense.id)}
+            className="rounded-full bg-red-500 p-2"
+            activeOpacity={0.8}>
+            <Ionicons name="trash-outline" size={16} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  const renderCompletedState = () => {
+    const checkedCount = extractedExpenses.filter((expense) => expense.checked).length;
+
+    return (
+      <View className="flex-1 py-6">
+        <View className="mb-4 flex-row items-center justify-between px-6">
+          <Text className="text-lg text-gray-600">That's what we found:</Text>
+          <Text className="text-sm text-gray-500">{checkedCount} selected</Text>
+        </View>
+
+        <View className="flex-1">
+          <View className="flex-row justify-between border-b border-gray-200 px-6 py-3">
+            <Text className="font-medium text-gray-600">Expense</Text>
+            <Text className="font-medium text-gray-600">Actions</Text>
           </View>
-        ))}
-      </View>
 
-      <View className="mt-8 flex-row gap-2 px-6">
-        <TouchableOpacity
-          onPress={handleRetry}
-          className="flex-1 items-center rounded-lg border border-red-400 py-4"
-          activeOpacity={0.8}>
-          <Text className="font-medium text-red-500">🔄 Retry</Text>
-        </TouchableOpacity>
+          {extractedExpenses.map((expense, index) => renderExpenseItem(expense, index))}
+        </View>
 
-        <TouchableOpacity
-          onPress={handleConfirmAndSave}
-          className="flex-1 items-center rounded-lg bg-blue-500 py-4"
-          activeOpacity={0.8}>
-          <Text className="font-medium text-white">Confirm & save</Text>
-        </TouchableOpacity>
+        <View className="mt-8 flex-row gap-2 px-6">
+          <TouchableOpacity
+            onPress={handleRetry}
+            className="flex-1 items-center rounded-lg border border-red-400 py-4"
+            activeOpacity={0.8}>
+            <Text className="font-medium text-red-500">🔄 Retry</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleConfirmAndSave}
+            className="flex-1 items-center rounded-lg bg-blue-500 py-4"
+            activeOpacity={0.8}>
+            <Text className="font-medium text-white">Confirm & save ({checkedCount})</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const renderContent = () => {
     switch (recordingState) {
