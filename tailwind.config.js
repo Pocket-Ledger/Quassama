@@ -5,9 +5,14 @@ module.exports = {
   // NOTE: Update this to include the paths to all of your component files.
   content: ['./App.js', './components/**/*.{js,jsx,ts,tsx}', 'screens/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
+  darkMode: 'class', // or 'media' or 'class'
   theme: {
     extend: {
       colors: {
+        background: {
+          light: '#F9FAFB',
+          dark: '#121212',
+        },
         green: {
           DEFAULT: '#34C759',
           500: '#34C759',
@@ -45,6 +50,9 @@ module.exports = {
           primary: 'rgba(0, 0, 0, 1)',
           secondary: 'rgba(0, 0, 0, 0.7)',
           disabled: 'rgba(0, 0, 0, 0.38)',
+          primaryDark: 'rgba(255, 255, 255, 1)',
+          secondaryDark: 'rgba(255, 255, 255, 0.7)',
+          disabledDark: 'rgba(255, 255, 255, 0.38)',
         },
         border: {
           light: 'rgba(0, 0, 0, 0.2)',

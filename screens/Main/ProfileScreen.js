@@ -10,18 +10,18 @@ import { useAlert } from 'hooks/useAlert';
 import CustomAlert from 'components/CustomALert';
 import { useTranslation } from 'react-i18next';
 import deleteAccount from 'utils/deleteAccount';
+import { colorScheme } from "nativewind";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const { t, i18n } = useTranslation();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  console.log('User', user);
+    const [currentTheme, setCurrentTheme] = useState("light");
 
   // Add custom alert hook
   const { alertConfig, showSuccess, showError, hideAlert } = useAlert();
@@ -32,6 +32,7 @@ const ProfileScreen = () => {
       try {
         const userDetails = await User.getUserDetails();
         setUser(userDetails);
+        console.log(currentTheme);
       } catch (error) {
         console.error(error);
       } finally {
@@ -63,6 +64,14 @@ const ProfileScreen = () => {
     }
   };
 
+  const toggleTheme = () => {
+    const newTheme = currentTheme === "light" ? "dark" : "light";
+    setCurrentTheme(newTheme);
+    colorScheme.set(newTheme);
+    console.log("Theme changed to:", newTheme);
+  };
+ 
+
   const menuItems = [
     {
       id: 'profile',
@@ -87,14 +96,14 @@ const ProfileScreen = () => {
       rightText: getCurrentLanguageDisplayName(),
       action: () => navigation.navigate('Languages'),
     },
-    /*  {
+    {
       id: 'darkmode',
       title: t('profile.darkMode'),
       icon: 'moon',
       hasSwitch: true,
-      switchValue: isDarkMode,
-      onSwitchChange: setIsDarkMode,
-    }, */
+      switchValue: currentTheme === 'dark',
+      onSwitchChange: toggleTheme,
+    },
   ];
 
   const handleLogoutPress = () => {
