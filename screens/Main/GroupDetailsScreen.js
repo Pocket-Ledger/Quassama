@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  useColorScheme,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -52,6 +53,7 @@ const GroupDetailsScreen = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   // Use the alert hook
   const { alertConfig, hideAlert, showSuccess, showError, showConfirm } = useAlert();
+  const colorSchema = useColorScheme();
 
   console.log('groupData', groupData);
 
@@ -234,9 +236,9 @@ const GroupDetailsScreen = () => {
 
   if (loading || !groupData) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-white">
+      <SafeAreaView className="flex-1 items-center justify-center bg-white dark:bg-slate-800">
         <ActivityIndicator size="large" color="#2979FF" />
-        <Text className="mt-4">{t('common.loading')}</Text>
+        <Text className="mt-4 dark:text-gray-300">{t('common.loading')}</Text>
       </SafeAreaView>
     );
   }
@@ -341,7 +343,7 @@ const GroupDetailsScreen = () => {
   const isGroupCreator = groupData && groupData.created_by === currentUserId;
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800">
       <View className="container">
         <Header
           title={name}
@@ -356,12 +358,12 @@ const GroupDetailsScreen = () => {
 
                 {/* Options Menu */}
                 {showOptionsMenu && (
-                  <View className="absolute right-0 top-12 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg">
+                  <View className="absolute right-0 top-12 z-10 w-48 rounded-lg border border-gray-200 bg-white dark:bg-slate-700 shadow-lg">
                     <TouchableOpacity
                       onPress={handleEditGroup}
                       className="flex-row items-center border-b border-gray-100 px-4 py-3">
                       <Feather name="settings" size={18} color="#374151" />
-                      <Text className="ml-3 font-dmsans-medium text-base text-gray-700">
+                      <Text className="ml-3 font-dmsans-medium text-base text-gray-700 dark:text-gray-300">
                         {t('groupDetails.editGroup')}
                       </Text>
                     </TouchableOpacity>
@@ -397,26 +399,26 @@ const GroupDetailsScreen = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2979FF']} />
           }>
           {/* Group Summary Card */}
-          <View className="mb-6 rounded-xl border border-gray-100 bg-white p-6">
-            <Text className="text-center font-dmsans-medium text-base text-black/75">
+          <View className="mb-6 rounded-xl border border-gray-100 bg-white dark:bg-slate-700 p-6">
+            <Text className="text-center font-dmsans-medium text-base text-black/75 dark:text-gray-300">
               {t('groupDetails.totalGroupExpenses')}
             </Text>
-            <Text className="text-center font-dmsans-medium text-2xl text-black">
+            <Text className="text-center font-dmsans-medium text-2xl text-black dark:text-white">
               {t('common.currency')} {TotalExpenses}
             </Text>
 
             {members && members.length > 1 && (
               <View className="mt-6 flex-row justify-between ">
                 <View className="flex-1">
-                  <Text className="font-dmsans-medium text-sm text-black/75">
+                  <Text className="font-dmsans-medium text-sm text-black/75 dark:text-gray-300">
                     {t('groupDetails.youPaid')}
                   </Text>
-                  <Text className="font-dmsans-medium text-lg text-black">
+                  <Text className="font-dmsans-medium text-lg text-black dark:text-white">
                     {youPaid} {t('common.currency')}
                   </Text>
                 </View>
                 <View className="flex-1 items-end">
-                  <Text className="font-dmsans-medium text-sm text-black/75">
+                  <Text className="font-dmsans-medium text-sm text-black/75 dark:text-gray-300">
                     {t('groupDetails.youOwe')}
                   </Text>
                   <Text className="font-dmsans-medium text-lg text-red-500">
@@ -448,7 +450,7 @@ const GroupDetailsScreen = () => {
           {/* Members List with Horizontal Scroll */}
           {members && members.length > 1 && (
             <View className="mb-6">
-              <Text className="mb-3 text-lg font-medium text-black">Members</Text>
+              <Text className="mb-3 text-lg font-medium text-black dark:text-gray-300">Members</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -479,7 +481,7 @@ const GroupDetailsScreen = () => {
                               ? 'text-green-500'
                               : memberBalance < 0
                                 ? 'text-red-500'
-                                : 'text-gray-500'
+                                : 'text-gray-500 dark:text-gray-300'
                           }`}>
                           {formattedBalance} {t('common.currency')}
                         </Text>
@@ -492,7 +494,7 @@ const GroupDetailsScreen = () => {
 
           {/* Recently Expenses Header */}
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-medium text-black">
+            <Text className="text-lg font-medium text-black dark:text-gray-300">
               {t('groupDetails.recentExpenses')}
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('AllExpenses', { groupId })}>
@@ -532,10 +534,10 @@ const GroupDetailsScreen = () => {
             ) : (
               <View className="items-center justify-center py-8">
                 <Feather name="receipt" size={48} color="#D1D5DB" />
-                <Text className="mt-4 text-center text-base text-gray-500">
+                <Text className="mt-4 text-center text-base text-gray-500 dark:text-gray-300">
                   {t('groupDetails.noRecentExpenses')}
                 </Text>
-                <Text className="mt-2 text-center text-sm text-gray-400">
+                <Text className="mt-2 text-center text-sm text-gray-400 dark:text-gray-500">
                   {t('groupDetails.addFirstExpense')}
                 </Text>
               </View>

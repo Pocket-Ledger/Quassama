@@ -13,7 +13,7 @@ const Header = ({ title, showIcon = false, route, rightIcon }) => {
       }`}>
       <View className="flex-row items-center gap-2 ml-2">
         <BackButton />
-        <Text className="text-xl text-black font-dmsans-bold">{title}</Text>
+        <Text className="text-xl text-black font-dmsans-bold dark:text-white">{title}</Text>
       </View>
 
       {/* Right side content */}

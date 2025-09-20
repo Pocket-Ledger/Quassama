@@ -5,12 +5,12 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 const GroupItem = ({ group, onPress, onStarPress }) => {
   return (
     <TouchableOpacity
-      className="mb-4 h-[123px] flex-row items-center justify-between rounded-xl border border-gray-100 bg-white p-4 "
+      className="mb-4 h-[123px] flex-row items-center justify-between rounded-xl border border-gray-100 bg-white p-4 dark:bg-slate-700 dark:border-gray-400"
       onPress={() => onPress(group)}>
       <View className="flex-row items-center flex-1">
         {/* Group Members */}
         <View className="justify-between flex-1 h-full">
-          <Text className="text-[20px] font-medium text-black">
+          <Text className="text-[20px] font-medium text-black dark:text-white">
             {group.name || 'Unnamed Group'}
           </Text>
 
@@ -21,7 +21,7 @@ const GroupItem = ({ group, onPress, onStarPress }) => {
               .map((member, index) => (
                 <View
                   key={index}
-                  className={`h-10 w-10 items-center justify-center rounded-full border-2 border-white ${
+                  className={`h-10 w-10 items-center justify-center rounded-full border-2 border-white dark:border-gray-400 ${
                     index > 0 ? '-ml-2' : ''
                   }`}
                   style={{ backgroundColor: member.color }}>

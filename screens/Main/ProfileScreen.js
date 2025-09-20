@@ -164,7 +164,7 @@ const ProfileScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800">
       <ScrollView
         className="container"
         showsVerticalScrollIndicator={false}
@@ -190,10 +190,10 @@ const ProfileScreen = () => {
             </>
           ) : (
             <>
-              <Text className="mb-2 font-dmsans-bold text-xl text-black">
+              <Text className="mb-2 font-dmsans-bold text-xl text-black dark:text-white">
                 {userProfile.username}
               </Text>
-              <Text className="text-base font-normal text-gray-500">{userProfile.email}</Text>
+              <Text className="text-base font-normal text-gray-500 dark:text-gray-400">{userProfile.email}</Text>
             </>
           )}
         </View>
@@ -203,17 +203,17 @@ const ProfileScreen = () => {
           {menuItems.map((item) => (
             <TouchableOpacity
               key={item.id}
-              className="mb-1 flex-row items-center justify-between border-b border-gray-250 py-4"
+              className="mb-1 flex-row items-center justify-between border-b border-gray-250 py-4 dark:border-gray-500"
               onPress={item.action}
               disabled={item.hasSwitch}>
               <View className="flex-row items-center">
                 {/* Icon */}
-                <View className="mr-4 h-10 w-10 items-center justify-center bg-gray-100 rounded-full">
+                <View className="mr-4 h-10 w-10 items-center justify-center bg-gray-100 rounded-full dark:bg-gray-700">
                   <Feather name={item.icon} size={20} color="#666" />
                 </View>
 
                 {/* Title */}
-                <Text className="text-lg font-normal text-black">{item.title}</Text>
+                <Text className="text-lg font-normal text-black dark:text-white">{item.title}</Text>
               </View>
 
               {/* Right Side Content */}
@@ -223,7 +223,7 @@ const ProfileScreen = () => {
 
                 {/* Right Text */}
                 {item.rightText && (
-                  <Text className="mr-2 text-base text-gray-500">{item.rightText}</Text>
+                  <Text className="mr-2 text-base text-gray-500 dark:text-white">{item.rightText}</Text>
                 )}
 
                 {/* Switch */}

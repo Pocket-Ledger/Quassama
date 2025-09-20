@@ -68,7 +68,7 @@ const LoadingScreen = () => {
   const { t } = useTranslation();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800">
       <ScrollView
         className="container"
         showsVerticalScrollIndicator={false}
@@ -156,18 +156,18 @@ const ProfileDetailsScreen = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800">
       <ScrollView
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <Header title={t('profile.title')} />
-        <Text className="text-sm font-normal">{t('profileDetails.subtitle')}</Text>
+        <Text className="text-sm font-normal dark:text-gray-50">{t('profileDetails.subtitle')}</Text>
         <View className="relative pt-4">
           <View className="form-container gap-4">
             <View className="gap-4">
               <View className="input-group">
-                <Text className="input-label">{t('profileDetails.name')}</Text>
+                <Text className="input-label dark:text-white">{t('profileDetails.name')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="person-outline"
@@ -200,7 +200,7 @@ const ProfileDetailsScreen = () => {
               </View>
 
               <View className="input-group">
-                <Text className="input-label">{t('profileDetails.email')}</Text>
+                <Text className="input-label dark:text-white">{t('profileDetails.email')}</Text>
                 <View className="input-container">
                   <Ionicons
                     name="mail-outline"
@@ -225,7 +225,7 @@ const ProfileDetailsScreen = () => {
                     autoCorrect={false}
                   />
                 </View>
-                <Text className="text-xs text-gray-500 mt-1">{t('profileDetails.emailNotEditable', 'Email cannot be changed')}</Text>
+                <Text className="text-xs text-gray-500 mt-1 dark:text-white">{t('profileDetails.emailNotEditable', 'Email cannot be changed')}</Text>
               </View>
 
               <TouchableOpacity

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -35,20 +35,20 @@ const InvitationCard = ({ invitation, onAccept, onDecline }) => {
   }, [invitation.user_id, t]);
 
   return (
-    <View className="my-6 rounded-xl bg-blue-50 p-4">
+    <View className="my-6 rounded-xl bg-blue-50 p-4 dark:bg-slate-700">
       <View className="flex-row items-center">
         <View
           className="mr-3 h-12 w-12 items-center justify-center rounded-full"
           style={{ backgroundColor: '#E91E63' }}>
-          <Text className="font-dmsans-bold text-lg text-white">
+          <Text className="font-dmsans-bold text-lg text-white dark:text-gray-300">
             {inviterName[0]?.toUpperCase() || '?'}
           </Text>
         </View>
         <View className="flex-1">
-          <Text className="font-dmsans-bold text-base text-black">
+          <Text className="font-dmsans-bold text-base text-black dark:text-white">
             {t('invitations.join', { groupName: invitation.group_name })}
           </Text>
-          <Text className="text-sm text-gray-500">
+          <Text className="text-sm text-gray-500 dark:text-gray-300">
             {t('invitations.invitedBy', { name: inviterName })}
           </Text>
         </View>
@@ -84,6 +84,7 @@ const GroupsScreen = () => {
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const [groupTotal, setGroupTotal] = useState(0);
   const [favoriteGroupIds, setFavoriteGroupIds] = useState([]);
+  const colorScheme = useColorScheme();
 
   const user = auth.currentUser.uid;
 
@@ -266,7 +267,7 @@ const GroupsScreen = () => {
   const sortedGroups = [...favoriteGroups, ...nonFavoriteGroups];
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800" edges={['top', 'left', 'right']}>
       <View className="container">
         {/* Header */}
         <Header title={t('group.title')} showIcon={true} route="AddNewGroup" />
@@ -300,9 +301,9 @@ const GroupsScreen = () => {
             // Loading skeleton
             <View className="px-4">
               {[1, 2, 3].map((item) => (
-                <View key={item} className="mb-4 rounded-xl bg-gray-100 p-4">
-                  <View className="mb-2 h-4 w-3/4 rounded bg-gray-200" />
-                  <View className="h-3 w-1/2 rounded bg-gray-200" />
+                <View key={item} className="mb-4 rounded-xl bg-gray-100 p-4 dark:bg-slate-700">
+                  <View className="mb-2 h-4 w-3/4 rounded bg-gray-200 dark:bg-slate-600" />
+                  <View className="h-3 w-1/2 rounded bg-gray-200 dark:bg-slate-600" />
                 </View>
               ))}
             </View>
@@ -312,9 +313,10 @@ const GroupsScreen = () => {
               <View className="mb-4">
                 <TextInput
                   placeholder={t('group.search')}
-                  className="input-field pl-4 "
+                  className="input-field pl-4 dark:bg-slate-700"
                   value={searchQuery}
                   onChangeText={handleSearch}
+                  placeholderTextColor={colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.3)'}
                 />
               </View>
               <GroupsList
@@ -338,12 +340,12 @@ const GroupsScreen = () => {
               <View className="mb-4 items-center justify-center">
                 <Ionicons name="people" size={70} color="#2979FF" />
               </View>
-              <Text className="mb-2 font-dmsans-bold text-[24px] ">{t('group.noGroupsYet')}</Text>
-              <Text className="mb-6 text-center text-gray-500">{t('group.startByCreating')}</Text>
+              <Text className="mb-2 font-dmsans-bold text-[24px] dark:text-white">{t('group.noGroupsYet')}</Text>
+              <Text className="mb-6 text-center text-gray-500 dark:text-gray-300">{t('group.startByCreating')}</Text>
               <TouchableOpacity
                 className="rounded-lg bg-primary px-6 py-3"
                 onPress={() => navigation.navigate('AddNewGroup')}>
-                <Text className="font-semibold text-white">{t('group.createFirstGroup')}</Text>
+                <Text className="font-semibold text-white dark:text-gray-300">{t('group.createFirstGroup')}</Text>
               </TouchableOpacity>
             </View>
           )}

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigationType } from 'hooks/useNavigationType';
 
 export function CustomTabBar({ state, descriptors, navigation }) {
   const insets = useSafeAreaInsets();
   const { isGestureNavigation } = useNavigationType();
+  const colorScheme = useColorScheme();
 
   // Dynamic padding based on navigation type
   const bottomPadding = isGestureNavigation
@@ -15,7 +16,7 @@ export function CustomTabBar({ state, descriptors, navigation }) {
 
   return (
     <View
-      className="flex-row justify-between border-t border-gray-200 bg-white px-4 shadow-sm"
+      className="flex-row justify-between border-t border-gray-200 bg-white dark:bg-slate-800 dark:border-gray-600 px-4 shadow-sm"
       style={{
         paddingTop: 8,
         paddingBottom: bottomPadding,
@@ -60,7 +61,7 @@ export function CustomTabBar({ state, descriptors, navigation }) {
             onPress={onPress}
             activeOpacity={0.7}>
             <View className="relative mb-1">
-              <Ionicons name={getIcon()} size={24} color={isFocused ? '#2979FF' : '#00000040'} />
+              <Ionicons name={getIcon()} size={24} color={isFocused ? '#2979FF': colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.8)'  : 'rgba(0, 0, 0, 0.25)'} />
               {/* {route.name === 'Profile' && (
                 <View className="absolute -right-2 -top-1.5 h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
                   <Text className="text-xs text-white font-dmsans-bold">1</Text>
@@ -68,7 +69,7 @@ export function CustomTabBar({ state, descriptors, navigation }) {
               )} */}
             </View>
             <Text
-              className={`font-dmsans-bold text-xs ${isFocused ? ' text-blue-500' : ' text-gray-250'}`}>
+              className={`font-dmsans-bold text-xs ${isFocused ? ' text-blue-500' : ' text-gray-250 dark:text-gray-50'}`}>
               {label}
             </Text>
           </TouchableOpacity>

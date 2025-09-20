@@ -74,11 +74,11 @@ const ExpenseListItem = ({
         {/* Expense Details */}
         <View className="flex-1">
           <Text
-            className={`font-dmsans-medium text-base text-black  ${customStyle.nameText || ''}`}
+            className={`font-dmsans-medium text-base text-black dark:text-white ${customStyle.nameText || ''}`}
             numberOfLines={1}>
             {name}
           </Text>
-          <Text className={`text-sm text-gray-500 ${customStyle.timeText || ''}`} numberOfLines={1}>
+          <Text className={`text-sm text-gray-500 dark:text-gray-400 ${customStyle.timeText || ''}`} numberOfLines={1}>
             {time}
           </Text>
         </View>
@@ -86,11 +86,11 @@ const ExpenseListItem = ({
 
       {/* Right side - Amount and Paid By */}
       <View className="items-end">
-        <Text className={`font-dmsans-medium text-base text-black ${customStyle.amountText || ''}`}>
+        <Text className={`font-dmsans-medium text-base text-black dark:text-white ${customStyle.amountText || ''}`}>
           {amount} {getDisplayCurrency()}
         </Text>
         <Text
-          className={`font-dmsans-medium text-sm text-gray-500 ${customStyle.paidByText || ''}`}
+          className={`font-dmsans-medium text-sm text-gray-500 dark:text-gray-400 ${customStyle.paidByText || ''}`}
           numberOfLines={1}>
           {getPaidByText()}
         </Text>

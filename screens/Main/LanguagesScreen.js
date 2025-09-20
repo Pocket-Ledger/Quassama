@@ -87,13 +87,13 @@ const LanguagesScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800">
       <ScrollView
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <Header title={t('languages.title')} />
-        <Text className="text-sm font-normal">{t('languages.subtitle')}</Text>
+        <Text className="text-sm font-normal dark:text-white">{t('languages.subtitle')}</Text>
         <View className="relative pt-4">
           <View className="form-container">
             {/* Language Options */}
@@ -101,22 +101,22 @@ const LanguagesScreen = () => {
               {languages.map((language) => (
                 <TouchableOpacity
                   key={language.code}
-                  className={`mb-2 flex-row items-center justify-between rounded-lg border p-4 ${
+                  className={`mb-2 flex-row items-center justify-between rounded-lg border dark:border-gray-700 p-4 ${
                     selectedLanguage === language.code
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 bg-white'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-slate-700'
+                      : 'border-gray-200 bg-white dark:bg-slate-700'
                   }`}
                   onPress={() => handleLanguageSelect(language)}>
                   <View className="flex-row items-center">
-                    <Text className="mr-3 text-2xl">{language.flag}</Text>
+                    <Text className="mr-3 text-2xl dark:text-white">{language.flag}</Text>
                     <View>
                       <Text
                         className={`text-lg font-medium ${
-                          selectedLanguage === language.code ? 'text-blue-600' : 'text-black'
+                          selectedLanguage === language.code ? 'text-blue-600' : 'text-black dark:text-white'
                         }`}>
                         {language.name}
                       </Text>
-                      <Text className="text-sm text-gray-500">{language.nativeName}</Text>
+                      <Text className="text-sm text-gray-500 dark:text-white">{language.nativeName}</Text>
                     </View>
                   </View>
 

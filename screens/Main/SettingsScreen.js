@@ -44,13 +44,13 @@ const SettingsScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800">
       <ScrollView
         className="container"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}>
         <Header title={t('settings.title')} />
-        <Text className="text-sm font-normal">{t('settings.subtitle')}</Text>
+        <Text className="text-sm font-normal dark:text-white">{t('settings.subtitle')}</Text>
         <View className="relative pt-4">
           <View className="form-container">
             {/* Notifications Setting */}
@@ -59,7 +59,7 @@ const SettingsScreen = () => {
                 <View className="h-10 w-10 items-center justify-center ">
                   <Ionicons name="notifications-outline" size={20} color="#666" />
                 </View>
-                <Text className="text-lg font-normal text-black">
+                <Text className="text-lg font-normal text-black dark:text-white">
                   {t('settings.notifications')}
                 </Text>
               </View>
@@ -74,10 +74,10 @@ const SettingsScreen = () => {
 
             {/* Currency Setting */}
             <View className="mb-6">
-              <Text className="input-label mb-2">{t('settings.currency')}</Text>
+              <Text className="input-label mb-2 dark:text-white">{t('settings.currency')}</Text>
               <View className="input-container">
                 <TouchableOpacity
-                  className="h-14 w-full flex-row items-center justify-between rounded-input border border-border-light bg-gray-100 px-4"
+                  className="h-14 w-full flex-row items-center justify-between rounded-input border border-border-light bg-gray-100 px-4 dark:bg-slate-700"
                   disabled={true}>
                   <Text className="text-base text-gray-400">{selectedCurrency}</Text>
                   <Ionicons
@@ -86,7 +86,7 @@ const SettingsScreen = () => {
                     color="#ccc"
                   />
                 </TouchableOpacity>
-              <Text className="text-xs text-gray-500 mt-2">This feature is coming soon</Text>
+              <Text className="text-xs text-gray-500 mt-2 dark:text-white">This feature is coming soon</Text>
 
                 {/* Currency Dropdown - Commented out since feature is disabled */}
                 {/* {showCurrencyDropdown && (
