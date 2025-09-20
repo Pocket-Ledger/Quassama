@@ -28,11 +28,11 @@ const SwitchGroupModal = ({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View className="flex-1 items-center justify-center bg-black/50">
-        <View className="max-h-[70%] min-w-[280px] max-w-[90%] rounded-xl bg-white p-5 shadow-lg">
+        <View className="max-h-[70%] min-w-[280px] max-w-[90%] rounded-xl bg-white p-5 shadow-lg dark:bg-slate-800">
           {/* Header */}
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="font-dmsans-bold text-lg text-gray-800">{modalTitle}</Text>
-            <Pressable onPress={onClose} className="rounded p-1 active:bg-gray-100">
+            <Text className="font-dmsans-bold text-lg text-gray-800 dark:text-white">{modalTitle}</Text>
+            <Pressable onPress={onClose} className="rounded p-1 active:bg-gray-100 dark:active:bg-gray-300">
               <Feather name="x" size={20} color="#666" />
             </Pressable>
           </View>
@@ -49,7 +49,7 @@ const SwitchGroupModal = ({
             {groups.length === 0 ? (
               <View className="items-center py-5">
                 <Feather name="users" size={32} color="#ccc" />
-                <Text className="mt-2 text-sm text-gray-400">{t('group.noGroupsAvailable')}</Text>
+                <Text className="mt-2 text-sm text-gray-400 dark:text-gray-300">{t('group.noGroupsAvailable')}</Text>
               </View>
             ) : (
               groups.map((group) => (
@@ -58,8 +58,8 @@ const SwitchGroupModal = ({
                   onPress={() => handleGroupSelection(group.id, group.name)}
                   className={`mb-1 rounded-lg px-3 py-3 ${
                     selectedGroupId === group.id
-                      ? 'border border-primary bg-blue-50'
-                      : 'active:bg-gray-50'
+                      ? 'border border-primary bg-blue-50 dark:bg-blue-900'
+                      : 'active:bg-gray-50 dark:active:bg-gray-300'
                   }`}>
                   <View className="flex-row items-center justify-between">
                     <View className="flex-1">
@@ -67,12 +67,12 @@ const SwitchGroupModal = ({
                         className={`text-base ${
                           selectedGroupId === group.id
                             ? 'font-semibold text-primary'
-                            : 'font-normal text-gray-800'
+                            : 'font-normal text-gray-800 dark:text-gray-300'
                         }`}>
                         {group.name}
                       </Text>
                       {group.memberCount && (
-                        <Text className="mt-0.5 text-xs text-gray-500">
+                        <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                           {t('group.memberCount', { count: group.memberCount })}
                         </Text>
                       )}
@@ -89,13 +89,13 @@ const SwitchGroupModal = ({
           {/* Create New Group Option */}
           {showCreateNewOption && onCreateNew && (
             <>
-              <View className="my-3 h-px bg-gray-200" />
+              <View className="my-3 h-px bg-gray-200 dark:bg-gray-600" />
               <Pressable
                 onPress={() => {
                   onCreateNew();
                   onClose();
                 }}
-                className="flex-row items-center rounded-lg px-3 py-3 active:bg-gray-50">
+                className="flex-row items-center rounded-lg px-3 py-3 active:bg-gray-50 dark:active:bg-gray-300">
                 <Feather name="plus" size={16} color="#2979FF" className="mr-2" />
                 <Text className="ml-2 text-base font-medium text-primary">
                   {t('group.createNewGroup')}
@@ -105,11 +105,11 @@ const SwitchGroupModal = ({
           )}
 
           {/* Cancel Button */}
-          <View className="my-3 h-px bg-gray-200" />
-          <Pressable onPress={onClose} className="items-center rounded-lg py-3 active:bg-red-50">
+          <View className="my-3 h-px bg-gray-200 dark:bg-gray-600" />
+          <Pressable onPress={onClose} className="items-center rounded-lg py-3 active:bg-red-50 dark:active:bg-red-900">
             <Text className="text-base font-medium text-red-500">{t('common.cancel')}</Text>
           </Pressable>
-        </View>
+        </View>bg-white
       </View>
     </Modal>
   );
