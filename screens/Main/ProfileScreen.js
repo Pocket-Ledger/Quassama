@@ -234,6 +234,7 @@ const ProfileScreen = () => {
                     trackColor={{ false: '#E5E5E5', true: '#2979FF' }}
                     thumbColor={item.switchValue ? '#ffffff' : '#ffffff'}
                     ios_backgroundColor="#E5E5E5"
+                    disabled={false}
                   />
                 )}
 

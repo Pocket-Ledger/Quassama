@@ -438,7 +438,7 @@ const AllExpensesScreen = () => {
   };
 
   return (
-    <SafeAreaView className="container flex-1 bg-white">
+    <SafeAreaView className="container flex-1 bg-white dark:bg-slate-800">
       <Header title={t('expense.title')} />
       <View className="mb-4">
         <SearchBar

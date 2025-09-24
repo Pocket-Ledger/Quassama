@@ -1,10 +1,13 @@
 {
   "expo": {
-    "name": "quassama",
+    "name": "Quassama",
     "slug": "quassama",
     "version": "1.0.2",
     "scheme": "quassama",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "web": {
       "favicon": "./assets/logo.png"
     },
@@ -25,24 +28,32 @@
           "iosDisplayInForeground": true
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-apple-authentication"
     ],
     "orientation": "portrait",
     "icon": "./assets/logo.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.quassama.app",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"],
-        "NSMicrophoneUsageDescription": "This app needs access to microphone to record expense notes."
-      }
+        "UIBackgroundModes": [
+          "remote-notification",
+          "remote-notification"
+        ],
+        "NSMicrophoneUsageDescription": "This app needs access to microphone to record expense notes.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "com.quassama.app",
@@ -58,7 +69,9 @@
         "RECORD_AUDIO",
         "WRITE_EXTERNAL_STORAGE",
         "READ_EXTERNAL_STORAGE",
-        "MODIFY_AUDIO_SETTINGS"
+        "MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "useNextNotificationsApi": true
     },

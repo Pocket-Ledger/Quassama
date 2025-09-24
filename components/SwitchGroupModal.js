@@ -109,7 +109,7 @@ const SwitchGroupModal = ({
           <Pressable onPress={onClose} className="items-center rounded-lg py-3 active:bg-red-50 dark:active:bg-red-900">
             <Text className="text-base font-medium text-red-500">{t('common.cancel')}</Text>
           </Pressable>
-        </View>bg-white
+        </View>
       </View>
     </Modal>
   );

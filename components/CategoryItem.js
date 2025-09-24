@@ -61,7 +61,7 @@ const CategoryItem = ({
     switch (variant) {
       case 'list':
         return {
-          container: 'flex-row items-center p-3 border-b border-gray-100',
+          container: 'flex-row items-center p-3 border-b border-gray-100 dark:border-gray-600',
           iconContainer: `${currentSize.iconContainer} mr-3`,
           textContainer: 'flex-1',
           textStyle: `${currentSize.textSize} font-medium`,
@@ -88,23 +88,23 @@ const CategoryItem = ({
 
   const styles = getVariantStyles();
 
-  // Background and text colors based on selection state
-  const getColors = () => {
+  // Background and text colors based on selection state with dark mode support
+  const getColorClasses = () => {
     if (isSelected) {
       return {
-        backgroundColor: `${color}`, // 20% opacity
+        backgroundColor: 'bg-blue-500 dark:bg-blue-600',
         iconColor: '#fff',
-        textColor: '#000',
+        textColor: 'text-gray-900 dark:text-gray-100',
       };
     }
     return {
-      backgroundColor: `#E6F0FF`, // Light gray background
-      iconColor: `${color}`,
-      textColor: '#000',
+      backgroundColor: 'bg-blue-50 dark:bg-gray-700',
+      iconColor: color,
+      textColor: 'text-gray-900 dark:text-white/70',
     };
   };
 
-  const colors = getColors();
+  const colorClasses = getColorClasses();
 
   const handlePress = () => {
     if (onPress) {
@@ -118,20 +118,18 @@ const CategoryItem = ({
       onPress={handlePress}
       activeOpacity={0.7}>
       <View
-        className={`${styles.iconContainer} items-center justify-center rounded-full`}
+        className={`${styles.iconContainer} items-center justify-center rounded-full ${colorClasses.backgroundColor}`}
         style={{
-          backgroundColor: colors.backgroundColor,
           ...customStyle.iconContainer,
         }}>
-        <Feather name={icon} size={currentSize.iconSize} color={colors.iconColor} />
+        <Feather name={icon} size={currentSize.iconSize} color={colorClasses.iconColor} />
       </View>
 
       {showLabel && variant !== 'icon-only' && (
         <View className={styles.textContainer}>
           <Text
-            className={styles.textStyle}
+            className={`${styles.textStyle} ${colorClasses.textColor}`}
             style={{
-              color: colors.textColor,
               ...customStyle.text,
             }}
             numberOfLines={1}>

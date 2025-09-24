@@ -320,10 +320,10 @@ const SplitWithSection = ({
     <View className="input-group">
       {/* Split With Checkbox */}
       <View className="flex-row items-center justify-between mb-3">
-        <Text className="text-base font-medium text-black">
+        <Text className="text-base font-medium text-black dark:text-white/80">
           {t('expense.split.splitWith')}
           {isSplitEnabled && (
-            <Text className="text-sm font-normal text-gray-500">
+            <Text className="text-sm font-normal text-gray-500 dark:text-gray-50">
               {' '}
               ({Object.keys(splits).length} {t('expense.split.people')})
             </Text>
@@ -337,7 +337,7 @@ const SplitWithSection = ({
             {isSplitEnabled && <Feather name="check" size={14} color="white" />}
           </View>
           <Text
-            className={`text-sm text-gray-600 ${!totalAmount || parseFloat(totalAmount) <= 0 ? 'opacity-50' : ''}`}>
+            className={`text-sm text-gray-600 ${!totalAmount || parseFloat(totalAmount) <= 0 ? 'opacity-50' : ''} dark:text-gray-300`}>
             {t('expense.split.enableSplit')}
           </Text>
         </TouchableOpacity>
@@ -354,7 +354,6 @@ const SplitWithSection = ({
         animationType="slide"
         presentationStyle="pageSheet"
         onRequestClose={handleSplitSheetCancel}>
-        <SafeAreaView className="flex-1 bg-white">
           <View className="flex-1">
             {/* Header */}
             <View className="flex-row items-center justify-between px-4 py-4 border-b border-gray-200">
@@ -406,7 +405,6 @@ const SplitWithSection = ({
               </TouchableOpacity> */}
             </View>
           </View>
-        </SafeAreaView>
       </Modal>
 
       {/* Add Person Modal */}
@@ -415,7 +413,6 @@ const SplitWithSection = ({
         animationType="slide"
         presentationStyle="pageSheet"
         onRequestClose={() => setIsAddPersonModalVisible(false)}>
-        <SafeAreaView className="flex-1 bg-white">
           <View className="flex-1">
             <View className="flex-row items-center justify-between px-4 py-4 border-b border-gray-200">
               <TouchableOpacity onPress={() => setIsAddPersonModalVisible(false)}>
@@ -449,7 +446,6 @@ const SplitWithSection = ({
               />
             </View>
           </View>
-        </SafeAreaView>
       </Modal>
       <CustomAlert
         visible={alertConfig.visible}

@@ -354,7 +354,7 @@ const NewExpenseScreen = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white " edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-800" edges={['top', 'left', 'right']}>
       <View className="container">
         <Header title={t('expense.addExpense')} />
 
@@ -370,7 +370,7 @@ const NewExpenseScreen = () => {
             {/* Expense Name */}
             <View className="input-group">
               <View className="flex-row items-center justify-between">
-                <Text className="input-label text-base font-medium text-black">
+                <Text className="input-label text-base font-medium text-black dark:text-white">
                   {t('expense.expenseTitle')}
                 </Text>
                 <Text
@@ -401,7 +401,7 @@ const NewExpenseScreen = () => {
 
             {/* Amount */}
             <View className="input-group">
-              <Text className="input-label text-base font-medium text-black">
+              <Text className="input-label text-base font-medium text-black dark:text-white">
                 {t('expense.expenseAmount')}
               </Text>
               <View className="input-container relative">
@@ -437,7 +437,7 @@ const NewExpenseScreen = () => {
 
             {/* Group Selection */}
             <View className="input-group">
-              <Text className="input-label text-base font-medium text-black">
+              <Text className="input-label text-base font-medium text-black dark:text-white">
                 {t('group.selectGroup')}
               </Text>
               <TouchableOpacity
@@ -449,13 +449,13 @@ const NewExpenseScreen = () => {
                   <View className="flex-1">
                     {selectedGroupData ? (
                       <View className="flex flex-row justify-between pr-2">
-                        <Text className="text-base text-black">{selectedGroupData.name}</Text>
-                        <Text className="text-sm text-gray-500">
+                        <Text className="text-base text-black dark:text-white">{selectedGroupData.name}</Text>
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
                           {t('group.memberCount', { count: selectedGroupData.memberCount })}
                         </Text>
                       </View>
                     ) : (
-                      <Text className="text-base text-gray-400">{t('expense.selectGroup')}</Text>
+                      <Text className="text-base text-gray-400 dark:text-gray-500">{t('expense.selectGroup')}</Text>
                     )}
                   </View>
                   <Feather name="chevron-down" size={20} color="#666" />
@@ -483,7 +483,7 @@ const NewExpenseScreen = () => {
 
             {/* Category */}
             <View>
-              <Text className="input-label mb-3 text-base font-medium text-black">
+              <Text className="input-label mb-3 text-base font-medium text-black dark:text-white/80">
                 {t('expense.selectCategory')}
               </Text>
               
