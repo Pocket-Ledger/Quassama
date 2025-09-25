@@ -16,7 +16,7 @@ import transcribeAudio from '../../models/expens_Ai/transcribeAudio';
 import extractExpensesFromText from '../../models/expens_Ai/extractExpensesFromText';
 import ProcessExpenses from '../../models/expens_Ai/processExpenses';
 
-const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
+const VoiceRecordingBottomSheetWithExpoAudio = forwardRef(({ onExpensesExtracted }, ref) => {
   const [recordingState, setRecordingState] = useState('idle');
   const [seconds, setSeconds] = useState(0);
   const [extractedExpenses, setExtractedExpenses] = useState([]);
@@ -599,4 +599,4 @@ const VoiceRecordingBottomSheet = forwardRef(({ onExpensesExtracted }, ref) => {
   );
 });
 
-export default VoiceRecordingBottomSheet;
+export default VoiceRecordingBottomSheetWithExpoAudio;
