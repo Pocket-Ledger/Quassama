@@ -506,7 +506,7 @@ const AllExpensesScreen = () => {
         currency={t('common.currency')}
         resultCount={pagination.totalItems}
       />
-      <VoiceRecordingButton />
+      {/* <VoiceRecordingButton /> */}
     </SafeAreaView>
   );
 };
