@@ -47,7 +47,7 @@ const GroupItem = ({ group, onPress, onStarPress }) => {
       <View className="flex-col items-end justify-between h-full">
         <TouchableOpacity onPress={() => onStarPress(group.id)}>
           <AntDesign
-            name={group.isStarred ? 'star' : 'staro'}
+            name={group.isStarred ? 'star' : 'star'}
             size={20}
             color={group.isStarred ? '#FFCC00' : '#E5E5E5'}
           />

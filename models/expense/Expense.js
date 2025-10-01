@@ -620,67 +620,60 @@ class Expense {
   }
 
   // Calculate balances for each user in a group considering splits
+  // Balance = Actual Paid - Fair Share
+  // Positive balance = User is owed money (paid more than their share)
+  // Negative balance = User owes money (paid less than their share)
   static async calculateGroupBalances(groupId) {
     if (!groupId || typeof groupId !== 'string') {
       throw new Error('A valid groupId (string) is required');
     }
 
     const expenses = await this.getExpensesByGroup(groupId);
-    const group = await Group.getGroupById(groupId); // Get group info once
-    const balances = {}; // { userId: { paid: amount, owes: amount, balance: amount } }
+    const group = await Group.getGroupById(groupId);
+    const balances = {}; // { userId: { actualPaid: amount, fairShare: amount, balance: amount } }
 
     for (const expense of expenses) {
       const { user_id, amount, is_settlement, settlement_type, is_split, splits } = expense;
       
       // Initialize user balance if not exists
       if (!balances[user_id]) {
-        balances[user_id] = { paid: 0, owes: 0, balance: 0 };
+        balances[user_id] = { actualPaid: 0, fairShare: 0, balance: 0 };
       }
 
       if (is_settlement) {
-        // Handle settlement transactions
+        // Settlements directly adjust balances, not through paid/share system
+        // payment = payer transfers money, reducing their balance (they're settling what they owed)
+        // receipt = receiver gets money, reducing what they're owed
         if (settlement_type === 'payment') {
-          balances[user_id].paid += amount;
+          // Person who paid the settlement
+          balances[user_id].balance -= amount;
         } else if (settlement_type === 'receipt') {
-          balances[user_id].paid -= amount;
+          // Person who received the settlement
+          balances[user_id].balance += amount;
         }
       } else {
-        // Record who paid the expense
-        balances[user_id].paid += amount;
+        // Regular expense: record actual payment
+        balances[user_id].actualPaid += amount;
 
         if (is_split && splits && Object.keys(splits).length > 0) {
-          // For split expenses, assign debt to each participant including the payer
+          // For split expenses, each participant's fair share is explicitly defined
           console.log(`Processing split expense: ${expense.title || 'Unknown'}, splits:`, splits);
           
-          // Calculate total split amount to determine payer's share
-          let totalSplitAmount = 0;
-          Object.values(splits).forEach(splitInfo => {
-            totalSplitAmount += parseFloat(splitInfo.amount) || 0;
-          });
-          
-          // Assign split amounts to participants
           Object.values(splits).forEach(splitInfo => {
             const splitUserId = splitInfo.user_id || splitInfo.id;
             const splitAmount = parseFloat(splitInfo.amount) || 0;
             
             if (splitUserId && splitAmount > 0) {
               if (!balances[splitUserId]) {
-                balances[splitUserId] = { paid: 0, owes: 0, balance: 0 };
+                balances[splitUserId] = { actualPaid: 0, fairShare: 0, balance: 0 };
               }
-              balances[splitUserId].owes += splitAmount;
-              console.log(`User ${splitUserId} owes ${splitAmount} from split`);
+              balances[splitUserId].fairShare += splitAmount;
+              console.log(`User ${splitUserId}'s fair share: ${splitAmount}`);
             }
           });
-          
-          // The payer owes the remaining amount (total - total splits)
-          const payerShare = amount - totalSplitAmount;
-          if (payerShare > 0) {
-            balances[user_id].owes += payerShare;
-            console.log(`Payer ${user_id} owes ${payerShare} (their share of split expense)`);
-          }
         } else {
           // For non-split expenses, split equally among all group members
-          console.log(`Processing non-split expense: ${expense.title || 'Unknown'}, amount: ${amount}`);
+          console.log(`Processing equal-split expense: ${expense.title || 'Unknown'}, amount: ${amount}`);
           
           const members = group && group.members ? group.members : [];
           const memberCount = members.length;
@@ -693,23 +686,25 @@ class Expense {
               const memberId = typeof member === 'string' ? member : (member.id || member.user_id);
               if (memberId) {
                 if (!balances[memberId]) {
-                  balances[memberId] = { paid: 0, owes: 0, balance: 0 };
+                  balances[memberId] = { actualPaid: 0, fairShare: 0, balance: 0 };
                 }
-                balances[memberId].owes += sharePerMember;
-                console.log(`User ${memberId} owes ${sharePerMember} from equal split`);
+                balances[memberId].fairShare += sharePerMember;
+                console.log(`User ${memberId}'s fair share: ${sharePerMember}`);
               }
             });
           } else {
             // Fallback: if no group members found, assign to payer
-            balances[user_id].owes += amount;
+            balances[user_id].fairShare += amount;
           }
         }
       }
     }
 
-    // Calculate final balance for each user (positive = owed money, negative = owes money)
+    // Calculate final balance for each user
+    // Balance = Actual Paid - Fair Share
     Object.keys(balances).forEach(userId => {
-      balances[userId].balance = balances[userId].paid - balances[userId].owes;
+      balances[userId].balance = balances[userId].actualPaid - balances[userId].fairShare;
+      console.log(`User ${userId}: paid ${balances[userId].actualPaid}, share ${balances[userId].fairShare}, balance ${balances[userId].balance}`);
     });
 
     return balances;
@@ -725,11 +720,11 @@ class Expense {
     }
 
     const balances = await this.calculateGroupBalances(groupId);
-    const userBalance = balances[currentUser.uid] || { paid: 0, owes: 0, balance: 0 };
+    const userBalance = balances[currentUser.uid] || { actualPaid: 0, fairShare: 0, balance: 0 };
     
     return {
-      paid: parseFloat(userBalance.paid.toFixed(2)),
-      owes: parseFloat(userBalance.owes.toFixed(2)),
+      actualPaid: parseFloat(userBalance.actualPaid.toFixed(2)),
+      fairShare: parseFloat(userBalance.fairShare.toFixed(2)),
       balance: parseFloat(userBalance.balance.toFixed(2))
     };
   }
@@ -916,7 +911,7 @@ class Expense {
     // Use the new calculateGroupBalances method that handles splits
     const balances = await this.calculateGroupBalances(groupId);
     
-    // If date range is specified, we need to filter expenses by date
+    // If date range is specified, we need to recalculate with filtered expenses
     if (startDate && endDate) {
       const expensesCol = collection(db, 'expenses');
       const q = query(
@@ -927,73 +922,87 @@ class Expense {
       );
       const snapshot = await getDocs(q);
       const expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const group = await Group.getGroupById(groupId);
       
-      // Recalculate balances with filtered expenses
+      // Recalculate balances with filtered expenses using the same logic
       const filteredBalances = {};
       
       expenses.forEach((expense) => {
         const { user_id, amount, is_settlement, settlement_type, is_split, splits } = expense;
         
         if (!filteredBalances[user_id]) {
-          filteredBalances[user_id] = { paid: 0, owes: 0, balance: 0 };
+          filteredBalances[user_id] = { actualPaid: 0, fairShare: 0, balance: 0 };
         }
 
         if (is_settlement) {
           if (settlement_type === 'payment') {
-            filteredBalances[user_id].paid += amount;
+            filteredBalances[user_id].balance -= amount;
           } else if (settlement_type === 'receipt') {
-            filteredBalances[user_id].paid -= amount;
+            filteredBalances[user_id].balance += amount;
           }
         } else {
-          filteredBalances[user_id].paid += amount;
+          filteredBalances[user_id].actualPaid += amount;
 
           if (is_split && splits && Object.keys(splits).length > 0) {
-            // For split expenses, assign debt to each participant including the payer
-            let totalSplitAmount = 0;
-            
-            // First calculate total split amount
-            Object.values(splits).forEach(splitInfo => {
-              totalSplitAmount += parseFloat(splitInfo.amount) || 0;
-            });
-            
-            // Assign split amounts to participants
             Object.values(splits).forEach(splitInfo => {
               const splitUserId = splitInfo.user_id || splitInfo.id;
               const splitAmount = parseFloat(splitInfo.amount) || 0;
               
               if (splitUserId && splitAmount > 0) {
                 if (!filteredBalances[splitUserId]) {
-                  filteredBalances[splitUserId] = { paid: 0, owes: 0, balance: 0 };
+                  filteredBalances[splitUserId] = { actualPaid: 0, fairShare: 0, balance: 0 };
                 }
-                filteredBalances[splitUserId].owes += splitAmount;
+                filteredBalances[splitUserId].fairShare += splitAmount;
               }
             });
-            
-            // The payer owes the remaining amount (total - total splits)
-            const payerShare = amount - totalSplitAmount;
-            if (payerShare > 0) {
-              filteredBalances[user_id].owes += payerShare;
-            }
           } else {
-            filteredBalances[user_id].owes += amount;
+            const members = group && group.members ? group.members : [];
+            const memberCount = members.length;
+            
+            if (memberCount > 0) {
+              const sharePerMember = amount / memberCount;
+              members.forEach(member => {
+                const memberId = typeof member === 'string' ? member : (member.id || member.user_id);
+                if (memberId) {
+                  if (!filteredBalances[memberId]) {
+                    filteredBalances[memberId] = { actualPaid: 0, fairShare: 0, balance: 0 };
+                  }
+                  filteredBalances[memberId].fairShare += sharePerMember;
+                }
+              });
+            } else {
+              filteredBalances[user_id].fairShare += amount;
+            }
           }
         }
       });
 
-      // Convert to final balance format
+      // Calculate final balances
+      Object.keys(filteredBalances).forEach(userId => {
+        filteredBalances[userId].balance = filteredBalances[userId].actualPaid - filteredBalances[userId].fairShare;
+      });
+
+      // Return full balance details for each user
       const result = {};
       Object.keys(filteredBalances).forEach(userId => {
-        const balance = filteredBalances[userId].paid - filteredBalances[userId].owes;
-        result[userId] = parseFloat(balance.toFixed(2));
+        result[userId] = {
+          actualPaid: parseFloat(filteredBalances[userId].actualPaid.toFixed(2)),
+          fairShare: parseFloat(filteredBalances[userId].fairShare.toFixed(2)),
+          balance: parseFloat(filteredBalances[userId].balance.toFixed(2))
+        };
       });
 
       return result;
     }
 
-    // Convert balances to the expected format (just the final balance number)
+    // Return full balance details for each user
     const result = {};
     Object.keys(balances).forEach(userId => {
-      result[userId] = balances[userId].balance;
+      result[userId] = {
+        actualPaid: parseFloat(balances[userId].actualPaid.toFixed(2)),
+        fairShare: parseFloat(balances[userId].fairShare.toFixed(2)),
+        balance: parseFloat(balances[userId].balance.toFixed(2))
+      };
     });
 
     console.log(`getBalanceByAllUsersInGroup for group ${groupId}:`, {

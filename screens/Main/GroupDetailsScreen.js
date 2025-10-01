@@ -69,27 +69,19 @@ const GroupDetailsScreen = () => {
     try {
       const groupRef = doc(db, 'groups', groupId);
 
-      // 1) Fire four independent calls in parallel:
+      // 1) Fire independent calls in parallel:
       const [
         snap,
         rawExpenses,
         allExpenses,
-        userPaidAmount,
-        totalsByUser,
-        balanceByUser,
         balanceByAllUsersInGroup,
       ] = await Promise.all([
         getDoc(groupRef),
         Expense.getExpensesByGroupWithLimit(groupId, LIMIT),
         Expense.getExpensesByGroup(groupId),
-        Expense.getTotalExpensesByUserAndGroup(groupId),
-        Expense.getTotalExpensesPerUserByGroup(groupId),
-        Expense.getBalanceByUserAndGroup(groupId),
         Expense.getBalanceByAllUsersInGroup(groupId),
       ]);
 
-      console.log('Total spent by each user:', totalsByUser);
-      console.log('Balance by user:', balanceByUser);
       console.log('Balance by all users in group:', balanceByAllUsersInGroup);
 
       // 2) If group exists, set its basic data
@@ -134,15 +126,24 @@ const GroupDetailsScreen = () => {
         return sum;
       }, 0);
 
-      // Get current user's balance to determine what they owe
+      // Get current user's balance details
       const auth = getAuth();
       const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
-      const userBalance = balanceByAllUsersInGroup[currentUserId] || 0;
-      const actualOwe = userBalance < 0 ? Math.abs(userBalance) : 0;
+      const userBalanceData = balanceByAllUsersInGroup[currentUserId] || { actualPaid: 0, fairShare: 0, balance: 0 };
+      
+      // Extract actual paid and what they owe
+      const actualPaid = userBalanceData.actualPaid || 0;
+      const fairShare = userBalanceData.fairShare || 0;
+      const balance = userBalanceData.balance || 0;
+      
+      // If balance is negative, user owes money
+      const actualOwe = balance < 0 ? Math.abs(balance) : 0;
+
+      console.log('User balance details:', { actualPaid, fairShare, balance, actualOwe });
 
       // 6) Update state in one go
       setTotalExpenses(totalAmount);
-      setYouPaid(userPaidAmount);
+      setYouPaid(actualPaid);
       setYouOwe(actualOwe);
       setRecentExpenses(expensesWithUsernames);
       setBalanceByAllUsers(balanceByAllUsersInGroup); // Store the balance data
@@ -248,7 +249,9 @@ const GroupDetailsScreen = () => {
 
   // Helper function to get balance for a member
   const getMemberBalance = (memberId) => {
-    return balanceByAllUsers[memberId] || 0;
+    const balanceData = balanceByAllUsers[memberId];
+    if (!balanceData) return 0;
+    return balanceData.balance || 0;
   };
 
   // Helper function to format balance with appropriate sign and color
@@ -432,7 +435,9 @@ const GroupDetailsScreen = () => {
           {/* Settle Up Button - Only show for group admin and when there are imbalances */}
           {isGroupCreator &&
             TotalExpenses > 0 &&
-            Object.values(balanceByAllUsers).some((balance) => Math.abs(balance) > 0.01) && (
+            Object.values(balanceByAllUsers).some((balanceData) => 
+              Math.abs(balanceData?.balance || 0) > 0.01
+            ) && (
               <TouchableOpacity
                 className="mb-6 rounded-lg bg-primary py-4"
                 onPress={handleSettleUp}
