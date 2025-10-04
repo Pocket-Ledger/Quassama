@@ -106,7 +106,8 @@ const LanguagesScreen = () => {
                       ? 'border-blue-500 bg-blue-50 dark:bg-slate-700'
                       : 'border-gray-200 bg-white dark:bg-slate-700'
                   }`}
-                  onPress={() => handleLanguageSelect(language)}>
+                  onPress={() => handleLanguageSelect(language)}
+                  activeOpacity={1}>
                   <View className="flex-row items-center">
                     <Text className="mr-3 text-2xl dark:text-white">{language.flag}</Text>
                     <View>

@@ -1146,6 +1146,7 @@ class Expense {
 
       // Calculate totals by category
       const categoryTotals = {};
+      const categoryCounts = {};
       let totalAmount = 0;
 
       expenses.forEach((expense) => {
@@ -1160,8 +1161,10 @@ class Expense {
 
         if (!categoryTotals[categoryKey]) {
           categoryTotals[categoryKey] = 0;
+          categoryCounts[categoryKey] = 0;
         }
         categoryTotals[categoryKey] += amount;
+        categoryCounts[categoryKey] += 1;
         totalAmount += amount;
       });
 
@@ -1177,6 +1180,7 @@ class Expense {
           return {
             category: categoryName,
             amount: categoryTotals[categoryName],
+            count: categoryCounts[categoryName],
             percentage:
               totalAmount > 0 ? Math.round((categoryTotals[categoryName] / totalAmount) * 100) : 0,
             color: categoryInfo.color,
@@ -1249,6 +1253,7 @@ class Expense {
 
       // Calculate totals by category
       const categoryTotals = {};
+      const categoryCounts = {};
       let totalAmount = 0;
 
       expenses.forEach((expense) => {
@@ -1263,8 +1268,10 @@ class Expense {
 
         if (!categoryTotals[categoryKey]) {
           categoryTotals[categoryKey] = 0;
+          categoryCounts[categoryKey] = 0;
         }
         categoryTotals[categoryKey] += amount;
+        categoryCounts[categoryKey] += 1;
         totalAmount += amount;
       });
 
@@ -1280,6 +1287,7 @@ class Expense {
           return {
             category: categoryName,
             amount: categoryTotals[categoryName],
+            count: categoryCounts[categoryName],
             percentage:
               totalAmount > 0 ? Math.round((categoryTotals[categoryName] / totalAmount) * 100) : 0,
             color: categoryInfo.color,

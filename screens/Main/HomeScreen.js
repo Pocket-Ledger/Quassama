@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Feather, Fontisto, MaterialIcons } from '@expo/vector-icons';
 import PieChart from 'components/PieChart';
+import OverviewSection from 'components/OverviewSection';
 import Expense from 'models/expense/Expense';
 import { useFocusEffect, useNavigation } from '@react-navigation/core';
 import User from 'models/auth/user';
@@ -54,6 +55,10 @@ const HomeScreen = () => {
     expenseCount: 0,
   });
   const [isLoadingOverview, setIsLoadingOverview] = useState(true);
+  
+  // State for selected month/year navigation
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   // State for pull-to-refresh
   const [refreshing, setRefreshing] = useState(false);
@@ -79,16 +84,16 @@ const HomeScreen = () => {
     fetchUser();
   }, []);
   // Function to fetch expense overview
-  const fetchExpenseOverview = useCallback(async () => {
+  const fetchExpenseOverview = useCallback(async (month = selectedMonth, year = selectedYear) => {
     setIsLoadingOverview(true);
     try {
       let overview;
       if (selectedGroup) {
         // Get overview for selected group
-        overview = await Expense.getExpenseOverview(selectedGroup);
+        overview = await Expense.getExpenseOverview(selectedGroup, month, year);
       } else {
         // Get overview for all user's expenses
-        overview = await Expense.getExpenseOverviewAllGroups();
+        overview = await Expense.getExpenseOverviewAllGroups(month, year);
       }
       setOverviewData(overview);
     } catch (error) {
@@ -97,17 +102,43 @@ const HomeScreen = () => {
       setOverviewData({
         categoryData: [],
         totalAmount: 0,
-        monthName: new Date().toLocaleDateString(
+        monthName: new Date(year, month).toLocaleDateString(
           i18n.language === 'ar' ? 'ar-SA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US',
           { month: 'long' }
         ),
-        year: new Date().getFullYear(),
+        year: year,
         expenseCount: 0,
       });
     } finally {
       setIsLoadingOverview(false);
     }
-  }, [selectedGroup, i18n.language]);
+  }, [selectedGroup, selectedMonth, selectedYear, i18n.language]);
+
+  // Function to handle month navigation
+  const handleMonthChange = useCallback((direction) => {
+    let newMonth = selectedMonth;
+    let newYear = selectedYear;
+
+    if (direction === 'next') {
+      newMonth += 1;
+      if (newMonth > 11) {
+        newMonth = 0;
+        newYear += 1;
+      }
+    } else if (direction === 'previous') {
+      newMonth -= 1;
+      if (newMonth < 0) {
+        newMonth = 11;
+        newYear -= 1;
+      }
+    }
+
+    setSelectedMonth(newMonth);
+    setSelectedYear(newYear);
+    
+    // Fetch overview for the new month
+    fetchExpenseOverview(newMonth, newYear);
+  }, [selectedMonth, selectedYear, fetchExpenseOverview]);
 
   // Function to fetch balances
   const fetchBalances = useCallback(async () => {
@@ -270,6 +301,12 @@ const HomeScreen = () => {
       setShowGroupModal(false);
       await AsyncStorage.setItem('selectedGroupId', String(groupId));
 
+      // Reset to current month when switching groups
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      setSelectedMonth(currentMonth);
+      setSelectedYear(currentYear);
+
       // Fetch members for the selected group
       const members = await Group.getMembersByGroup(groupId);
       setGroupMembers(members);
@@ -284,8 +321,8 @@ const HomeScreen = () => {
       );
       setTransformedRecentActivity(transformedData);
 
-      // Fetch updated overview for the selected group
-      fetchExpenseOverview();
+      // Fetch updated overview for the selected group with current month
+      fetchExpenseOverview(currentMonth, currentYear);
       setSelectedGroupId(groupId);
 
       console.log('Selected Group ID:', groupId);
@@ -431,94 +468,12 @@ const HomeScreen = () => {
             </View>
           </View> */}
           {/* Overview Section */}
-          <View className="p-4 bg-white border border-gray-100 rounded-xl dark:bg-slate-700 dark:border-gray-700">
-            <Text className="mb-4 text-lg font-medium text-black dark:text-white">
-              {t('home.monthlyOverview', {
-                month: overviewData.monthName,
-                year: overviewData.year,
-              })}
-            </Text>
-
-            {isLoadingOverview ? (
-              <View className="flex-row items-center">
-                <View className="relative mr-6">
-                  <View className="w-20 h-20 bg-gray-200 rounded-full" />
-                </View>
-                <View className="flex-1">
-                  <View className="w-32 h-4 mb-2 bg-gray-200 rounded" />
-                  <View className="w-24 h-4 mb-2 bg-gray-200 rounded" />
-                  <View className="h-4 mb-2 bg-gray-200 rounded w-28" />
-                </View>
-              </View>
-            ) : overviewData.categoryData.length === 0 ? (
-              <View className="flex flex-row items-center justify-around py-8">
-                {/* <Feather name="pie-chart" size={48} color="#ccc" /> */}
-                <View className="">
-                  <Text className="mt-2 text-lg text-gray-500 dark:text-gray-300">
-                    {t('home.noExpensesThisMonth')}
-                  </Text>
-                  <Text className="mt-1 text-sm text-gray-400 dark:text-gray-500">
-                    Tap + to add Your first Expense
-                  </Text>
-                </View>
-                <View className="items-center justify-center bg-blue-100 rounded-full h-18 w-18 dark:bg-slate-600">
-                  <Wallet size={38} color="#3B82F6" strokeWidth={2.5} />
-                </View>
-              </View>
-            ) : (
-              <View className="flex-row items-center">
-                <View className="relative mr-6">
-                  <PieChart data={overviewData.categoryData} size={80} />
-                </View>
-
-                <View className="flex-1">
-                  {overviewData.categoryData.slice(0, 4).map((item, index) => (
-                    <View key={index} className="flex-row items-center justify-between mb-2">
-                      <View className="flex-row items-center">
-                        <View
-                          className="w-3 h-3 mr-2 rounded-full"
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <Text className="text-lg font-normal text-gray-500 dark:text-gray-300">
-                          {t(`categories.${item.category.toLowerCase()}`, {
-                            defaultValue: item.category,
-                          })}
-                        </Text>
-                      </View>
-                      <Text className="text-lg font-medium text-black">{item.percentage}%</Text>
-                    </View>
-                  ))}
-                  {overviewData.categoryData.length > 4 && (
-                    <Text className="text-sm text-gray-400 dark:text-gray-500">
-                      {t('home.moreCategoriesCount', {
-                        count: overviewData.categoryData.length - 4,
-                      })}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            )}
-
-            {/* Total amount display */}
-            {!isLoadingOverview && overviewData.totalAmount > 0 && (
-              <View className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-300">
-                <View className="flex-row justify-between">
-                  <Text className="text-gray-500 font-dmsans-medium dark:text-white">
-                    {t('home.totalExpenses')}
-                  </Text>
-                  <Text className="text-black font-dmsans-bold dark:text-white">
-                    {overviewData.totalAmount.toFixed(2)} {getCurrency()}
-                  </Text>
-                </View>
-                <View className="flex-row justify-between mt-1">
-                  <Text className="text-gray-500 font-dmsans-medium dark:text-white">
-                    {t('home.totalTransactions')}
-                  </Text>
-                  <Text className="text-black dark:text-white">{overviewData.expenseCount}</Text>
-                </View>
-              </View>
-            )}
-          </View>
+          <OverviewSection
+            overviewData={overviewData}
+            isLoadingOverview={isLoadingOverview}
+            getCurrency={getCurrency}
+            onMonthChange={handleMonthChange}
+          />
           {/* Recent Activity */}
           <View className="mx-4 ">
             <View className="flex-row items-center justify-between mb-4">

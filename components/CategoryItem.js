@@ -116,7 +116,7 @@ const CategoryItem = ({
     <TouchableOpacity
       className={`${styles.container} ${customStyle.container || ''}`}
       onPress={handlePress}
-      activeOpacity={0.7}>
+      activeOpacity={1}>
       <View
         className={`${styles.iconContainer} items-center justify-center rounded-full ${colorClasses.backgroundColor}`}
         style={{
