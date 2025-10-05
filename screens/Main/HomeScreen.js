@@ -26,6 +26,7 @@ import Notification from 'models/notifications/notifications';
 import { capitalizeFirst, getFirstLetterCapitalized } from 'utils/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react-native';
+import RecurringTransactions from 'components/RecurringTransactions';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -533,6 +534,7 @@ const HomeScreen = () => {
               </TouchableOpacity>
             </View>
 
+
             {/* Group selection modal */}
             <SwitchGroupModal
               visible={showGroupModal}
@@ -600,6 +602,8 @@ const HomeScreen = () => {
               </>
             )}
           </View>
+          <RecurringTransactions />
+
         </View>
       </ScrollView>
     </SafeAreaView>
