@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ActivityIndicator, TextInput, ScrollView } from 'react-native';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import * as Sharing from 'expo-sharing';
 import transcribeAudio from '../../models/expens_Ai/transcribeAudio';
 import extractExpensesFromText from '../../models/expens_Ai/extractExpensesFromText';
 import ProcessExpenses from '../../models/expens_Ai/processExpenses';
+import { DEFAULT_CATEGORIES } from '../../constants/category';
 
 const VoiceRecordingBottomSheetWithExpoAV = forwardRef(({ onExpensesExtracted }, ref) => {
   const [recordingState, setRecordingState] = useState('idle');
@@ -17,6 +18,7 @@ const VoiceRecordingBottomSheetWithExpoAV = forwardRef(({ onExpensesExtracted },
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingExpense, setEditingExpense] = useState({ expense: '', amount: '' });
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [recording, setRecording] = useState(null);
   const [recordingUri, setRecordingUri] = useState(null);
   const [sound, setSound] = useState(null);
@@ -201,12 +203,16 @@ const VoiceRecordingBottomSheetWithExpoAV = forwardRef(({ onExpensesExtracted },
       const expensesProcessor = new ProcessExpenses(extractedExpensesData);
       const processedData = expensesProcessor.processAndLog();
 
+      // Get the default "Other" category
+      const defaultCategory = DEFAULT_CATEGORIES.find(cat => cat.name === 'Other') || DEFAULT_CATEGORIES[0];
+
       // Convert to the format expected by the UI with id, checked status, and original data
       const formattedExpenses = extractedExpensesData.map((expense, index) => ({
         id: Date.now() + index,
         expense: expense.title,
         amount: expense.amount,
         checked: true,
+        category: defaultCategory, // Add default category
       }));
 
       /* Test data - uncomment for testing
@@ -618,48 +624,107 @@ const VoiceRecordingBottomSheetWithExpoAV = forwardRef(({ onExpensesExtracted },
 
     if (isEditing) {
       return (
-        <View key={expense.id} className="border-b border-gray-100 px-6 py-4">
-          <View className="flex-row items-center gap-4">
-            {/* Checkbox (disabled during editing) */}
-            <TouchableOpacity disabled className="opacity-50">
-              <View
-                className={`h-6 w-6 rounded border-2 ${expense.checked ? 'border-blue-500 bg-blue-500' : 'border-gray-300'} items-center justify-center`}>
-                {expense.checked && <Ionicons name="checkmark" size={16} color="white" />}
+        <View key={expense.id} className="mx-4 my-2 rounded-xl border-2 border-blue-200 bg-blue-50 p-4">
+          <View className="mb-3 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-2">
+              <View className="rounded-full bg-blue-500 p-1.5">
+                <Ionicons name="create" size={14} color="white" />
               </View>
-            </TouchableOpacity>
+              <Text className="font-semibold text-blue-700">Editing Expense</Text>
+            </View>
+          </View>
 
-            {/* Edit inputs */}
-            <View className="flex-1 gap-2">
+          <View className="gap-3">
+            {/* Expense Name Input */}
+            <View>
+              <Text className="mb-1.5 text-xs font-medium text-gray-600">Expense Name</Text>
               <TextInput
                 value={editingExpense.expense}
                 onChangeText={(text) => setEditingExpense((prev) => ({ ...prev, expense: text }))}
-                className="rounded border border-gray-300 px-3 py-2 text-gray-800"
-                placeholder="Expense name"
-              />
-              <TextInput
-                value={editingExpense.amount}
-                onChangeText={(text) => setEditingExpense((prev) => ({ ...prev, amount: text }))}
-                className="rounded border border-gray-300 px-3 py-2 text-gray-800"
-                placeholder="Amount"
-                keyboardType="numeric"
+                className="rounded-lg border-2 border-blue-200 bg-white px-4 py-3 text-base text-gray-800"
+                placeholder="Enter expense name"
+                placeholderTextColor="#9CA3AF"
               />
             </View>
 
-            {/* Save/Cancel buttons */}
-            <View className="flex-row gap-2">
-              <TouchableOpacity
-                onPress={handleSaveEdit}
-                className="rounded-full bg-green-500 p-2"
-                activeOpacity={0.8}>
-                <Ionicons name="checkmark" size={16} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleCancelEdit}
-                className="rounded-full bg-gray-500 p-2"
-                activeOpacity={0.8}>
-                <Ionicons name="close" size={16} color="white" />
-              </TouchableOpacity>
+            {/* Amount Input */}
+            <View>
+              <Text className="mb-1.5 text-xs font-medium text-gray-600">Amount</Text>
+              <TextInput
+                value={editingExpense.amount}
+                onChangeText={(text) => setEditingExpense((prev) => ({ ...prev, amount: text }))}
+                className="rounded-lg border-2 border-blue-200 bg-white px-4 py-3 text-base text-gray-800"
+                placeholder="Enter amount"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+              />
             </View>
+            
+            {/* Category Picker */}
+            <View>
+              <Text className="mb-1.5 text-xs font-medium text-gray-600">Category</Text>
+              <TouchableOpacity
+                onPress={() => setShowCategoryPicker(!showCategoryPicker)}
+                className="flex-row items-center justify-between rounded-lg border-2 border-blue-200 bg-white px-4 py-3">
+                <View className="flex-row items-center gap-3">
+                  <View className="rounded-full p-1.5" style={{backgroundColor: editingExpense.category?.color ? `${editingExpense.category.color}20` : '#F3F4F6'}}>
+                    <Ionicons
+                      name={editingExpense.category?.icon || 'pricetag'}
+                      size={18}
+                      color={editingExpense.category?.color || '#666'}
+                    />
+                  </View>
+                  <Text className="text-base text-gray-800">
+                    {editingExpense.category?.name || 'Select Category'}
+                  </Text>
+                </View>
+                <Ionicons name={showCategoryPicker ? 'chevron-up' : 'chevron-down'} size={20} color="#3B82F6" />
+              </TouchableOpacity>
+              
+              {/* Category List */}
+              {showCategoryPicker && (
+                <ScrollView className="mt-2 max-h-48 rounded-lg border-2 border-blue-200 bg-white">
+                  {DEFAULT_CATEGORIES.map((cat, idx) => (
+                    <TouchableOpacity
+                      key={cat.id}
+                      onPress={() => {
+                        setEditingExpense((prev) => ({ ...prev, category: cat }));
+                        setShowCategoryPicker(false);
+                      }}
+                      className={`flex-row items-center gap-3 px-4 py-3 ${idx !== DEFAULT_CATEGORIES.length - 1 ? 'border-b border-gray-100' : ''}`}
+                      activeOpacity={0.7}>
+                      <View className="rounded-full p-2" style={{backgroundColor: `${cat.color}20`}}>
+                        <Ionicons name={cat.icon} size={20} color={cat.color} />
+                      </View>
+                      <Text className="flex-1 text-base text-gray-800">{cat.name}</Text>
+                      {editingExpense.category?.id === cat.id && (
+                        <View className="rounded-full bg-blue-500 p-1">
+                          <Ionicons name="checkmark" size={16} color="white" />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View className="mt-4 flex-row gap-3">
+            <TouchableOpacity
+              onPress={handleSaveEdit}
+              className="flex-1 flex-row items-center justify-center gap-2 rounded-lg bg-green-500 py-3.5"
+              activeOpacity={0.8}>
+              <Ionicons name="checkmark-circle" size={20} color="white" />
+              <Text className="font-semibold text-white">Save Changes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleCancelEdit}
+              className="flex-row items-center justify-center gap-2 rounded-lg bg-gray-500 px-5 py-3.5"
+              activeOpacity={0.8}>
+              <Ionicons name="close-circle" size={20} color="white" />
+              <Text className="font-semibold text-white">Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       );
@@ -668,41 +733,59 @@ const VoiceRecordingBottomSheetWithExpoAV = forwardRef(({ onExpensesExtracted },
     return (
       <View
         key={expense.id}
-        className="flex-row items-center justify-between border-b border-gray-100 px-6 py-4">
+        className="mx-4 my-1.5 flex-row items-center rounded-lg border border-gray-200 bg-white p-4">
         {/* Checkbox */}
         <TouchableOpacity
           onPress={() => handleCheckboxToggle(expense.id)}
-          className="mr-3"
-          activeOpacity={0.8}>
+          className="mr-4"
+          activeOpacity={0.7}>
           <View
-            className={`h-6 w-6 rounded border-2 ${expense.checked ? 'border-blue-500 bg-blue-500' : 'border-gray-300'} items-center justify-center`}>
-            {expense.checked && <Ionicons name="checkmark" size={16} color="white" />}
+            className={`h-7 w-7 rounded-lg border-2 ${expense.checked ? 'border-blue-500 bg-blue-500' : 'border-gray-300'} items-center justify-center`}>
+            {expense.checked && <Ionicons name="checkmark" size={18} color="white" />}
           </View>
         </TouchableOpacity>
 
         {/* Expense details */}
         <View className="flex-1">
-          <Text className={`font-medium ${expense.checked ? 'text-gray-800' : 'text-gray-400'}`}>
+          <Text className={`text-base font-semibold ${expense.checked ? 'text-gray-800' : 'text-gray-400 line-through'}`}>
             {expense.expense}
           </Text>
-          <Text className={`${expense.checked ? 'text-gray-600' : 'text-gray-400'}`}>
+          <Text className={`mt-0.5 text-base font-medium ${expense.checked ? 'text-blue-600' : 'text-gray-400'}`}>
             {expense.amount}
           </Text>
+        </View>
+
+        {/* Category Column */}
+        <View className="w-24 items-center">
+          {expense.category ? (
+            <View className="flex-row items-center gap-1.5 rounded-full px-2.5 py-1" style={{backgroundColor: expense.checked ? `${expense.category.color}15` : '#F3F4F6'}}>
+              <Ionicons
+                name={expense.category.icon}
+                size={14}
+                color={expense.checked ? expense.category.color : '#999'}
+              />
+              <Text className={`text-xs font-medium ${expense.checked ? 'text-gray-700' : 'text-gray-400'}`} numberOfLines={1}>
+                {expense.category.name}
+              </Text>
+            </View>
+          ) : (
+            <Text className="text-xs text-gray-400">No category</Text>
+          )}
         </View>
 
         {/* Action buttons */}
         <View className="ml-3 flex-row gap-2">
           <TouchableOpacity
             onPress={() => handleEditExpense(index)}
-            className="rounded-full bg-blue-500 p-2"
-            activeOpacity={0.8}>
-            <Ionicons name="create-outline" size={16} color="white" />
+            className="rounded-lg bg-blue-500 p-2.5"
+            activeOpacity={0.7}>
+            <Ionicons name="create-outline" size={18} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDeleteExpense(expense.id)}
-            className="rounded-full bg-red-500 p-2"
-            activeOpacity={0.8}>
-            <Ionicons name="trash-outline" size={16} color="white" />
+            className="rounded-lg bg-red-500 p-2.5"
+            activeOpacity={0.7}>
+            <Ionicons name="trash-outline" size={18} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -720,9 +803,10 @@ const VoiceRecordingBottomSheetWithExpoAV = forwardRef(({ onExpensesExtracted },
         </View>
 
         <View className="flex-1">
-          <View className="flex-row justify-between border-b border-gray-200 px-6 py-3">
-            <Text className="font-medium text-gray-600">Expense</Text>
-            <Text className="font-medium text-gray-600">Actions</Text>
+          <View className="flex-row items-center border-b border-gray-200 px-6 py-3">
+            <Text className="flex-1 font-medium text-gray-600">Expense</Text>
+            <Text className="w-24 font-medium text-gray-600">Category</Text>
+            <Text className="w-20 text-right font-medium text-gray-600">Actions</Text>
           </View>
 
           {extractedExpenses.map((expense, index) => renderExpenseItem(expense, index))}
