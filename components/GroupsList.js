@@ -11,7 +11,7 @@ const GroupsList = ({
 }) => {
   return (
     <ScrollView
-      className="flex-1 px-[10px]"
+      className="flex-1"
       showsVerticalScrollIndicator={showScrollIndicator}
       //contentContainerStyle={contentContainerStyle}
     >

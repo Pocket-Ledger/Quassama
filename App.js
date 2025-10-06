@@ -123,7 +123,7 @@ export default function App() {
         await registerForPushNotificationsAsync();
 
         // Schedule expense reminder
-        await scheduleExpenseReminder();
+        /* await scheduleExpenseReminder(); */
 
         // Wait for fonts to load
         if (fontsLoaded) {

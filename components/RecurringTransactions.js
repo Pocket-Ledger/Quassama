@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 
 // Demo data for recurring transactions
 const demoRecurringTransactions = [
@@ -50,6 +51,10 @@ const RecurringTransactions = () => {
   const { t } = useTranslation();
   const [selectedMonth] = useState(new Date().getMonth());
   const [selectedYear] = useState(new Date().getFullYear());
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [transactionTitle, setTransactionTitle] = useState('');
+  const [transactionPrice, setTransactionPrice] = useState('');
 
   // Generate calendar days for the current month
   const getDaysInMonth = (month, year) => {
@@ -75,6 +80,41 @@ const RecurringTransactions = () => {
   // Get recurring days from transactions
   const recurringDays = demoRecurringTransactions.map((t) => t.recurringDay);
 
+  const handleDayPress = (day) => {
+    setSelectedDay(day);
+    setModalVisible(true);
+    setTransactionTitle('');
+    setTransactionPrice('');
+  };
+
+  const handleAddTransaction = () => {
+    // Here you can handle adding the transaction
+    console.log('Adding transaction:', {
+      day: selectedDay,
+      title: transactionTitle,
+      price: transactionPrice,
+    });
+    setModalVisible(false);
+  };
+
+  const getFormattedDate = (day) => {
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return `${monthNames[selectedMonth]} ${day}, ${selectedYear}`;
+  };
+
   const renderCalendarDay = (day, index) => {
     if (day === null) {
       return <View key={`empty-${index}`} className="w-12 h-12" />;
@@ -83,7 +123,10 @@ const RecurringTransactions = () => {
     const isRecurring = recurringDays.includes(day);
 
     return (
-      <View key={day} className="w-12 h-12 items-center justify-center">
+      <TouchableOpacity
+        key={day}
+        onPress={() => handleDayPress(day)}
+        className="w-12 h-12 items-center justify-center">
         <View
           className={`w-10 h-10 rounded-full items-center justify-center ${
             isRecurring ? 'bg-[#007bff]' : 'bg-transparent'
@@ -95,7 +138,7 @@ const RecurringTransactions = () => {
             {day}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -113,7 +156,7 @@ const RecurringTransactions = () => {
         </Text>
 
         {/* Calendar Card */}
-        <View className="bg-[#E8E9F3] dark:bg-gray-800 rounded-3xl p-6 mb-6">
+        <View className="bg-[#ffffff] dark:bg-gray-800 rounded-3xl p-6 mb-6 border border-gray-200 dark:border-gray-700">
           {/* Calendar Grid */}
           <View className="flex-row flex-wrap mb-4">
             {calendarDays.map((day, index) => renderCalendarDay(day, index))}
@@ -124,7 +167,7 @@ const RecurringTransactions = () => {
             {demoRecurringTransactions.map((transaction) => (
               <View
                 key={transaction.id}
-                className="flex-row items-center justify-between bg-white dark:bg-gray-700 rounded-2xl p-4 mb-2">
+                className="flex-row items-center justify-between bg-white dark:bg-gray-700 rounded-2xl p-4 mb-2 border border-gray-200 dark:border-gray-700">
                 {/* Left side - Icon and Details */}
                 <View className="flex-row items-center flex-1">
                   <View
@@ -163,7 +206,7 @@ const RecurringTransactions = () => {
           </View>
 
           {/* Upgrade Section */}
-          <View className="mt-6 flex-row items-center">
+          {/* <View className="mt-6 flex-row items-center">
             <TouchableOpacity className="bg-blue-800 dark:bg-gray-600 rounded-xl px-6 py-3 mr-4">
               <Text className="text-white font-dmsans-bold text-base">Upgrade</Text>
             </TouchableOpacity>
@@ -171,8 +214,107 @@ const RecurringTransactions = () => {
               Upgrade to PRO to see your recurring transactions, automatically detected and
               refreshed once a day.
             </Text>
-          </View>
+          </View> */}
         </View>
+
+        {/* Add Transaction Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}>
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            className="flex-1 justify-end bg-black/50">
+            <View className="bg-white dark:bg-gray-800 rounded-t-3xl p-6 pb-10">
+              {/* Header */}
+              <View className="flex-row items-center justify-between mb-6">
+                <Text className="text-2xl font-dmsans-bold text-gray-900 dark:text-white">
+                  Add Recurring Transaction
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  className="w-10 h-10 items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full">
+                  <Ionicons name="close" size={24} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Selected Date Display */}
+              <View className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 mb-6 flex-row items-center">
+                <View className="w-12 h-12 bg-[#007bff] rounded-full items-center justify-center mr-4">
+                  <Ionicons name="calendar" size={24} color="white" />
+                </View>
+                <View>
+                  <Text className="text-sm text-gray-500 dark:text-gray-400 font-dmsans-regular">
+                    Selected Date
+                  </Text>
+                  <Text className="text-lg font-dmsans-bold text-gray-900 dark:text-white">
+                    {selectedDay && getFormattedDate(selectedDay)}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Title Input */}
+              <View className="mb-4">
+                <Text className="text-sm font-dmsans-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Transaction Title
+                </Text>
+                <View className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-600">
+                  <Ionicons
+                    name="pricetag-outline"
+                    size={20}
+                    color="#6B7280"
+                    style={{ marginRight: 8 }}
+                  />
+                  <TextInput
+                    className="flex-1 text-base font-dmsans-regular text-gray-900 dark:text-white"
+                    placeholder="e.g., Netflix Subscription"
+                    placeholderTextColor="#9CA3AF"
+                    value={transactionTitle}
+                    onChangeText={setTransactionTitle}
+                  />
+                </View>
+              </View>
+
+              {/* Price Input */}
+              <View className="mb-6">
+                <Text className="text-sm font-dmsans-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Amount
+                </Text>
+                <View className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-600">
+                  <Text className="text-lg font-dmsans-bold text-gray-700 dark:text-gray-300 mr-2">
+                    $
+                  </Text>
+                  <TextInput
+                    className="flex-1 text-base font-dmsans-regular text-gray-900 dark:text-white"
+                    placeholder="0.00"
+                    placeholderTextColor="#9CA3AF"
+                    keyboardType="decimal-pad"
+                    value={transactionPrice}
+                    onChangeText={setTransactionPrice}
+                  />
+                </View>
+              </View>
+
+              {/* Action Buttons */}
+              <View className="flex-row gap-3">
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-2xl py-4 items-center">
+                  <Text className="text-base font-dmsans-bold text-gray-700 dark:text-gray-300">
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleAddTransaction}
+                  className="flex-1 bg-[#007bff] rounded-2xl py-4 items-center shadow-lg"
+                  disabled={!transactionTitle || !transactionPrice}>
+                  <Text className="text-base font-dmsans-bold text-white">Add Transaction</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
       </View>
   );
 };
