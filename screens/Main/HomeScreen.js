@@ -27,6 +27,7 @@ import { capitalizeFirst, getFirstLetterCapitalized } from 'utils/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react-native';
 import RecurringTransactions from 'components/RecurringTransactions';
+import ThisMonth from 'components/ThisMonth';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -399,7 +400,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-slate-800" edges={['top', 'left', 'right']}>
-      <View className="flex-row items-center justify-between px-4 pb-4 bg-white dark:bg-slate-800">
+      <View className="flex-row items-center justify-between px-4 bg-white dark:bg-slate-800">
         <View className="flex-row items-center">
           <TouchableOpacity onPress={handleProfilePress}>
             <View className="items-center justify-center w-12 h-12 mr-3 rounded-full bg-primary">
@@ -468,6 +469,9 @@ const HomeScreen = () => {
               </Text>
             </View>
           </View> */}
+
+          {/* <ThisMonth /> */}
+
           {/* Overview Section */}
           <OverviewSection
             overviewData={overviewData}
@@ -475,6 +479,7 @@ const HomeScreen = () => {
             getCurrency={getCurrency}
             onMonthChange={handleMonthChange}
           />
+
           {/* Recent Activity */}
           <View className="mx-4 ">
             <View className="flex-row items-center justify-between mb-4">
@@ -602,7 +607,7 @@ const HomeScreen = () => {
               </>
             )}
           </View>
-          <RecurringTransactions />
+          {/* <RecurringTransactions /> */}
 
         </View>
       </ScrollView>
