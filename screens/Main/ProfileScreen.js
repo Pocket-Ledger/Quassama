@@ -96,14 +96,14 @@ const ProfileScreen = () => {
       rightText: getCurrentLanguageDisplayName(),
       action: () => navigation.navigate('Languages'),
     },
-    {
+    /* {
       id: 'darkmode',
       title: t('profile.darkMode'),
       icon: 'moon',
       hasSwitch: true,
       switchValue: currentTheme === 'dark',
       onSwitchChange: toggleTheme,
-    },
+    }, */
   ];
 
   const handleLogoutPress = () => {

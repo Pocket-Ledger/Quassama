@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Wallet, ChevronLeft, ChevronRight } from 'lucide-react-native';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import PieChart from './PieChart';
 import CategoryBreakdownModal from './CategoryBreakdownModal';
 import { useTranslation } from 'react-i18next';
@@ -10,22 +9,9 @@ const OverviewSection = ({ overviewData, isLoadingOverview, getCurrency, onMonth
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
-  // Swipe gesture handler
-  const swipeGesture = Gesture.Pan()
-    .onEnd((event) => {
-      if (event.translationX > 50) {
-        // Swiped right - go to previous month
-        onMonthChange?.('previous');
-      } else if (event.translationX < -50) {
-        // Swiped left - go to next month
-        onMonthChange?.('next');
-      }
-    });
-
   return (
     <>
-      <GestureDetector gesture={swipeGesture}>
-        <View className="p-4 bg-white border border-gray-100 rounded-xl dark:bg-slate-700 dark:border-gray-700">
+      <View className="p-4 bg-white border border-gray-100 rounded-xl dark:bg-slate-700 dark:border-gray-700">
           <View className="flex-row items-center justify-between mb-4">
             <TouchableOpacity
               onPress={() => onMonthChange?.('previous')}
@@ -136,8 +122,7 @@ const OverviewSection = ({ overviewData, isLoadingOverview, getCurrency, onMonth
           </View>
         </View>
       )}
-        </View>
-      </GestureDetector>
+      </View>
 
       {/* Category Breakdown Modal */}
       <CategoryBreakdownModal
