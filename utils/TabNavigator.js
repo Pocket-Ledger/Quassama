@@ -10,6 +10,8 @@ import HomeScreen from 'screens/Main/HomeScreen';
 import { CustomTopTabBar } from 'components/CustomTopTabBar';
 import { useNavigationType } from 'hooks/useNavigationType';
 import { CustomTabBar } from 'components/CostumTab';
+import { NewCustomTabBar } from 'components/NewCustomTabBar';
+import AllExpensesScreen from 'screens/Main/AllExpensesScreen';
 
 const BottomTab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -34,6 +36,11 @@ export function TabNavigator() {
       options: { tabBarLabel: t('navigation.newExpense') },
     },
     {
+      name: 'Expenses',
+      component: AllExpensesScreen,
+      options: { tabBarLabel: t('navigation.expenses') },
+    },
+    {
       name: 'Groups',
       component: GroupsScreen,
       options: { tabBarLabel: t('navigation.groups') },
@@ -51,7 +58,7 @@ export function TabNavigator() {
     console.log('📱 Using BOTTOM tabs (gesture navigation)');
     return (
       <BottomTab.Navigator
-        tabBar={(props) => <CustomTabBar {...props} />}
+        tabBar={(props) => <NewCustomTabBar {...props} />}
         screenOptions={screenOptions}>
         {screens.map((screen) => (
           <BottomTab.Screen

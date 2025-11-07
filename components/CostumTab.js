@@ -16,7 +16,7 @@ export function CustomTabBar({ state, descriptors, navigation }) {
 
   return (
     <View
-      className="flex-row justify-between border-t border-gray-200 bg-white dark:bg-slate-800 dark:border-gray-600 px-4 shadow-sm"
+      className="flex-row justify-between border-t border-gray-200 bg-white px-4 shadow-sm dark:border-gray-600 dark:bg-slate-800"
       style={{
         paddingTop: 5,
         paddingBottom: bottomPadding,
@@ -61,7 +61,17 @@ export function CustomTabBar({ state, descriptors, navigation }) {
             onPress={onPress}
             activeOpacity={1}>
             <View className="relative mb-1">
-              <Ionicons name={getIcon()} size={24} color={isFocused ? '#2563EB': colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.8)'  : 'rgba(0, 0, 0, 0.25)'} />
+              <Ionicons
+                name={getIcon()}
+                size={24}
+                color={
+                  isFocused
+                    ? '#2563EB'
+                    : colorScheme === 'dark'
+                      ? 'rgba(255, 255, 255, 0.8)'
+                      : 'rgba(0, 0, 0, 0.25)'
+                }
+              />
               {/* {route.name === 'Profile' && (
                 <View className="absolute -right-2 -top-1.5 h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1">
                   <Text className="text-xs text-white font-dmsans-bold">1</Text>

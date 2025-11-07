@@ -526,6 +526,7 @@
   "navigation": {
     "home": "Home",
     "newExpense": "New Expense",
+    "expenses": "Expenses",
     "groups": "Groups",
     "profile": "Profile",
     "back": "Back",
