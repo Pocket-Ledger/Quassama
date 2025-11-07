@@ -28,6 +28,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react-native';
 import RecurringTransactions from 'components/RecurringTransactions';
 import ThisMonth from 'components/ThisMonth';
+import BudgetBtn from '../../components/BudgetBtn';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -608,7 +609,7 @@ const HomeScreen = () => {
             )}
           </View>
           {/* <RecurringTransactions /> */}
-
+          <BudgetBtn />
         </View>
       </ScrollView>
     </SafeAreaView>
